@@ -6,9 +6,13 @@ import signUpSchema from "../../schemas/signUpSchema";
 import api from "../../api";
 import { isAuthenticated } from "../../auth/authHelper";
 import GoogleSignInButton from "./GoogleSignInButton";
+import ReCAPTCHA from "react-google-recaptcha";
+/// <reference types="vite/client" />
 
 const Signup = () => {
         const navigate = useNavigate();
+        const siteKey = (import.meta as any).env
+                .VITE_RECAPTCHA_SITE_KEY as string;
         const [apiError, setApiError] = useState<string | null>(null);
         const [loading, setLoading] = useState(true);
 
@@ -30,12 +34,17 @@ const Signup = () => {
                 password: "",
                 confirmPassword: "",
                 website: "", // honeypot
+                recaptchaToken: "",
         };
 
         const handleSubmit = async (
                 values: typeof initialValues,
                 { setSubmitting }: any
         ) => {
+                if (!values.recaptchaToken) {
+                        setApiError("Please complete the CAPTCHA");
+                        return;
+                }
                 setSubmitting(true);
                 setApiError(null);
                 try {
@@ -44,6 +53,7 @@ const Signup = () => {
                                 email: values.email,
                                 password: values.password,
                                 website: values.website,
+                                recaptchaToken: values.recaptchaToken,
                         });
                         navigate("/signin?signup=success"); // Redirect to signin with a success message
                 } catch (err: any) {
@@ -92,6 +102,7 @@ const Signup = () => {
                                                 isSubmitting,
                                                 errors,
                                                 touched,
+                                                setFieldValue,
                                         }) => (
                                                 <Form className="space-y-6">
                                                         {/* All form fields go here, styled with Tailwind */}
@@ -217,6 +228,25 @@ const Signup = () => {
                                                                         display: "none",
                                                                 }}
                                                         />
+
+                                                        {/* reCAPTCHA */}
+                                                        <div className="flex justify-center">
+                                                                <ReCAPTCHA
+                                                                        sitekey={
+                                                                                siteKey
+                                                                        }
+                                                                        onChange={(
+                                                                                token:
+                                                                                        | string
+                                                                                        | null
+                                                                        ) =>
+                                                                                setFieldValue(
+                                                                                        "recaptchaToken",
+                                                                                        token
+                                                                                )
+                                                                        }
+                                                                />
+                                                        </div>
 
                                                         <Button
                                                                 type="submit"

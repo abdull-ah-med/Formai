@@ -7,6 +7,10 @@ import { isAuthenticated } from "../../auth/authHelper";
 import { useEffect, useState } from "react";
 import GoogleSignInButton from "./GoogleSignInButton";
 import React from "react";
+import ReCAPTCHA from "react-google-recaptcha";
+
+// Ensure Vite env types are available
+/// <reference types="vite/client" />
 
 // Define interface for login response
 interface LoginResponse {
@@ -14,11 +18,14 @@ interface LoginResponse {
 }
 
 const Signin = () => {
+        const siteKey = (import.meta as any).env
+                .VITE_RECAPTCHA_SITE_KEY as string;
         const initialValues = {
                 email: "",
                 password: "",
                 rememberMe: false,
                 website: "",
+                recaptchaToken: "",
         };
         const navigate = useNavigate();
         const [loading, setLoading] = useState(true);
@@ -47,6 +54,10 @@ const Signin = () => {
                 values: typeof initialValues,
                 { setSubmitting, setFieldError }: any
         ) => {
+                if (!values.recaptchaToken) {
+                        setFieldError("email", "Please complete the CAPTCHA");
+                        return;
+                }
                 setSubmitting(true);
                 try {
                         await api.post<LoginResponse>("/auth/login", {
@@ -54,6 +65,7 @@ const Signin = () => {
                                 password: values.password,
                                 rememberMe: values.rememberMe,
                                 website: values.website,
+                                recaptchaToken: values.recaptchaToken,
                         });
 
                         // Track non-persistent session in localStorage so we can
@@ -84,7 +96,13 @@ const Signin = () => {
                         validationSchema={loginSchema}
                         onSubmit={handleSubmit}
                 >
-                        {({ isSubmitting, errors, touched, values }) => (
+                        {({
+                                isSubmitting,
+                                errors,
+                                touched,
+                                values,
+                                setFieldValue,
+                        }) => (
                                 <div className="min-h-screen bg-black text-white flex items-center justify-center pt-16">
                                         <div className="w-full max-w-md p-8 space-y-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl shadow-lg">
                                                 <div className="text-center">
@@ -173,6 +191,23 @@ const Signin = () => {
                                                                         display: "none",
                                                                 }}
                                                         />
+                                                        <div className="flex justify-center">
+                                                                <ReCAPTCHA
+                                                                        sitekey={
+                                                                                siteKey
+                                                                        }
+                                                                        onChange={(
+                                                                                token:
+                                                                                        | string
+                                                                                        | null
+                                                                        ) =>
+                                                                                setFieldValue(
+                                                                                        "recaptchaToken",
+                                                                                        token
+                                                                                )
+                                                                        }
+                                                                />
+                                                        </div>
                                                         <Button
                                                                 type="submit"
                                                                 disabled={

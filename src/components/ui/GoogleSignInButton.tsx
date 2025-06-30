@@ -8,6 +8,7 @@ interface GoogleSignInButtonProps
         variant?: "signin" | "signup"; // Controls label rendering
         label?: string; // Optional custom label
         disabled?: boolean;
+        remember?: boolean; // optional flag forwarded from email auth form
 }
 
 const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
