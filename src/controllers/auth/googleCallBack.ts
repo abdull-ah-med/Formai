@@ -23,8 +23,9 @@ export const googleCallback = async (req: Request, res: Response) => {
                                 .json({ message: "Missing code" });
                 }
 
-                // Must exactly match what you registered in Google Cloud Console:
+                // Use environment variable for redirect URI
                 const redirectUri =
+                        process.env.GOOGLE_REDIRECT_URI ||
                         "http://localhost:4000/api/auth/google/callback";
 
                 // Include clientSecret in production for secure exchanges
@@ -88,7 +89,7 @@ export const googleCallback = async (req: Request, res: Response) => {
                         }
                 );
 
-                // Set cookie — in dev, secure:false and SameSite='lax'
+                // Set cookie with proper cross-domain settings for production
                 res.cookie("token", token, {
                         httpOnly: true,
                         secure: process.env.NODE_ENV === "production",

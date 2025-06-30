@@ -42,19 +42,17 @@ export const loginUser = async (req: Request, res: Response) => {
                 }
         );
 
-        const cookie = [
-                `token=${token}`,
-                "HttpOnly",
-                "Secure",
-                "SameSite=None",
-                "Path=/",
-                rememberMe
-                        ? `Max-Age=${30 * 24 * 60 * 60}`
-                        : `Max-Age=${24 * 60 * 60}`,
-        ]
-                .filter(Boolean)
-                .join("; ");
+        // Set cookie with proper cross-domain settings for production
+        res.cookie("token", token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite:
+                        process.env.NODE_ENV === "production" ? "none" : "lax",
+                path: "/",
+                maxAge: rememberMe
+                        ? 30 * 24 * 60 * 60 * 1000 // 30 days
+                        : 24 * 60 * 60 * 1000, // 1 day
+        });
 
-        res.setHeader("Set-Cookie", cookie);
         res.status(200).json({ success: true, message: "Login successful" });
 };
