@@ -7,6 +7,26 @@ import {
         getUser,
 } from "../../auth/authHelper";
 import { Send } from "lucide-react";
+import FormBuilder from "./FormBuilder";
+
+// Define the FormSchema interface
+interface Option {
+  id: string;
+  text: string;
+}
+
+interface Question {
+  id: string;
+  type: 'short_answer' | 'dropdown';
+  label: string;
+  options?: Option[];
+}
+
+interface FormSchema {
+  title: string;
+  description: string;
+  questions: Question[];
+}
 
 interface UserData {
         id: string;
@@ -20,6 +40,7 @@ interface ChatMessage {
         content: string;
         isUser: boolean;
         timestamp: Date;
+        isActionable?: boolean;
 }
 
 const UserDashboard: React.FC = () => {
@@ -34,6 +55,8 @@ const UserDashboard: React.FC = () => {
         const [showWelcome, setShowWelcome] = useState(true);
         const messagesEndRef = useRef<HTMLDivElement>(null);
         const chatContainerRef = useRef<HTMLDivElement>(null);
+        const [formSchema, setFormSchema] = useState<FormSchema | null>(null);
+        const [showFormBuilder, setShowFormBuilder] = useState(false);
 
         // Verify authentication and fetch user data
         useEffect(() => {
@@ -108,6 +131,53 @@ const UserDashboard: React.FC = () => {
                         }, 100);
                 }
         }, [messages]);
+
+        useEffect(() => {
+        // Add a welcome message with an actionable button
+        const welcomeMessage: ChatMessage = {
+            id: Date.now().toString(),
+            content: "Hello! I can help you build a form. Would you like to start?",
+            isUser: false,
+            timestamp: new Date(),
+            isActionable: true,
+        };
+        setMessages([welcomeMessage]);
+    }, []);
+
+
+        const handleShowFormBuilder = async () => {
+        try {
+            console.log("Attempting to fetch sampleForm.json");
+            const response = await fetch('/sampleForm.json');
+            console.log("Fetch response:", response);
+            const data = await response.json();
+            console.log("Form schema data:", data);
+            setFormSchema(data);
+            setShowFormBuilder(true);
+            // Remove the actionable message and add a confirmation
+            setMessages(prev => [
+                ...prev.filter(m => !m.isActionable),
+                {
+                    id: Date.now().toString(),
+                    content: "Great! Here is the form builder.",
+                    isUser: false,
+                    timestamp: new Date(),
+                }
+            ]);
+        } catch (error) {
+            console.error("Failed to load form schema:", error);
+            // Inform the user about the error
+            setMessages(prev => [
+                ...prev,
+                {
+                    id: Date.now().toString(),
+                    content: "Sorry, I couldn't load the form builder. Please try again later.",
+                    isUser: false,
+                    timestamp: new Date(),
+                }
+            ]);
+        }
+    };
 
         if (status === "loading") {
                 return (
@@ -201,6 +271,14 @@ const UserDashboard: React.FC = () => {
                                                                                         message.content
                                                                                 }
                                                                         </p>
+                                                                        {message.isActionable && (
+                                                                            <Button 
+                                                                                onClick={handleShowFormBuilder}
+                                                                                className="mt-2 bg-blue-500 hover:bg-blue-600 text-white"
+                                                                            >
+                                                                                Start Building
+                                                                            </Button>
+                                                                        )}
                                                                         <div
                                                                                 className={`text-xs mt-1 ${
                                                                                         message.isUser
