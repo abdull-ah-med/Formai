@@ -5,7 +5,7 @@ import {
 } from "../utils/claudeClient";
 import { createGoogleForm } from "../utils/googleFormService";
 import UserModel from "../models/user.model";
-import { google } from "googleapis";
+import { OAuth2Client } from "google-auth-library";
 import { AuthTokenPayload } from "../middleware/verifyJWT";
 
 // A type guard for custom user property on Express Request - This is not needed if verifyJWT is used correctly.
@@ -88,7 +88,7 @@ export const finalizeForm = async (req: Request, res: Response) => {
                         });
                 }
 
-                const oauth2Client = new google.auth.OAuth2();
+                const oauth2Client = new OAuth2Client();
                 oauth2Client.setCredentials({
                         access_token: user.googleTokens.accessToken,
                         refresh_token: user.googleTokens.refreshToken,
