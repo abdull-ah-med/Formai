@@ -24,7 +24,9 @@ function normalizeOrigin(origin?: string) {
         return origin.replace(/\/+$/g, ""); // strip trailing slashes
 }
 
-const FRONTEND_URL = normalizeOrigin(process.env.FRONTEND_URL);
+const FRONTEND_URL = normalizeOrigin(
+        process.env.FRONTEND_URL || "https://formai-frontend-one.vercel.app"
+);
 const allowedOrigins = new Set([FRONTEND_URL, "http://localhost:5173"]);
 
 app.use(
