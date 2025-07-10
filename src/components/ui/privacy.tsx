@@ -311,7 +311,7 @@ const Privacy = () => {
                                                                                 contact
                                                                                 us
                                                                                 at
-                                                                                privacy@formai.com
+                                                                                reachformaihere@gmail.com
                                                                         </p>
                                                                 </div>
                                                         </section>

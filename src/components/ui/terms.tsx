@@ -452,7 +452,7 @@ const Terms = () => {
                                                                                 contact
                                                                                 us
                                                                                 at
-                                                                                legal@formai.com
+                                                                                reachformaihere@gmail.com
                                                                         </p>
                                                                         <p className="mt-4 text-sm text-gray-400">
                                                                                 Last
