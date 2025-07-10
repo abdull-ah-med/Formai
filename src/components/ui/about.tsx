@@ -71,17 +71,6 @@ const About = () => {
                                                                 Be Part of the
                                                                 Future
                                                         </Button>
-                                                        <Button
-                                                                size="lg"
-                                                                className="bg-white text-black hover:bg-transparent hover:border-white hover:text-white border-2 border-transparent px-8 py-3 text-lg font-semibold transition-all duration-300"
-                                                                onClick={() =>
-                                                                        navigate(
-                                                                                "/info"
-                                                                        )
-                                                                }
-                                                        >
-                                                                For Investors
-                                                        </Button>
                                                 </div>
                                         </div>
                                 </div>

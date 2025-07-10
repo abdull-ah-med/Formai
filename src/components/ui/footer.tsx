@@ -52,12 +52,6 @@ const Footer = () => {
                                                                 >
                                                                         About
                                                                 </Link>
-                                                                <Link
-                                                                        to="/info"
-                                                                        className="block text-gray-400 hover:text-white transition-colors"
-                                                                >
-                                                                        Info
-                                                                </Link>
                                                         </div>
                                                 </div>
 
@@ -87,12 +81,6 @@ const Footer = () => {
                                                                 >
                                                                         Cookie
                                                                         Policy
-                                                                </Link>
-                                                                <Link
-                                                                        to="/gdpr"
-                                                                        className="block text-gray-400 hover:text-white transition-colors"
-                                                                >
-                                                                        GDPR
                                                                 </Link>
                                                         </div>
                                                 </div>
