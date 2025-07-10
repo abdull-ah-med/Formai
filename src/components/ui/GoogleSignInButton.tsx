@@ -8,7 +8,6 @@ interface GoogleSignInButtonProps
         variant?: "signin" | "signup"; // Controls label rendering
         label?: string; // Optional custom label
         disabled?: boolean;
-        remember?: boolean; // optional flag forwarded from email auth form
 }
 
 const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
@@ -26,7 +25,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
                 // flag is removed, regardless of the checkbox state for email auth.
                 localStorage.removeItem("nonPersistentAuth");
 
-                const googleOAuthURL = getGoogleOAuthURL(true, variant);
+                const googleOAuthURL = getGoogleOAuthURL();
                 window.location.href = googleOAuthURL;
         };
 

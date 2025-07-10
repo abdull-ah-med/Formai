@@ -222,9 +222,6 @@ const Signin = () => {
 
                                                         {/* Google Sign In */}
                                                         <GoogleSignInButton
-                                                                remember={
-                                                                        values.rememberMe
-                                                                }
                                                                 variant="signin"
                                                         />
                                                 </Form>

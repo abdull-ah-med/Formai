@@ -1,10 +1,7 @@
-export interface GoogleOAuthOptions {
-        remember?: boolean;
-        mode?: "login" | "signup";
-}
+
 
 // New helper that conforms to backend expectations
-export function getGoogleOAuthURL(remember: boolean, nonce: string) {
+export function getGoogleOAuthURL() {
         const env = (import.meta as unknown as { env: Record<string, string> })
                 .env;
         const clientId = env?.VITE_GOOGLE_CLIENT_ID;
@@ -27,28 +24,9 @@ export function getGoogleOAuthURL(remember: boolean, nonce: string) {
                 scope: "openid email profile",
                 access_type: "offline",
                 include_granted_scopes: "true",
-                state: btoa(
-                        JSON.stringify({
-                                remember: remember ? 1 : 0,
-                                nonce,
-                        })
-                ),
         });
 
         return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
 
-// Legacy function kept for backward-compatibility in case other parts of the
-// codebase still import it. This now delegates to the new helper.
-export function buildGoogleOAuthURL(options: GoogleOAuthOptions = {}) {
-        const nonce =
-                typeof crypto !== "undefined" && "randomUUID" in crypto
-                        ? (
-                                  crypto as unknown as {
-                                          randomUUID: () => string;
-                                  }
-                          ).randomUUID()
-                        : Math.random().toString(36).substring(2, 15);
 
-        return getGoogleOAuthURL(Boolean(options.remember), nonce);
-}
