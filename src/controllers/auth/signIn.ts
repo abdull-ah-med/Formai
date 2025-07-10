@@ -82,5 +82,5 @@ export const loginUser = async (req: Request, res: Response) => {
                         : 24 * 60 * 60 * 1000, // 1 day
         });
 
-        res.status(200).json({ success: true, message: "Login successful" });
+        res.status(200).json({ success: true, message: "Login successful", token });
 };

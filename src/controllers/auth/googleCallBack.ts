@@ -104,9 +104,7 @@ export const googleCallback = async (req: Request, res: Response) => {
                 });
 
                 // Finally redirect back to your frontend app
-                return res.redirect(
-                        `${FRONTEND_URL || "http://localhost:5173"}/dashboard`
-                );
+                return res.status(200).json({ success: true, message: "Login successful", token });
         } catch (err) {
                 console.error("Google OAuth callback error:", err);
                 return res.status(500).send("OAuth callback failed");
