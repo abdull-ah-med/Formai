@@ -15,6 +15,20 @@ const api = axios.create({
 });
 
 // Handle authentication errors
+api.interceptors.request.use(
+        (config) => {
+                const token = localStorage.getItem("jwtToken");
+                if (token) {
+                        config.headers.Authorization = `Bearer ${token}`;
+                }
+                return config;
+        },
+        (error) => {
+                return Promise.reject(error);
+        }
+);
+
+// Handle authentication errors
 api.interceptors.response.use(
         (res) => res,
         (err) => {

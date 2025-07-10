@@ -60,13 +60,16 @@ const Signin = () => {
                 }
                 setSubmitting(true);
                 try {
-                        await api.post<LoginResponse>("/auth/login", {
+                        const res = await api.post<{ token: string } & LoginResponse>("/auth/login", {
                                 email: values.email,
                                 password: values.password,
                                 rememberMe: values.rememberMe,
                                 website: values.website,
                                 recaptchaToken: values.recaptchaToken,
                         });
+
+                        // Store the JWT in localStorage
+                        setAuthToken(res.data.token);
 
                         // Track non-persistent session in localStorage so we can
                         // auto-logout when all tabs are closed.
@@ -79,7 +82,6 @@ const Signin = () => {
                                 );
                         }
 
-                        // Server sets HttpOnly cookie; redirect on success
                         navigate("/dashboard", { replace: true });
                 } catch (err: any) {
                         setFieldError(

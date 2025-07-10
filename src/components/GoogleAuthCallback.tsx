@@ -1,0 +1,37 @@
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import api from '../api';
+import { setAuthToken } from '../auth/authHelper';
+
+const GoogleAuthCallback: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleCallback = async () => {
+      const params = new URLSearchParams(location.search);
+      const code = params.get('code');
+
+      if (code) {
+        try {
+          const res = await api.get<{ token: string }>('/auth/google/callback', {
+            params: { code },
+          });
+          setAuthToken(res.data.token);
+          navigate('/dashboard', { replace: true });
+        } catch (error) {
+          console.error('Google OAuth callback failed:', error);
+          navigate('/signin', { replace: true });
+        }
+      } else {
+        navigate('/signin', { replace: true });
+      }
+    };
+
+    handleCallback();
+  }, [navigate, location]);
+
+  return <div>Loading...</div>;
+};
+
+export default GoogleAuthCallback;

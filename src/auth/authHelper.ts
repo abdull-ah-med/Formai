@@ -15,6 +15,18 @@ export interface CurrentUser {
         fullName?: string;
 }
 
+export function setAuthToken(token: string | null) {
+        if (token) {
+                localStorage.setItem("jwtToken", token);
+        } else {
+                localStorage.removeItem("jwtToken");
+        }
+}
+
+export function getAuthToken(): string | null {
+        return localStorage.getItem("jwtToken");
+}
+
 /**
  * Fetches the current authenticated user (if any).
  * Returns `null` if the request is not authenticated (401) so callers can
@@ -34,6 +46,10 @@ export async function getUser(): Promise<CurrentUser | null> {
 }
 
 export async function isAuthenticated(): Promise<boolean> {
+        const token = getAuthToken();
+        if (!token) {
+                return false;
+        }
         try {
                 const res = await api.get<{ user: CurrentUser }>("/account");
                 // if we got a user object with an id, we’re good
@@ -50,6 +66,7 @@ export async function logout() {
         sessionStorage.removeItem("homeRedirected");
         localStorage.removeItem("nonPersistentAuth");
         localStorage.removeItem("tabCount");
+        setAuthToken(null); // Clear the token from localStorage
         await api.post("/auth/logout"); // clears HttpOnly cookie on server
 }
 

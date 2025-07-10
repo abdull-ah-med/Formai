@@ -12,6 +12,7 @@ import History from "./components/ui/history";
 import AccountSettings from "./components/ui/accountSettings";
 import ProtectedRoute from "./components/ui/ProtectedRoute";
 import DashboardLayout from "./components/ui/DashboardLayout";
+import GoogleAuthCallback from "./components/GoogleAuthCallback";
 
 export default function AppRoutes() {
         return (
@@ -19,6 +20,7 @@ export default function AppRoutes() {
                         <Route path="/" element={<Home />} />
                         <Route path="/signup" element={<Signup />} />
                         <Route path="/signin" element={<Signin />} />
+                        <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/privacy" element={<Privacy />} />
                         <Route path="/terms" element={<Terms />} />
