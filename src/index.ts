@@ -19,26 +19,61 @@ app.disable("etag");
 // ---------------------------------------------------------------------------
 // CORS CONFIGURATION
 // ---------------------------------------------------------------------------
-function normalizeOrigin(origin?: string) {
-        if (!origin) return undefined;
-        return origin.replace(/\/+$/g, ""); // strip trailing slashes
-}
-
-const FRONTEND_URL = normalizeOrigin(
-        process.env.FRONTEND_URL || "https://formai-frontend-one.vercel.app"
-);
-const allowedOrigins = new Set([FRONTEND_URL, "http://localhost:5173"]);
+const allowedOrigins = [
+        process.env.FRONTEND_URL || "https://formai-frontend-one.vercel.app",
+        "http://localhost:5173",
+];
 
 app.use(
         cors({
                 origin: (origin, callback) => {
-                        if (!origin) return callback(null, true); // server-to-server or curl
-                        const clean = normalizeOrigin(origin);
-                        if (clean && allowedOrigins.has(clean)) {
-                                // reflect the exact Origin header back so credentials work
-                                return callback(null, origin);
+                        // Allow requests with no origin (like mobile apps or curl requests)
+                        if (!origin) return callback(null, true);
+
+                        const normalizedOrigin = origin.replace(/\/+$/, "");
+
+                        for (const allowedOrigin of allowedOrigins) {
+                                const normalizedAllowedOrigin =
+                                        allowedOrigin.replace(/\/+$/, "");
+
+                                // Exact match
+                                if (
+                                        normalizedOrigin ===
+                                        normalizedAllowedOrigin
+                                ) {
+                                        return callback(null, origin); // Reflect origin
+                                }
+
+                                // Handle www subdomain variants for https urls
+                                if (
+                                        normalizedAllowedOrigin.startsWith(
+                                                "https://"
+                                        )
+                                ) {
+                                        const nonWww =
+                                                normalizedAllowedOrigin.replace(
+                                                        "https://www.",
+                                                        "https://"
+                                                );
+                                        const withWww = nonWww.replace(
+                                                "https://",
+                                                "https://www."
+                                        );
+
+                                        if (
+                                                normalizedOrigin === withWww ||
+                                                normalizedOrigin === nonWww
+                                        ) {
+                                                return callback(null, origin); // Reflect origin
+                                        }
+                                }
                         }
-                        return callback(new Error("Not allowed by CORS"));
+
+                        return callback(
+                                new Error(
+                                        `Not allowed by CORS. Origin: ${origin}`
+                                )
+                        );
                 },
                 credentials: true,
                 methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -49,6 +84,7 @@ app.use(
                 ],
         })
 );
+
 app.use(helmet());
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
