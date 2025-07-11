@@ -61,13 +61,6 @@ const Navbar = () => {
                   ]
                 : [
                           {
-                                  name: "Features",
-                                  href: "/#features",
-                                  isRouterLink: false,
-                                  icon: null,
-                                  onClick: undefined,
-                          },
-                          {
                                   name: "Pricing",
                                   href: "/pricing",
                                   isRouterLink: true,
@@ -77,6 +70,20 @@ const Navbar = () => {
                           {
                                   name: "About",
                                   href: "/about",
+                                  isRouterLink: true,
+                                  icon: null,
+                                  onClick: undefined,
+                          },
+                          {
+                                  name: "Sign In",
+                                  href: "/signin",
+                                  isRouterLink: true,
+                                  icon: null,
+                                  onClick: undefined,
+                          },
+                          {
+                                  name: "Sign Up",
+                                  href: "/signup",
                                   isRouterLink: true,
                                   icon: null,
                                   onClick: undefined,

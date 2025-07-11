@@ -32,7 +32,11 @@ const GoogleAuthCallback: React.FC = () => {
                 handleCallback();
         }, [navigate, location, login]);
 
-        return <div>Loading...</div>;
+        return (
+                <div className="flex items-center justify-center h-screen">
+                        <div>Loading...</div>
+                </div>
+        );
 };
 
 export default GoogleAuthCallback;
