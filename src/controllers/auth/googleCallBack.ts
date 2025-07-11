@@ -28,8 +28,11 @@ export const googleCallback = async (req: Request, res: Response) => {
                                 .json({ message: "Missing code" });
                 }
 
-                // Use environment variable for redirect URI
-                const redirectUri = `${FRONTEND_URL}/auth/google/callback`;
+                // Use environment variable for redirect URI, ensuring no trailing slash
+                const redirectUri = `${(FRONTEND_URL || "").replace(
+                        /\/$/,
+                        ""
+                )}/auth/google/callback`;
 
                 // Include clientSecret in production for secure exchanges
                 const client = new OAuth2Client({
