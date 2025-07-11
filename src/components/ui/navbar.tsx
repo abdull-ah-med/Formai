@@ -358,7 +358,6 @@ const Navbar = () => {
                                                         className="flex items-center space-x-2 text-white hover:bg-white/10"
                                                 >
                                                         <User className="h-5 w-5" />
-                                                        <span>{user?.fullName || "Account"}</span>
                                                         <ChevronDown
                                                                 className={`h-4 w-4 transition-transform ${
                                                                         isProfileMenuOpen ? "rotate-180" : ""
@@ -397,16 +396,16 @@ const Navbar = () => {
                         {/* Logout Confirmation Modal */}
                         {showLogoutConfirm && (
                                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
-                                        <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm text-center shadow-2xl">
+                                        <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-xl p-6 w-full max-w-sm text-center shadow-2xl">
                                                 <h3 className="text-xl font-semibold text-white mb-4">Are you sure?</h3>
-                                                <p className="text-gray-400 mb-6">
+                                                <p className="text-gray-300 mb-6">
                                                         You will be logged out of your account.
                                                 </p>
                                                 <div className="flex justify-center gap-4">
                                                         <Button
                                                                 variant="outline"
                                                                 onClick={() => setShowLogoutConfirm(false)}
-                                                                className="border-gray-600 text-white hover:bg-gray-700"
+                                                                className="bg-white/90 hover:bg-white text-black"
                                                         >
                                                                 Cancel
                                                         </Button>
