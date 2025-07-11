@@ -6,6 +6,7 @@ import SmoothScroll from "./components/ui/smooth-scroll";
 import AppRoutes from "./routes";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import SessionManager from "./components/SessionManager";
+import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
         useEffect(() => {
@@ -16,14 +17,16 @@ function App() {
         return (
                 <ErrorBoundary>
                         <Router>
-                                <SmoothScroll>
-                                        <div className="min-h-screen bg-black text-white">
-                                                <SessionManager />
-                                                <Navbar />
-                                                <AppRoutes />
-                                                <Footer />
-                                        </div>
-                                </SmoothScroll>
+                                <AuthProvider>
+                                        <SmoothScroll>
+                                                <div className="min-h-screen bg-black text-white">
+                                                        <SessionManager />
+                                                        <Navbar />
+                                                        <AppRoutes />
+                                                        <Footer />
+                                                </div>
+                                        </SmoothScroll>
+                                </AuthProvider>
                         </Router>
                 </ErrorBoundary>
         );

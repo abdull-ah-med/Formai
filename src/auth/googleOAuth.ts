@@ -1,4 +1,3 @@
-// New helper that conforms to backend expectations
 export function getGoogleOAuthURL() {
         const env = (import.meta as unknown as { env: Record<string, string> })
                 .env;

@@ -1,152 +1,37 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Button } from "./button";
-import {
-        Menu,
-        X,
-        Home,
-        Users,
-        FileText,
-        TrendingUp,
-        UserPlus,
-        LogIn,
-        LogOut,
-        DollarSign,
-        LayoutDashboard,
-        History,
-        Settings,
-        MessageSquare,
-} from "lucide-react";
+import { LogOut, Settings, User, ChevronDown, Menu, X, MessageSquare, History } from "lucide-react";
 import FormaiLogo from "../../assets/Formai.svg";
-import { isAuthenticated, logoutAndRedirect } from "../../auth/authHelper";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Navbar = () => {
-        const [isMenuOpen, setIsMenuOpen] = useState(false);
-        const [isAnimating, setIsAnimating] = useState(false);
-        const [isAuthenticatedState, setIsAuthenticatedState] = useState(false);
-        const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-        const menuRef = useRef<HTMLDivElement | null>(null);
-        const location = useLocation();
         const navigate = useNavigate();
+        const { isAuthenticated, user, logout } = useAuth();
+        const [isScrolled, setIsScrolled] = useState(false);
+        const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+        const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+        const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+        const handleScroll = () => {
+                const offset = window.scrollY;
+                setIsScrolled(offset > 10);
+        };
 
         useEffect(() => {
-                const checkAuth = async () => {
-                        const isValid = await isAuthenticated();
-                        setIsAuthenticatedState((prev) =>
-                                prev !== isValid ? isValid : prev
-                        );
-                };
-
-                checkAuth();
-
-                // Listen for storage changes (logout in another tab or auth flag removed)
-                const handleStorageChange = (e: StorageEvent) => {
-                        if (
-                                e.key === "nonPersistentAuth" ||
-                                e.key === "token"
-                        ) {
-                                checkAuth();
-                        }
-                };
-
-                // Also refresh auth state when tab/window regains focus
-                const handleVisibility = () => {
-                        if (!document.hidden) {
-                                checkAuth();
-                        }
-                };
-
-                // Refresh on browser navigation (back/forward)
-                const handlePopState = () => {
-                        checkAuth();
-                };
-
-                const handleAuthChange = () => {
-                        checkAuth();
-                };
-
-                window.addEventListener("storage", handleStorageChange);
-                window.addEventListener("authchange", handleAuthChange);
-                document.addEventListener("visibilitychange", handleVisibility);
-                window.addEventListener("popstate", handlePopState);
-
+                window.addEventListener("scroll", handleScroll);
                 return () => {
-                        window.removeEventListener(
-                                "storage",
-                                handleStorageChange
-                        );
-                        window.removeEventListener(
-                                "authchange",
-                                handleAuthChange
-                        );
-                        document.removeEventListener(
-                                "visibilitychange",
-                                handleVisibility
-                        );
-                        window.removeEventListener("popstate", handlePopState);
+                        window.removeEventListener("scroll", handleScroll);
                 };
-        }, [location]);
+        }, []);
 
-        const handleLogout = async () => {
+        const handleLogout = () => {
+                logout();
                 setShowLogoutConfirm(false);
-                // Broadcast logout and redirect to home. The helper triggers full
-                // page load, so navbar state will reset on reload.
-                await logoutAndRedirect("/");
+                navigate("/");
         };
 
-        const toggleMenu = () => {
-                if (!isAnimating) {
-                        setIsAnimating(true);
-                        setIsMenuOpen(!isMenuOpen);
-                }
-        };
-
-        const closeMenu = () => {
-                if (!isAnimating) {
-                        setIsAnimating(true);
-                        setIsMenuOpen(false);
-                }
-        };
-
-        // Handle animation completion
-        useEffect(() => {
-                if (isAnimating) {
-                        const timer = setTimeout(() => {
-                                setIsAnimating(false);
-                        }, 500); // Match the transition duration
-                        return () => clearTimeout(timer);
-                }
-        }, [isAnimating]);
-
-        // Handle click outside
-        useEffect(() => {
-                const handleClickOutside = (event: MouseEvent) => {
-                        if (
-                                menuRef.current &&
-                                !(menuRef.current as HTMLDivElement).contains(
-                                        event.target as Node
-                                )
-                        ) {
-                                closeMenu();
-                        }
-                };
-
-                if (isMenuOpen) {
-                        document.addEventListener(
-                                "mousedown",
-                                handleClickOutside
-                        );
-                }
-
-                return () => {
-                        document.removeEventListener(
-                                "mousedown",
-                                handleClickOutside
-                        );
-                };
-        }, [isMenuOpen]);
-
-        const navItems = isAuthenticatedState
+        const navItems = isAuthenticated
                 ? [
                           {
                                   name: "Chat",
@@ -176,43 +61,47 @@ const Navbar = () => {
                   ]
                 : [
                           {
-                                  name: "Getting Started",
+                                  name: "Features",
+                                  href: "/#features",
+                                  isRouterLink: false,
+                                  icon: null,
+                                  onClick: undefined,
+                          },
+                          {
+                                  name: "Pricing",
                                   href: "/pricing",
                                   isRouterLink: true,
-                                  icon: <DollarSign className="w-5 h-5" />,
-                          },
-                          {
-                                  name: "Sign In",
-                                  href: "/signin",
-                                  isRouterLink: true,
-                                  icon: <LogIn className="w-5 h-5" />,
-                          },
-                          {
-                                  name: "Sign Up",
-                                  href: "/signup",
-                                  isRouterLink: true,
-                                  icon: <TrendingUp className="w-5 h-5" />,
+                                  icon: null,
+                                  onClick: undefined,
                           },
                           {
                                   name: "About",
                                   href: "/about",
                                   isRouterLink: true,
-                                  icon: <Users className="w-5 h-5" />,
+                                  icon: null,
+                                  onClick: undefined,
                           },
                   ];
 
+        const closeAllMenus = () => {
+                setIsMobileMenuOpen(false);
+                setIsProfileMenuOpen(false);
+        };
+
         return (
                 <>
-                        <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md">
+                        <header
+                                className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+                                        isScrolled ? "bg-black/20 backdrop-blur-md" : ""
+                                }`}
+                        >
                                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                                         <div className="flex justify-between items-center h-16 relative">
                                                 {/* Logo/Brand */}
                                                 <div className="flex-shrink-0">
                                                         <Link to="/">
                                                                 <img
-                                                                        src={
-                                                                                FormaiLogo
-                                                                        }
+                                                                        src={FormaiLogo}
                                                                         alt="Formai"
                                                                         className="h-6 w-auto cursor-pointer hover:opacity-80 transition-opacity"
                                                                 />
@@ -223,48 +112,36 @@ const Navbar = () => {
                                                 <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
                                                         <div className="bg-black/20 backdrop-blur-md border border-white/10 rounded-full px-6 py-2">
                                                                 <div className="flex items-center space-x-4 md:space-x-8">
-                                                                        {navItems.map(
-                                                                                (
-                                                                                        item
-                                                                                ) => {
-                                                                                        const isActive =
-                                                                                                location.pathname ===
-                                                                                                item.href;
-                                                                                        return item.isRouterLink ? (
-                                                                                                <Link
-                                                                                                        key={
-                                                                                                                item.name
-                                                                                                        }
-                                                                                                        to={
-                                                                                                                item.href
-                                                                                                        }
-                                                                                                        className={`px-3 md:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 hover:bg-white/10 hover:scale-105 ${
-                                                                                                                isActive
-                                                                                                                        ? "bg-white/20 text-white shadow-inner"
-                                                                                                                        : "text-white/80 hover:text-white"
-                                                                                                        }`}
-                                                                                                >
-                                                                                                        {
-                                                                                                                item.name
-                                                                                                        }
-                                                                                                </Link>
-                                                                                        ) : (
-                                                                                                <button
-                                                                                                        key={
-                                                                                                                item.name
-                                                                                                        }
-                                                                                                        onClick={
-                                                                                                                item.onClick
-                                                                                                        }
-                                                                                                        className="text-white/80 hover:text-white px-3 md:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 hover:bg-white/10 hover:scale-105"
-                                                                                                >
-                                                                                                        {
-                                                                                                                item.name
-                                                                                                        }
-                                                                                                </button>
-                                                                                        );
-                                                                                }
-                                                                        )}
+                                                                        {navItems.map((item) => {
+                                                                                const isActive =
+                                                                                        window.location.pathname ===
+                                                                                        item.href;
+                                                                                return item.isRouterLink ? (
+                                                                                        <Link
+                                                                                                key={item.name}
+                                                                                                to={item.href}
+                                                                                                onClick={closeAllMenus}
+                                                                                                className={`px-3 md:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 hover:bg-white/10 hover:scale-105 ${
+                                                                                                        isActive
+                                                                                                                ? "bg-white/20 text-white shadow-inner"
+                                                                                                                : "text-white/80 hover:text-white"
+                                                                                                }`}
+                                                                                        >
+                                                                                                {item.name}
+                                                                                        </Link>
+                                                                                ) : (
+                                                                                        <button
+                                                                                                key={item.name}
+                                                                                                onClick={
+                                                                                                        item.onClick ||
+                                                                                                        closeAllMenus
+                                                                                                }
+                                                                                                className="text-white/80 hover:text-white px-3 md:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 hover:bg-white/10 hover:scale-105"
+                                                                                        >
+                                                                                                {item.name}
+                                                                                        </button>
+                                                                                );
+                                                                        })}
                                                                 </div>
                                                         </div>
                                                 </div>
@@ -274,38 +151,31 @@ const Navbar = () => {
                                                         <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={
-                                                                        toggleMenu
-                                                                }
+                                                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                                                 className="navbar-button relative group"
-                                                                disabled={
-                                                                        isAnimating
-                                                                }
                                                         >
                                                                 <div
                                                                         className={`w-6 h-6 flex flex-col justify-center items-center transition-all duration-300 ease-out ${
-                                                                                isMenuOpen
-                                                                                        ? "rotate-180"
-                                                                                        : ""
+                                                                                isMobileMenuOpen ? "rotate-180" : ""
                                                                         }`}
                                                                 >
                                                                         <span
                                                                                 className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ease-out ${
-                                                                                        isMenuOpen
+                                                                                        isMobileMenuOpen
                                                                                                 ? "rotate-45 translate-y-1"
                                                                                                 : "-translate-y-1"
                                                                                 }`}
                                                                         ></span>
                                                                         <span
                                                                                 className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ease-out ${
-                                                                                        isMenuOpen
+                                                                                        isMobileMenuOpen
                                                                                                 ? "opacity-0 scale-0"
                                                                                                 : "opacity-100 scale-100"
                                                                                 }`}
                                                                         ></span>
                                                                         <span
                                                                                 className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ease-out ${
-                                                                                        isMenuOpen
+                                                                                        isMobileMenuOpen
                                                                                                 ? "-rotate-45 -translate-y-1"
                                                                                                 : "translate-y-1"
                                                                                 }`}
@@ -317,93 +187,73 @@ const Navbar = () => {
                                                 {/* Beta Notice - Overlay */}
                                                 <div className="absolute left-1/2 -translate-x-1/2 bottom-0 mb-[-18px] z-50 pointer-events-none select-none hidden md:block">
                                                         <span className="text-xs text-white/70 bg-black/70 px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">
-                                                                beta version:
-                                                                some features
-                                                                may not work
+                                                                beta version: some features may not work
                                                         </span>
                                                 </div>
                                         </div>
                                 </div>
-                        </nav>
+                        </header>
 
                         {/* Mobile Navigation - Enhanced Slide-in Menu */}
-                        <div
-                                className={`fixed inset-0 z-50 md:hidden transition-all duration-400 ease-out ${
-                                        isMenuOpen
-                                                ? "opacity-100 pointer-events-auto"
-                                                : "opacity-0 pointer-events-none"
-                                }`}
-                        >
-                                {/* Backdrop */}
+                        {isMobileMenuOpen && (
                                 <div
-                                        className={`absolute inset-0 bg-black/60 backdrop-blur-md transition-all duration-400 ease-out ${
-                                                isMenuOpen
-                                                        ? "opacity-100"
-                                                        : "opacity-0"
-                                        }`}
-                                        onClick={closeMenu}
-                                />
-
-                                {/* Slide-in Menu */}
-                                <div
-                                        className={`absolute right-0 top-0 h-full w-80 bg-black/95 backdrop-blur-xl border-l border-white/10 transform transition-all duration-400 ease-out ${
-                                                isMenuOpen
-                                                        ? "translate-x-0"
-                                                        : "translate-x-full"
+                                        className={`fixed inset-0 z-50 md:hidden transition-all duration-400 ease-out ${
+                                                isMobileMenuOpen
+                                                        ? "opacity-100 pointer-events-auto"
+                                                        : "opacity-0 pointer-events-none"
                                         }`}
                                 >
+                                        {/* Backdrop */}
                                         <div
-                                                ref={menuRef}
-                                                className="h-full flex flex-col"
+                                                className={`absolute inset-0 bg-black/60 backdrop-blur-md transition-all duration-400 ease-out ${
+                                                        isMobileMenuOpen ? "opacity-100" : "opacity-0"
+                                                }`}
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                        />
+
+                                        {/* Slide-in Menu */}
+                                        <div
+                                                className={`absolute right-0 top-0 h-full w-80 bg-black/95 backdrop-blur-xl border-l border-white/10 transform transition-all duration-400 ease-out ${
+                                                        isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+                                                }`}
                                         >
-                                                {/* Header */}
-                                                <div className="flex items-center justify-between p-6 border-b border-white/10">
-                                                        <Link
-                                                                to="/"
-                                                                onClick={
-                                                                        closeMenu
-                                                                }
-                                                                className="flex items-center space-x-3 group"
-                                                        >
-                                                                <img
-                                                                        src={
-                                                                                FormaiLogo
-                                                                        }
-                                                                        alt="Formai"
-                                                                        className="h-8 w-auto group-hover:opacity-80 transition-opacity"
-                                                                />
-                                                        </Link>
-                                                        <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={
-                                                                        closeMenu
-                                                                }
-                                                                className="text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
-                                                        >
-                                                                <X size={20} />
-                                                        </Button>
-                                                </div>
+                                                <div className="h-full flex flex-col">
+                                                        {/* Header */}
+                                                        <div className="flex items-center justify-between p-6 border-b border-white/10">
+                                                                <Link
+                                                                        to="/"
+                                                                        onClick={() => setIsMobileMenuOpen(false)}
+                                                                        className="flex items-center space-x-3 group"
+                                                                >
+                                                                        <img
+                                                                                src={FormaiLogo}
+                                                                                alt="Formai"
+                                                                                className="h-8 w-auto group-hover:opacity-80 transition-opacity"
+                                                                        />
+                                                                </Link>
+                                                                <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => setIsMobileMenuOpen(false)}
+                                                                        className="text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
+                                                                >
+                                                                        <X size={20} />
+                                                                </Button>
+                                                        </div>
 
-                                                {/* Navigation Items */}
-                                                <div className="flex-1 px-6 py-8">
-                                                        <div className="space-y-2">
-                                                                {/* Removed Home link for mobile menu */}
+                                                        {/* Navigation Items */}
+                                                        <div className="flex-1 px-6 py-8">
+                                                                <div className="space-y-2">
+                                                                        {/* Removed Home link for mobile menu */}
 
-                                                                {/* Navigation Items */}
-                                                                {navItems.map(
-                                                                        (
-                                                                                item,
-                                                                                index
-                                                                        ) => {
+                                                                        {/* Navigation Items */}
+                                                                        {navItems.map((item, index) => {
                                                                                 const isActive =
-                                                                                        location.pathname ===
+                                                                                        window.location.pathname ===
                                                                                         item.href;
                                                                                 return (
                                                                                         <div
-                                                                                                key={
-                                                                                                        item.name
-                                                                                                }
+                                                                                                key={item.name}
                                                                                                 className="relative"
                                                                                                 style={{
                                                                                                         animationDelay: `${
@@ -417,8 +267,10 @@ const Navbar = () => {
                                                                                                                 to={
                                                                                                                         item.href
                                                                                                                 }
-                                                                                                                onClick={
-                                                                                                                        closeMenu
+                                                                                                                onClick={() =>
+                                                                                                                        setIsMobileMenuOpen(
+                                                                                                                                false
+                                                                                                                        )
                                                                                                                 }
                                                                                                                 className={`flex items-center space-x-4 p-4 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 group transform hover:scale-105 ${
                                                                                                                         isActive
@@ -444,7 +296,9 @@ const Navbar = () => {
                                                                                                                                 item.onClick
                                                                                                                         )
                                                                                                                                 item.onClick();
-                                                                                                                        closeMenu();
+                                                                                                                        setIsMobileMenuOpen(
+                                                                                                                                false
+                                                                                                                        );
                                                                                                                 }}
                                                                                                                 className="flex items-center space-x-4 p-4 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 group transform hover:scale-105"
                                                                                                         >
@@ -462,69 +316,96 @@ const Navbar = () => {
                                                                                                 )}
                                                                                         </div>
                                                                                 );
-                                                                        }
-                                                                )}
+                                                                        })}
+                                                                </div>
                                                         </div>
-                                                </div>
 
-                                                {/* Footer */}
-                                                <div className="p-6 border-t border-white/10">
-                                                        <div className="text-center">
-                                                                <p className="text-white/40 text-sm mb-2">
-                                                                        beta
-                                                                        version:
-                                                                        some
-                                                                        features
-                                                                        may not
-                                                                        work
-                                                                </p>
-                                                                <p className="text-white/40 text-sm mb-4">
-                                                                        Revolutionizing
-                                                                        form
-                                                                        creation
-                                                                        with AI
-                                                                </p>
-                                                                <div className="flex justify-center space-x-4">
-                                                                        <div className="w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
-                                                                        <div className="w-2 h-2 bg-white/20 rounded-full animate-pulse delay-150"></div>
-                                                                        <div className="w-2 h-2 bg-white/20 rounded-full animate-pulse delay-300"></div>
+                                                        {/* Footer */}
+                                                        <div className="p-6 border-t border-white/10">
+                                                                <div className="text-center">
+                                                                        <p className="text-white/40 text-sm mb-2">
+                                                                                beta version: some features may not work
+                                                                        </p>
+                                                                        <p className="text-white/40 text-sm mb-4">
+                                                                                Revolutionizing form creation with AI
+                                                                        </p>
+                                                                        <div className="flex justify-center space-x-4">
+                                                                                <div className="w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+                                                                                <div className="w-2 h-2 bg-white/20 rounded-full animate-pulse delay-150"></div>
+                                                                                <div className="w-2 h-2 bg-white/20 rounded-full animate-pulse delay-300"></div>
+                                                                        </div>
                                                                 </div>
                                                         </div>
                                                 </div>
                                         </div>
                                 </div>
-                        </div>
+                        )}
+
+                        {/* Profile Menu */}
+                        {isAuthenticated && (
+                                <div className="hidden md:block">
+                                        <div className="relative">
+                                                <Button
+                                                        variant="ghost"
+                                                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                                                        className="flex items-center space-x-2 text-white hover:bg-white/10"
+                                                >
+                                                        <User className="h-5 w-5" />
+                                                        <span>{user?.fullName || "Account"}</span>
+                                                        <ChevronDown
+                                                                className={`h-4 w-4 transition-transform ${
+                                                                        isProfileMenuOpen ? "rotate-180" : ""
+                                                                }`}
+                                                        />
+                                                </Button>
+                                                {isProfileMenuOpen && (
+                                                        <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg py-1 z-50">
+                                                                <Link
+                                                                        to="/account-settings"
+                                                                        onClick={() => {
+                                                                                setIsProfileMenuOpen(false);
+                                                                                closeAllMenus();
+                                                                        }}
+                                                                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700"
+                                                                >
+                                                                        <Settings className="w-4 h-4 mr-2" />
+                                                                        Settings
+                                                                </Link>
+                                                                <button
+                                                                        onClick={() => {
+                                                                                setShowLogoutConfirm(true);
+                                                                                closeAllMenus();
+                                                                        }}
+                                                                        className="w-full text-left flex items-center px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
+                                                                >
+                                                                        <LogOut className="w-4 h-4 mr-2" />
+                                                                        Logout
+                                                                </button>
+                                                        </div>
+                                                )}
+                                        </div>
+                                </div>
+                        )}
 
                         {/* Logout Confirmation Modal */}
                         {showLogoutConfirm && (
-                                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60]">
-                                        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 max-w-md mx-4">
-                                                <h3 className="text-xl font-bold text-white mb-4">
-                                                        Confirm Logout
-                                                </h3>
-                                                <p className="text-gray-300 mb-6">
-                                                        This action will log you
-                                                        out and redirect you to
-                                                        the home page. Are you
-                                                        sure you want to
-                                                        continue?
+                                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
+                                        <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm text-center shadow-2xl">
+                                                <h3 className="text-xl font-semibold text-white mb-4">Are you sure?</h3>
+                                                <p className="text-gray-400 mb-6">
+                                                        You will be logged out of your account.
                                                 </p>
-                                                <div className="flex space-x-4">
+                                                <div className="flex justify-center gap-4">
                                                         <Button
-                                                                onClick={() =>
-                                                                        setShowLogoutConfirm(
-                                                                                false
-                                                                        )
-                                                                }
-                                                                className="bg-gray-600 text-white hover:bg-gray-700"
+                                                                variant="outline"
+                                                                onClick={() => setShowLogoutConfirm(false)}
+                                                                className="border-gray-600 text-white hover:bg-gray-700"
                                                         >
                                                                 Cancel
                                                         </Button>
                                                         <Button
-                                                                onClick={
-                                                                        handleLogout
-                                                                }
-                                                                className="bg-red-600 text-white hover:bg-red-700"
+                                                                onClick={handleLogout}
+                                                                className="bg-red-600 hover:bg-red-700 text-white"
                                                         >
                                                                 Logout
                                                         </Button>

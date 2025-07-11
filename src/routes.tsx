@@ -20,12 +20,14 @@ export default function AppRoutes() {
                         <Route path="/" element={<Home />} />
                         <Route path="/signup" element={<Signup />} />
                         <Route path="/signin" element={<Signin />} />
-                        <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+                        <Route
+                                path="/auth/google/callback"
+                                element={<GoogleAuthCallback />}
+                        />
                         <Route path="/about" element={<About />} />
                         <Route path="/privacy" element={<Privacy />} />
                         <Route path="/terms" element={<Terms />} />
                         <Route path="/cookies" element={<Cookies />} />
-                        {/* <Route path="/gdpr" element={<GDPR />} /> */}
                         <Route path="/pricing" element={<Pricing />} />
                         <Route element={<DashboardLayout />}>
                                 <Route element={<ProtectedRoute />}>

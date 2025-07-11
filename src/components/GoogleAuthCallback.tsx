@@ -1,37 +1,38 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import api from '../api';
-import { setAuthToken } from '../auth/authHelper';
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import api from "../api";
+import { useAuth } from "../contexts/AuthContext";
 
 const GoogleAuthCallback: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+        const navigate = useNavigate();
+        const location = useLocation();
+        const { login } = useAuth();
 
-  useEffect(() => {
-    const handleCallback = async () => {
-      const params = new URLSearchParams(location.search);
-      const code = params.get('code');
+        useEffect(() => {
+                const handleCallback = async () => {
+                        const params = new URLSearchParams(location.search);
+                        const code = params.get("code");
 
-      if (code) {
-        try {
-          const res = await api.get<{ token: string }>('/auth/google/callback', {
-            params: { code },
-          });
-          setAuthToken(res.data.token);
-          navigate('/dashboard', { replace: true });
-        } catch (error) {
-          console.error('Google OAuth callback failed:', error);
-          navigate('/signin', { replace: true });
-        }
-      } else {
-        navigate('/signin', { replace: true });
-      }
-    };
+                        if (code) {
+                                try {
+                                        const res = await api.get<{ token: string }>("/auth/google/callback", {
+                                                params: { code },
+                                        });
+                                        await login(res.data.token);
+                                        navigate("/dashboard", { replace: true });
+                                } catch (error) {
+                                        console.error("Google OAuth callback failed:", error);
+                                        navigate("/signin", { replace: true });
+                                }
+                        } else {
+                                navigate("/signin", { replace: true });
+                        }
+                };
 
-    handleCallback();
-  }, [navigate, location]);
+                handleCallback();
+        }, [navigate, location, login]);
 
-  return <div>Loading...</div>;
+        return <div>Loading...</div>;
 };
 
 export default GoogleAuthCallback;

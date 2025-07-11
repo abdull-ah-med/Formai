@@ -1,31 +1,19 @@
 // src/components/ui/ProtectedRoute.tsx
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { isAuthenticated, logoutAndRedirect } from "../../auth/authHelper";
+import { useAuth } from "../../contexts/AuthContext";
 
 const ProtectedRoute: React.FC = () => {
-        const [status, setStatus] = useState<"loading" | "ok" | "nope">(
-                "loading"
-        );
+        const { isAuthenticated, loading } = useAuth();
 
-        useEffect(() => {
-                isAuthenticated()
-                        .then((auth) => {
-                                setStatus(auth ? "ok" : "nope");
-                                if (!auth) logoutAndRedirect("/signin");
-                        })
-                        .catch(() => {
-                                setStatus("nope");
-                                logoutAndRedirect("/signin");
-                        });
-        }, []);
-
-        if (status === "loading") {
+        if (loading) {
                 return <div className="spinner">Loading…</div>;
         }
-        if (status === "nope") {
+
+        if (!isAuthenticated) {
                 return <Navigate to="/signin" replace />;
         }
+
         return <Outlet />;
 };
 

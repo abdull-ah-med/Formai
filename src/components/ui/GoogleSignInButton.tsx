@@ -1,5 +1,4 @@
 import { Button } from "./button";
-import Cookies from "js-cookie";
 import { getGoogleOAuthURL } from "../../auth/googleOAuth";
 import { cn } from "../../lib/utils";
 
@@ -18,13 +17,8 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         ...rest
 }) => {
         const handleGoogleSignIn = () => {
-                // Don't proceed if the button is disabled
                 if (disabled) return;
-
-                // Google sign-in is always persistent. Ensure the non-persistent
-                // flag is removed, regardless of the checkbox state for email auth.
                 localStorage.removeItem("nonPersistentAuth");
-
                 const googleOAuthURL = getGoogleOAuthURL();
                 window.location.href = googleOAuthURL;
         };
