@@ -1,12 +1,11 @@
-
-
 // New helper that conforms to backend expectations
 export function getGoogleOAuthURL() {
         const env = (import.meta as unknown as { env: Record<string, string> })
                 .env;
         const clientId = env?.VITE_GOOGLE_CLIENT_ID;
         const redirectUri =
-                env?.VITE_FRONTEND_URL + "/auth/google/callback";
+                (env?.VITE_FRONTEND_URL || "").replace(/\/$/, "") +
+                "/auth/google/callback";
 
         if (!clientId) {
                 throw new Error("Missing VITE_GOOGLE_CLIENT_ID env variable");
@@ -23,5 +22,3 @@ export function getGoogleOAuthURL() {
 
         return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
-
-
