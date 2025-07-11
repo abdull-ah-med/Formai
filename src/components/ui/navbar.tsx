@@ -348,51 +348,6 @@ const Navbar = () => {
                                 </div>
                         )}
 
-                        {/* Profile Menu */}
-                        {isAuthenticated && (
-                                <div className="hidden md:block">
-                                        <div className="relative">
-                                                <Button
-                                                        variant="ghost"
-                                                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                                                        className="flex items-center space-x-2 text-white hover:bg-white/10"
-                                                >
-                                                        <User className="h-5 w-5" />
-                                                        <ChevronDown
-                                                                className={`h-4 w-4 transition-transform ${
-                                                                        isProfileMenuOpen ? "rotate-180" : ""
-                                                                }`}
-                                                        />
-                                                </Button>
-                                                {isProfileMenuOpen && (
-                                                        <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg py-1 z-50">
-                                                                <Link
-                                                                        to="/account-settings"
-                                                                        onClick={() => {
-                                                                                setIsProfileMenuOpen(false);
-                                                                                closeAllMenus();
-                                                                        }}
-                                                                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-700"
-                                                                >
-                                                                        <Settings className="w-4 h-4 mr-2" />
-                                                                        Settings
-                                                                </Link>
-                                                                <button
-                                                                        onClick={() => {
-                                                                                setShowLogoutConfirm(true);
-                                                                                closeAllMenus();
-                                                                        }}
-                                                                        className="w-full text-left flex items-center px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
-                                                                >
-                                                                        <LogOut className="w-4 h-4 mr-2" />
-                                                                        Logout
-                                                                </button>
-                                                        </div>
-                                                )}
-                                        </div>
-                                </div>
-                        )}
-
                         {/* Logout Confirmation Modal */}
                         {showLogoutConfirm && (
                                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">

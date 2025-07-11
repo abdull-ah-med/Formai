@@ -5,7 +5,7 @@ import loginSchema from "../../schemas/loginSchema";
 import api from "../../api";
 import { useEffect } from "react";
 import GoogleSignInButton from "./GoogleSignInButton";
-import React from "react";
+import React, { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -22,12 +22,13 @@ const Signin = () => {
         const initialValues = {
                 email: "",
                 password: "",
-                rememberMe: false,
-                website: "",
                 recaptchaToken: "",
         };
         const navigate = useNavigate();
         const { isAuthenticated, loading, login } = useAuth();
+        const [showPassword, setShowPassword] = useState(false);
+        const [isLoading, setIsLoading] = useState(false);
+        const [error, setError] = useState<string | null>(null);
 
         // Check if user is already authenticated
         useEffect(() => {
@@ -45,13 +46,12 @@ const Signin = () => {
                         setFieldError("email", "Please complete the CAPTCHA");
                         return;
                 }
-                setSubmitting(true);
+                setIsLoading(true);
+                setError(null);
                 try {
                         const res = await api.post<{ token: string } & LoginResponse>("/auth/login", {
                                 email: values.email,
                                 password: values.password,
-                                rememberMe: values.rememberMe,
-                                website: values.website,
                                 recaptchaToken: values.recaptchaToken,
                         });
 
@@ -59,16 +59,12 @@ const Signin = () => {
 
                         // Track non-persistent session in localStorage so we can
                         // auto-logout when all tabs are closed.
-                        if (values.rememberMe) {
-                                localStorage.removeItem("nonPersistentAuth");
-                        } else {
-                                localStorage.setItem("nonPersistentAuth", "true");
-                        }
+                        // Removed "rememberMe" logic as per edit hint
 
                         navigate("/dashboard", { replace: true });
                 } catch (err: any) {
                         setFieldError("email", err.response?.data?.message || "Login failed");
-                        setSubmitting(false);
+                        setIsLoading(false);
                 }
         };
 
@@ -131,22 +127,7 @@ const Signin = () => {
                                                                         className="mt-2 text-sm text-red-500"
                                                                 />
                                                         </div>
-                                                        <div>
-                                                                <div className="flex items-center">
-                                                                        <Field
-                                                                                type="checkbox"
-                                                                                id="rememberMe"
-                                                                                name="rememberMe"
-                                                                                className="h-4 w-4 text-blue-600 bg-white/5 border-white/10 rounded focus:ring-white/50"
-                                                                        />
-                                                                        <label
-                                                                                htmlFor="rememberMe"
-                                                                                className="ml-2 block text-sm text-gray-300 select-none"
-                                                                        >
-                                                                                Remember me
-                                                                        </label>
-                                                                </div>
-                                                        </div>
+                                                        {/* Removed "Remember me" checkbox */}
                                                         <Field
                                                                 type="text"
                                                                 name="website"
