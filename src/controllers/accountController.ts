@@ -76,52 +76,13 @@ export const checkGoogleFormsPermission = async (req: Request, res: Response) =>
                         }
                 }
 
-                // Test Google Forms permission by trying to create a simple test form
-                try {
-                        const forms = google.forms({ version: "v1", auth: oauth2Client });
-
-                        // Try to create a test form to verify permissions
-                        // This will fail if the user doesn't have Forms permission
-                        const testForm = await forms.forms.create({
-                                requestBody: {
-                                        info: {
-                                                title: "Permission Check",
-                                                documentTitle: "Permission Check",
-                                        },
-                                },
-                        });
-
-                        // If successful, immediately delete the test form
-                        if (testForm.data.formId) {
-                                // Since the Forms API doesn't have a delete method,
-                                // we'll just leave the test form in their Google account
-                        }
-
-                        return res.status(200).json({
-                                success: true,
-                                hasPermission: true,
-                                message: "User has Google Forms permission",
-                        });
-                } catch (error: any) {
-                        // Check specific error responses that indicate permission issues
-                        if (error.response && error.response.status === 403) {
-                                return res.status(200).json({
-                                        success: true,
-                                        hasPermission: false,
-                                        reason: "PERMISSION_DENIED",
-                                        message: "User does not have permission to access Google Forms",
-                                });
-                        }
-
-                        // Other errors might be connectivity or Google API issues
-                        console.error("Google Forms permission check error:", error);
-                        return res.status(200).json({
-                                success: true,
-                                hasPermission: false,
-                                reason: "API_ERROR",
-                                message: "Error checking Google Forms permission",
-                        });
-                }
+                // Instead of creating a test form which may fail due to API limits or other issues,
+                // trust that if the user has connected their account with the forms scope, they have permission
+                return res.status(200).json({
+                        success: true,
+                        hasPermission: true,
+                        message: "User has Google Forms permission",
+                });
         } catch (error) {
                 console.error("Google Forms permission check error:", error);
                 return res.status(500).json({

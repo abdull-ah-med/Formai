@@ -47,10 +47,47 @@ router.get("/account", verifyJWT, async (req, res) => {
 router.get("/account/google-forms-permission", verifyJWT, checkGoogleFormsPermission);
 
 /**
- * PUT /api/account-password
- * Updates the user's password after verifying current password.
- * Rejects requests for Google-linked accounts.
+ * GET /api/account/debug-google-token
+ * Debug endpoint to check Google token status
  */
+router.get("/account/debug-google-token", verifyJWT, async (req, res) => {
+        try {
+                const payload = req.user as AuthTokenPayload | undefined;
+                if (!payload?.sub) {
+                        return res.status(401).json({ success: false, error: "Unauthorized" });
+                }
+
+                // Find the user
+                const user = await User.findById(payload.sub);
+                if (!user) {
+                        return res.status(404).json({ success: false, error: "User not found" });
+                }
+
+                // Check Google connection status
+                const hasGoogleAccount = Boolean(user.googleId);
+                const hasAccessToken = Boolean(user.googleTokens?.accessToken);
+                const hasRefreshToken = Boolean(user.googleTokens?.refreshToken);
+                const tokenExpired = user.googleTokens?.expiryDate ? user.googleTokens.expiryDate <= Date.now() : true;
+
+                return res.status(200).json({
+                        success: true,
+                        googleStatus: {
+                                connected: hasGoogleAccount,
+                                hasAccessToken,
+                                hasRefreshToken,
+                                tokenExpired,
+                                expiryDate: user.googleTokens?.expiryDate
+                                        ? new Date(user.googleTokens.expiryDate).toISOString()
+                                        : null,
+                                scopes: user.googleTokens?.scope || "unknown",
+                        },
+                });
+        } catch (error) {
+                console.error("Debug Google token error:", error);
+                return res.status(500).json({ success: false, error: "Internal server error" });
+        }
+});
+
 router.put("/account-password", verifyJWT, async (req, res) => {
         try {
                 const payload = req.user as AuthTokenPayload | undefined;
