@@ -35,7 +35,7 @@ export interface ReviseFormResponse {
         data: {
                 formId: string;
                 schema: FormSchema;
-                revisionsRemaining: number;
+                revisionsRemaining: number | null;
         };
         error?: string;
 }

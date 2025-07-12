@@ -117,22 +117,25 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                                 <Button
                                                         variant="outline"
                                                         onClick={() => setShowPermissionDialog(false)}
-                                                        className="border-white/20 hover:bg-white/5 transition-colors duration-300"
+                                                        className="border-white/20 hover:bg-white/5 transition-colors duration-300 min-w-[80px]"
+                                                        size="sm"
                                                 >
                                                         Cancel
                                                 </Button>
                                                 <Button
                                                         onClick={handleConnectGoogle}
                                                         className="bg-blue-600 hover:bg-blue-700 transition-colors duration-300 shadow-lg"
+                                                        size="sm"
                                                 >
-                                                        Connect Google Account
+                                                        Connect Google
                                                 </Button>
                                                 <Button
                                                         variant="secondary"
                                                         onClick={handleGoToSettings}
                                                         className="bg-white/10 hover:bg-white/20 transition-colors duration-300"
+                                                        size="sm"
                                                 >
-                                                        Go to Settings
+                                                        Settings
                                                 </Button>
                                         </DialogFooter>
                                 </DialogContent>

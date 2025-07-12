@@ -122,10 +122,6 @@ const Privacy = () => {
                                                                                         Store session and form history
                                                                                         securely
                                                                                 </li>
-                                                                                <li>
-                                                                                        Enforce the daily limit of 3
-                                                                                        forms per user
-                                                                                </li>
                                                                         </ul>
                                                                         <p>
                                                                                 We do <strong>not</strong> sell or share

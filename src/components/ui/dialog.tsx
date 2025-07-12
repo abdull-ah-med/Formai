@@ -81,7 +81,7 @@ export const DialogHeader: React.FC<DialogHeaderProps> = ({ children, className 
 };
 
 export const DialogFooter: React.FC<DialogFooterProps> = ({ children, className }) => {
-        return <div className={cn("mt-8 flex justify-end space-x-4", className)}>{children}</div>;
+        return <div className={cn("mt-8 flex flex-wrap gap-2 justify-end", className)}>{children}</div>;
 };
 
 export const DialogTitle: React.FC<DialogTitleProps> = ({ children, className }) => {

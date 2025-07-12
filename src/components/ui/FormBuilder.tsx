@@ -6,7 +6,7 @@ interface FormBuilderProps {
         schema: FormSchema;
         onAccept: () => void;
         onRevise: (prompt: string) => void;
-        revisionsRemaining: number;
+        revisionsRemaining: number | null;
         isLoading: boolean;
         formId?: string;
 }
@@ -122,13 +122,15 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                                 {/* Action Buttons */}
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                                         <div>
-                                                {!showRevisionForm && revisionsRemaining > 0 && (
+                                                {!showRevisionForm && (
                                                         <button
                                                                 onClick={() => setShowRevisionForm(true)}
                                                                 className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                                                                 disabled={isLoading}
                                                         >
-                                                                Revise Form ({revisionsRemaining} left)
+                                                                {revisionsRemaining === null
+                                                                        ? "Revise Form"
+                                                                        : `Revise Form (${revisionsRemaining} left)`}
                                                         </button>
                                                 )}
                                         </div>
