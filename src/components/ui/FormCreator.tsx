@@ -116,86 +116,98 @@ const FormCreator: React.FC = () => {
         };
 
         return (
-                <div className="container mx-auto px-4 py-8">
-                        {!formSchema ? (
-                                <div className="max-w-2xl mx-auto">
-                                        <h1 className="text-3xl font-bold mb-6">Create a Form with AI</h1>
-                                        <p className="text-gray-600 mb-8">
-                                                Describe the form you want to create, and our AI will generate it for
-                                                you.
-                                        </p>
+                <div className="min-h-screen bg-black text-white pt-16">
+                        <div className="container mx-auto px-4 py-8">
+                                <h1 className="text-3xl font-bold mb-6 text-center">Create a Form</h1>
 
-                                        <form onSubmit={handleGenerate} className="mb-8">
-                                                <div className="mb-4">
-                                                        <label htmlFor="prompt" className="block mb-2 font-medium">
-                                                                What kind of form do you need?
-                                                        </label>
-                                                        <textarea
-                                                                id="prompt"
-                                                                rows={4}
-                                                                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                                placeholder="E.g., Create a feedback form for a tech meetup with fields for rating the speakers and venue"
-                                                                value={prompt}
-                                                                onChange={(e) => setPrompt(e.target.value)}
-                                                                disabled={isGenerating}
-                                                        />
-                                                </div>
+                                {needsGoogleAuth ? (
+                                        <div className="max-w-md mx-auto bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                                                <h2 className="text-xl font-semibold mb-4">Connect Google Account</h2>
+                                                <p className="text-gray-300 mb-6">
+                                                        To create Google Forms, you need to connect your Google account
+                                                        first.
+                                                </p>
+                                                <GoogleSignInButton
+                                                        variant="signup"
+                                                        label="Connect Google Account"
+                                                        onSuccess={() => setNeedsGoogleAuth(false)}
+                                                />
+                                        </div>
+                                ) : !formSchema ? (
+                                        <div className="max-w-2xl mx-auto">
+                                                <form onSubmit={handleGenerate} className="mb-8">
+                                                        <div className="mb-4">
+                                                                <label
+                                                                        htmlFor="prompt"
+                                                                        className="block mb-2 font-medium"
+                                                                >
+                                                                        What kind of form do you need?
+                                                                </label>
+                                                                <textarea
+                                                                        id="prompt"
+                                                                        rows={4}
+                                                                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                                        placeholder="E.g., Create a feedback form for a tech meetup with fields for rating the speakers and venue"
+                                                                        value={prompt}
+                                                                        onChange={(e) => setPrompt(e.target.value)}
+                                                                        disabled={isGenerating}
+                                                                />
+                                                        </div>
 
-                                                <button
-                                                        type="submit"
-                                                        disabled={!prompt.trim() || isGenerating}
-                                                        className={`w-full py-3 px-6 rounded-lg font-medium ${
-                                                                !prompt.trim() || isGenerating
-                                                                        ? "bg-blue-300 text-white"
-                                                                        : "bg-blue-600 hover:bg-blue-700 text-white"
-                                                        }`}
-                                                >
-                                                        {isGenerating ? "Generating..." : "Generate Form"}
-                                                </button>
-                                        </form>
+                                                        <button
+                                                                type="submit"
+                                                                className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50"
+                                                                disabled={!prompt.trim() || isGenerating}
+                                                        >
+                                                                {isGenerating ? "Generating..." : "Generate Form"}
+                                                        </button>
 
-                                        {error && (
-                                                <div className="p-4 mb-4 bg-red-50 border-l-4 border-red-500 text-red-700">
-                                                        {error}
-                                                </div>
-                                        )}
-                                </div>
-                        ) : (
-                                <div>
-                                        {needsGoogleAuth ? (
-                                                <div className="max-w-md mx-auto text-center p-6 bg-white rounded-lg shadow-lg">
-                                                        <h2 className="text-2xl font-bold mb-4">
-                                                                Connect to Google Forms
-                                                        </h2>
-                                                        <p className="mb-6 text-gray-600">
-                                                                Please connect your Google account to create the form in
-                                                                Google Forms
-                                                        </p>
-                                                        <GoogleSignInButton onSuccess={handleGoogleAuthSuccess} />
                                                         {error && (
-                                                                <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md">
-                                                                        {error}
-                                                                </div>
+                                                                <p className="mt-4 text-red-400 text-center">{error}</p>
                                                         )}
+                                                </form>
+
+                                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                                                        <h2 className="text-xl font-semibold mb-4">How It Works</h2>
+                                                        <ol className="list-decimal pl-5 space-y-2 text-gray-300">
+                                                                <li>
+                                                                        Describe the form you need in plain English
+                                                                        (e.g., "Create a job application form with
+                                                                        fields for work experience")
+                                                                </li>
+                                                                <li>
+                                                                        Our AI will generate a form based on your
+                                                                        description
+                                                                </li>
+                                                                <li>
+                                                                        Review the form and make revisions if needed (up
+                                                                        to 3 times)
+                                                                </li>
+                                                                <li>
+                                                                        When you're satisfied, click "Create Google
+                                                                        Form" to publish it to your Google account
+                                                                </li>
+                                                        </ol>
                                                 </div>
-                                        ) : (
-                                                <>
-                                                        {error && (
-                                                                <div className="p-4 mb-6 bg-red-50 border-l-4 border-red-500 text-red-700">
-                                                                        {error}
-                                                                </div>
-                                                        )}
-                                                        <FormBuilder
-                                                                schema={formSchema}
-                                                                onAccept={handleAccept}
-                                                                onRevise={handleRevise}
-                                                                revisionsRemaining={revisionsRemaining}
-                                                                isLoading={isProcessing}
-                                                        />
-                                                </>
-                                        )}
-                                </div>
-                        )}
+                                        </div>
+                                ) : (
+                                        <>
+                                                {error && (
+                                                        <div className="p-4 mb-6 bg-red-50 border-l-4 border-red-500 text-red-700">
+                                                                {error}
+                                                        </div>
+                                                )}
+                                                <FormBuilder
+                                                        schema={formSchema}
+                                                        onAccept={handleAccept}
+                                                        onRevise={handleRevise}
+                                                        revisionsRemaining={revisionsRemaining}
+                                                        isLoading={isProcessing}
+                                                        formId={formId || undefined}
+                                                />
+                                        </>
+                                )}
+                        </div>
                 </div>
         );
 };
