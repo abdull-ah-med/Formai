@@ -5,6 +5,7 @@ import api from "../../api";
 import { checkGoogleFormsPermission, getPermissionErrorMessage } from "../../utils/googleFormsHelper";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./dialog";
 import { getGoogleOAuthURL } from "../../auth/googleOAuth";
+import { finalizeForm } from "../../api";
 
 interface FormFinalizeButtonProps {
         formId: string;
@@ -45,10 +46,11 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                         }
 
                         // If they have permission, proceed with form finalization
-                        const response = await api.post<FormFinalizeResponse>(`/forms/${formId}/finalize`);
+                        // Use the proper API endpoint
+                        const response = (await finalizeForm(formId)) as FormFinalizeResponse;
 
-                        if (response.data.success && response.data.data) {
-                                const googleFormUrl = response.data.data.googleFormUrl;
+                        if (response.success && response.data) {
+                                const googleFormUrl = response.data.googleFormUrl;
                                 if (onSuccess) {
                                         onSuccess(googleFormUrl);
                                 } else {
@@ -56,7 +58,7 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                         window.open(googleFormUrl, "_blank");
                                 }
                         } else {
-                                setError(response.data.error || "Failed to finalize form");
+                                setError(response.error || "Failed to finalize form");
                         }
                 } catch (err: any) {
                         if (err.response?.data?.error === "CONNECT_GOOGLE") {
