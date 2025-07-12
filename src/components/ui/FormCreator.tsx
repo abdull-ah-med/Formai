@@ -121,17 +121,34 @@ const FormCreator: React.FC = () => {
                                 <h1 className="text-3xl font-bold mb-6 text-center">Create a Form</h1>
 
                                 {needsGoogleAuth ? (
-                                        <div className="max-w-md mx-auto bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-                                                <h2 className="text-xl font-semibold mb-4">Connect Google Account</h2>
-                                                <p className="text-gray-300 mb-6">
+                                        <div className="max-w-md mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl ring-1 ring-white/10 shadow-[0_0_30px_rgba(120,120,255,0.15)]">
+                                                <div className="flex items-center mb-6">
+                                                        <div className="w-12 h-12 rounded-full bg-blue-500/20 backdrop-blur-sm flex items-center justify-center mr-4">
+                                                                <svg
+                                                                        className="w-6 h-6 text-blue-400"
+                                                                        fill="currentColor"
+                                                                        viewBox="0 0 24 24"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                >
+                                                                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm1-11v6h-2v-6H7l5-5 5 5h-4z"></path>
+                                                                </svg>
+                                                        </div>
+                                                        <h2 className="text-2xl font-semibold text-white">
+                                                                Connect Google Account
+                                                        </h2>
+                                                </div>
+                                                <p className="text-gray-300 mb-8 leading-relaxed">
                                                         To create Google Forms, you need to connect your Google account
-                                                        first.
+                                                        first. This allows Formai to create forms in your Google Drive.
                                                 </p>
-                                                <GoogleSignInButton
-                                                        variant="signup"
-                                                        label="Connect Google Account"
-                                                        onSuccess={() => setNeedsGoogleAuth(false)}
-                                                />
+                                                <div className="mt-8">
+                                                        <GoogleSignInButton
+                                                                variant="signup"
+                                                                label="Connect Google Account"
+                                                                onSuccess={() => setNeedsGoogleAuth(false)}
+                                                                className="bg-blue-600 hover:bg-blue-700 transition-all duration-300 shadow-lg"
+                                                        />
+                                                </div>
                                         </div>
                                 ) : !formSchema ? (
                                         <div className="max-w-2xl mx-auto">
@@ -147,7 +164,7 @@ const FormCreator: React.FC = () => {
                                                                         id="prompt"
                                                                         rows={4}
                                                                         className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                                        placeholder="E.g., Create a feedback form for a tech meetup with fields for rating the speakers and venue"
+                                                                        placeholder="Describe the form you want to create..."
                                                                         value={prompt}
                                                                         onChange={(e) => setPrompt(e.target.value)}
                                                                         disabled={isGenerating}

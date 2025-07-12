@@ -22,81 +22,84 @@ const Privacy = () => {
                                                         Privacy Policy
                                                 </h1>
                                                 <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                                                        Your privacy is
-                                                        important to us. This
-                                                        policy explains how we
-                                                        collect, use, and
-                                                        protect your
-                                                        information.
+                                                        Last Updated: July 12, 2025
                                                 </p>
                                         </div>
 
                                         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 md:p-12">
                                                 <div className="space-y-8">
                                                         <section>
-                                                                <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                                                                        <Eye className="w-6 h-6 mr-3 text-blue-400" />
-                                                                        Information
-                                                                        We
-                                                                        Collect
+                                                                <h2 className="text-2xl font-bold text-white mb-4">
+                                                                        1. Introduction
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                We
-                                                                                collect
-                                                                                information
-                                                                                you
-                                                                                provide
-                                                                                directly
-                                                                                to
-                                                                                us,
-                                                                                such
-                                                                                as
-                                                                                when
-                                                                                you:
+                                                                                Formai ("we", "our", or "us") respects
+                                                                                your privacy and is committed to
+                                                                                protecting your personal data. This
+                                                                                privacy policy explains how we collect,
+                                                                                use, and protect your information when
+                                                                                you use our application and related
+                                                                                services, including Google sign-in and
+                                                                                Google Forms integration.
                                                                         </p>
+                                                                </div>
+                                                        </section>
+
+                                                        <section>
+                                                                <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+                                                                        <Eye className="w-6 h-6 mr-3 text-blue-400" />
+                                                                        2. Information We Collect
+                                                                </h2>
+                                                                <div className="text-gray-300 space-y-4">
+                                                                        <p>
+                                                                                We collect limited information necessary
+                                                                                to provide our services:
+                                                                        </p>
+                                                                        <h3 className="text-lg font-semibold text-white mt-4">
+                                                                                a. Google Account Information
+                                                                        </h3>
                                                                         <ul className="list-disc list-inside space-y-2 ml-4">
+                                                                                <li>Google ID</li>
+                                                                                <li>Name</li>
+                                                                                <li>Email address</li>
+                                                                                <li>Profile picture (if available)</li>
+                                                                        </ul>
+                                                                        <p>Used only for login and personalization.</p>
+
+                                                                        <h3 className="text-lg font-semibold text-white mt-4">
+                                                                                b. Form Metadata
+                                                                        </h3>
+                                                                        <ul className="list-disc list-inside space-y-2 ml-4">
+                                                                                <li>Your prompts</li>
+                                                                                <li>Generated form JSON</li>
                                                                                 <li>
-                                                                                        Sign
-                                                                                        up
-                                                                                        for
-                                                                                        our
-                                                                                        service
+                                                                                        Form title and creation
+                                                                                        timestamp
                                                                                 </li>
-                                                                                <li>
-                                                                                        Contact
-                                                                                        us
-                                                                                        for
-                                                                                        support
-                                                                                </li>
-                                                                                <li>
-                                                                                        Use
-                                                                                        our
-                                                                                        services
-                                                                                </li>
-                                                                                <li>
-                                                                                        Subscribe
-                                                                                        to
-                                                                                        our
-                                                                                        newsletter
-                                                                                </li>
+                                                                                <li>Google Form URL</li>
+                                                                                <li>User ID</li>
                                                                         </ul>
                                                                         <p>
-                                                                                This
-                                                                                may
-                                                                                include
-                                                                                your
-                                                                                name,
-                                                                                email
-                                                                                address,
-                                                                                and
-                                                                                any
-                                                                                other
-                                                                                information
-                                                                                you
-                                                                                choose
-                                                                                to
-                                                                                provide.
+                                                                                We do <strong>not</strong> access or
+                                                                                modify your existing Google Drive files
+                                                                                or forms.
+                                                                        </p>
+
+                                                                        <h3 className="text-lg font-semibold text-white mt-4">
+                                                                                c. Cookies
+                                                                        </h3>
+                                                                        <p>
+                                                                                We use secure cookies (e.g., HttpOnly)
+                                                                                for:
+                                                                        </p>
+                                                                        <ul className="list-disc list-inside space-y-2 ml-4">
+                                                                                <li>Authentication</li>
+                                                                                <li>Session management</li>
+                                                                        </ul>
+                                                                        <p>
+                                                                                We do <strong>not</strong> use cookies
+                                                                                for advertising or tracking.
                                                                         </p>
                                                                 </div>
                                                         </section>
@@ -104,132 +107,97 @@ const Privacy = () => {
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
                                                                         <Lock className="w-6 h-6 mr-3 text-green-400" />
-                                                                        How We
-                                                                        Use Your
-                                                                        Information
+                                                                        3. Use of Information
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                We
-                                                                                use
-                                                                                the
-                                                                                information
-                                                                                we
-                                                                                collect
+                                                                                We use the information we collect solely
                                                                                 to:
                                                                         </p>
                                                                         <ul className="list-disc list-inside space-y-2 ml-4">
+                                                                                <li>Authenticate you via Google</li>
+                                                                                <li>Generate AI forms via Claude</li>
+                                                                                <li>Create Google Forms</li>
                                                                                 <li>
-                                                                                        Provide
-                                                                                        and
-                                                                                        improve
-                                                                                        our
-                                                                                        services
+                                                                                        Store session and form history
+                                                                                        securely
                                                                                 </li>
                                                                                 <li>
-                                                                                        Communicate
-                                                                                        with
-                                                                                        you
-                                                                                        about
-                                                                                        updates
-                                                                                        and
-                                                                                        features
-                                                                                </li>
-                                                                                <li>
-                                                                                        Send
-                                                                                        you
-                                                                                        marketing
-                                                                                        communications
-                                                                                        (with
-                                                                                        your
-                                                                                        consent)
-                                                                                </li>
-                                                                                <li>
-                                                                                        Respond
-                                                                                        to
-                                                                                        your
-                                                                                        questions
-                                                                                        and
-                                                                                        support
-                                                                                        requests
-                                                                                </li>
-                                                                                <li>
-                                                                                        Ensure
-                                                                                        the
-                                                                                        security
-                                                                                        and
-                                                                                        integrity
-                                                                                        of
-                                                                                        our
-                                                                                        platform
+                                                                                        Enforce the daily limit of 3
+                                                                                        forms per user
                                                                                 </li>
                                                                         </ul>
+                                                                        <p>
+                                                                                We do <strong>not</strong> sell or share
+                                                                                your data with third parties.
+                                                                        </p>
+                                                                </div>
+                                                        </section>
+
+                                                        <section>
+                                                                <h2 className="text-2xl font-bold text-white mb-4">
+                                                                        4. Google APIs
+                                                                </h2>
+                                                                <div className="text-gray-300 space-y-4">
+                                                                        <p>
+                                                                                Our application uses Google OAuth for
+                                                                                authentication and the Google Forms API
+                                                                                to create forms. We follow Google OAuth
+                                                                                and API policies.
+                                                                        </p>
+                                                                        <p>Important limitations of our access:</p>
+                                                                        <ul className="list-disc list-inside space-y-2 ml-4">
+                                                                                <li>
+                                                                                        We <strong>never</strong> access
+                                                                                        or modify your existing Google
+                                                                                        Forms or Drive files
+                                                                                </li>
+                                                                                <li>
+                                                                                        We only create new forms based
+                                                                                        on your explicit requests
+                                                                                </li>
+                                                                                <li>
+                                                                                        We do not read responses
+                                                                                        submitted to your forms
+                                                                                </li>
+                                                                        </ul>
+                                                                        <p>
+                                                                                You can revoke our access to your Google
+                                                                                account at any time by visiting:{" "}
+                                                                                <a
+                                                                                        href="https://myaccount.google.com/permissions"
+                                                                                        className="text-blue-400 hover:underline"
+                                                                                        target="_blank"
+                                                                                        rel="noopener noreferrer"
+                                                                                >
+                                                                                        https://myaccount.google.com/permissions
+                                                                                </a>
+                                                                        </p>
                                                                 </div>
                                                         </section>
 
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
                                                                         <Users className="w-6 h-6 mr-3 text-purple-400" />
-                                                                        Information
-                                                                        Sharing
+                                                                        5. Data Storage and Security
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                We
-                                                                                do
-                                                                                not
-                                                                                sell,
-                                                                                trade,
-                                                                                or
-                                                                                otherwise
-                                                                                transfer
-                                                                                your
-                                                                                personal
-                                                                                information
-                                                                                to
-                                                                                third
-                                                                                parties
-                                                                                without
-                                                                                your
-                                                                                consent,
-                                                                                except
-                                                                                in
-                                                                                the
-                                                                                following
-                                                                                circumstances:
+                                                                                Data is securely stored and encrypted.
+                                                                                Only minimal necessary data is retained.
                                                                         </p>
                                                                         <ul className="list-disc list-inside space-y-2 ml-4">
                                                                                 <li>
-                                                                                        With
-                                                                                        your
-                                                                                        explicit
-                                                                                        consent
+                                                                                        All data is encrypted at rest
+                                                                                        and in transit
                                                                                 </li>
                                                                                 <li>
-                                                                                        To
-                                                                                        comply
-                                                                                        with
-                                                                                        legal
-                                                                                        obligations
+                                                                                        Access to our database is
+                                                                                        strictly controlled
                                                                                 </li>
                                                                                 <li>
-                                                                                        To
-                                                                                        protect
-                                                                                        our
-                                                                                        rights
-                                                                                        and
-                                                                                        safety
-                                                                                </li>
-                                                                                <li>
-                                                                                        With
-                                                                                        trusted
-                                                                                        service
-                                                                                        providers
-                                                                                        who
-                                                                                        assist
-                                                                                        in
-                                                                                        our
-                                                                                        operations
+                                                                                        We implement industry-standard
+                                                                                        security measures
                                                                                 </li>
                                                                         </ul>
                                                                 </div>
@@ -237,126 +205,58 @@ const Privacy = () => {
 
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4">
-                                                                        Data
-                                                                        Security
+                                                                        6. Your Rights
+                                                                </h2>
+                                                                <div className="text-gray-300 space-y-4">
+                                                                        <p>You have the right to:</p>
+                                                                        <ul className="list-disc list-inside space-y-2 ml-4">
+                                                                                <li>Revoke OAuth access</li>
+                                                                                <li>Request data deletion via email</li>
+                                                                        </ul>
+                                                                </div>
+                                                        </section>
+
+                                                        <section>
+                                                                <h2 className="text-2xl font-bold text-white mb-4">
+                                                                        7. Children's Privacy
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                We
-                                                                                implement
-                                                                                appropriate
-                                                                                technical
-                                                                                and
-                                                                                organizational
-                                                                                measures
-                                                                                to
-                                                                                protect
-                                                                                your
-                                                                                personal
-                                                                                information
-                                                                                against
-                                                                                unauthorized
-                                                                                access,
-                                                                                alteration,
-                                                                                disclosure,
-                                                                                or
-                                                                                destruction.
+                                                                                Formai is not intended for users under
+                                                                                13 years of age. We do not knowingly
+                                                                                collect personal information from
+                                                                                children under 13. If we learn we have
+                                                                                collected personal information from a
+                                                                                child under 13, we will delete that
+                                                                                information promptly.
                                                                         </p>
                                                                 </div>
                                                         </section>
 
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4">
-                                                                        Your
-                                                                        Rights
+                                                                        8. Policy Updates
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                You
-                                                                                have
-                                                                                the
-                                                                                right
-                                                                                to
-                                                                                access,
-                                                                                correct,
-                                                                                or
-                                                                                delete
-                                                                                your
-                                                                                personal
-                                                                                information
-                                                                                at
-                                                                                any
-                                                                                time.
+                                                                                We may update this privacy policy from
+                                                                                time to time. Revisions will be posted
+                                                                                with updated dates.
                                                                         </p>
                                                                 </div>
                                                         </section>
 
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4">
-                                                                        Contact
-                                                                        Us
+                                                                        9. Contact
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                If
-                                                                                you
-                                                                                have
-                                                                                any
-                                                                                questions
-                                                                                about
-                                                                                this
-                                                                                Privacy
-                                                                                Policy,
-                                                                                please
-                                                                                contact
-                                                                                us
-                                                                                at
-                                                                                reachformaihere@gmail.com
+                                                                                If you have any questions or concerns
+                                                                                about this privacy policy or our data
+                                                                                practices, please contact us at:
                                                                         </p>
-                                                                </div>
-                                                        </section>
-
-                                                        <section>
-                                                                <h2 className="text-2xl font-bold text-white mb-4">
-                                                                        Updates
-                                                                        to This
-                                                                        Policy
-                                                                </h2>
-                                                                <div className="text-gray-300">
-                                                                        <p>
-                                                                                We
-                                                                                may
-                                                                                update
-                                                                                this
-                                                                                Privacy
-                                                                                Policy
-                                                                                from
-                                                                                time
-                                                                                to
-                                                                                time.
-                                                                                We
-                                                                                will
-                                                                                notify
-                                                                                you
-                                                                                of
-                                                                                any
-                                                                                changes
-                                                                                by
-                                                                                posting
-                                                                                the
-                                                                                new
-                                                                                Privacy
-                                                                                Policy
-                                                                                on
-                                                                                this
-                                                                                page.
-                                                                        </p>
-                                                                        <p className="mt-4 text-sm text-gray-400">
-                                                                                Last
-                                                                                Updated:
-                                                                                December
-                                                                                2024
-                                                                        </p>
+                                                                        <p>📧 Email: reachformaihere@gmail.com</p>
                                                                 </div>
                                                         </section>
                                                 </div>

@@ -16,6 +16,9 @@ const UserDashboard: React.FC = () => {
         const [formSchema, setFormSchema] = useState<FormSchema | null>(null);
         const [formId, setFormId] = useState<string | null>(null);
         const [error, setError] = useState("");
+        const [showRevisionForm, setShowRevisionForm] = useState(false);
+        const [revisionPrompt, setRevisionPrompt] = useState("");
+        const [revisionsRemaining, setRevisionsRemaining] = useState(3);
 
         const handleSubmit = async (e: React.FormEvent) => {
                 e.preventDefault();
@@ -88,6 +91,33 @@ const UserDashboard: React.FC = () => {
                 setFormId(null);
                 setResponse("");
                 setPrompt("");
+        };
+
+        const handleRevisionSubmit = (e: React.FormEvent) => {
+                e.preventDefault();
+                if (!revisionPrompt.trim() || !formId) return;
+
+                setIsLoading(true);
+                setError("");
+
+                reviseForm(formId, revisionPrompt)
+                        .then((response: any) => {
+                                const typedResponse = response as ReviseFormResponse;
+                                if (typedResponse.success) {
+                                        setFormSchema(typedResponse.data.schema);
+                                        setRevisionsRemaining(typedResponse.data.revisionsRemaining);
+                                        setRevisionPrompt("");
+                                        setShowRevisionForm(false);
+                                } else {
+                                        setError(typedResponse.error || "Failed to revise form");
+                                }
+                        })
+                        .catch((err: any) => {
+                                setError(err.response?.data?.error || "An error occurred while revising the form");
+                        })
+                        .finally(() => {
+                                setIsLoading(false);
+                        });
         };
 
         return (
@@ -169,11 +199,13 @@ const UserDashboard: React.FC = () => {
 
                                                                 <div className="flex justify-between items-center mt-6">
                                                                         <button
-                                                                                onClick={() => setFormSchema(null)}
+                                                                                onClick={() =>
+                                                                                        setShowRevisionForm(true)
+                                                                                }
                                                                                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-white"
                                                                                 disabled={isLoading}
                                                                         >
-                                                                                Edit Prompt
+                                                                                Edit Form
                                                                         </button>
 
                                                                         <FormFinalizeButton
@@ -182,6 +214,54 @@ const UserDashboard: React.FC = () => {
                                                                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white"
                                                                         />
                                                                 </div>
+
+                                                                {/* Revision Form */}
+                                                                {showRevisionForm && (
+                                                                        <div className="mt-6 border-t border-white/10 pt-6">
+                                                                                <h3 className="text-lg font-medium mb-2 text-white">
+                                                                                        Make changes
+                                                                                </h3>
+                                                                                <form onSubmit={handleRevisionSubmit}>
+                                                                                        <textarea
+                                                                                                className="w-full p-3 bg-white/5 border border-white/10 rounded text-white mb-4"
+                                                                                                rows={3}
+                                                                                                value={revisionPrompt}
+                                                                                                onChange={(e) =>
+                                                                                                        setRevisionPrompt(
+                                                                                                                e.target
+                                                                                                                        .value
+                                                                                                        )
+                                                                                                }
+                                                                                                placeholder="Describe the changes you want to make to the form"
+                                                                                        ></textarea>
+                                                                                        <div className="flex justify-end gap-2">
+                                                                                                <button
+                                                                                                        type="button"
+                                                                                                        onClick={() =>
+                                                                                                                setShowRevisionForm(
+                                                                                                                        false
+                                                                                                                )
+                                                                                                        }
+                                                                                                        className="px-4 py-2 border border-white/20 rounded text-white"
+                                                                                                >
+                                                                                                        Cancel
+                                                                                                </button>
+                                                                                                <button
+                                                                                                        type="submit"
+                                                                                                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                                                                        disabled={
+                                                                                                                !revisionPrompt.trim() ||
+                                                                                                                isLoading
+                                                                                                        }
+                                                                                                >
+                                                                                                        {isLoading
+                                                                                                                ? "Submitting..."
+                                                                                                                : "Submit Changes"}
+                                                                                                </button>
+                                                                                        </div>
+                                                                                </form>
+                                                                        </div>
+                                                                )}
                                                         </div>
                                                 </div>
                                         )}
@@ -192,7 +272,7 @@ const UserDashboard: React.FC = () => {
                                                         <textarea
                                                                 value={prompt}
                                                                 onChange={(e) => setPrompt(e.target.value)}
-                                                                placeholder="e.g., Create a survey for customer satisfaction..."
+                                                                placeholder="Describe the form you want to create..."
                                                                 className="w-full bg-white/5 border border-white/10 rounded-xl p-4 pr-24 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"
                                                                 rows={3}
                                                         />

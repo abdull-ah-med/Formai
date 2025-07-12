@@ -37,7 +37,7 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
 
         return (
                 <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
                         onClick={() => onOpenChange(false)}
                 >
                         {children}
@@ -66,7 +66,8 @@ export const DialogContent: React.FC<DialogContentProps> = ({ children, classNam
                         ref={contentRef}
                         onClick={(e) => e.stopPropagation()}
                         className={cn(
-                                "bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl p-6 w-full max-w-md shadow-2xl",
+                                "bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 w-full max-w-md shadow-2xl animate-in slide-in-from-bottom-10 duration-300",
+                                "ring-1 ring-white/10 shadow-[0_0_30px_rgba(120,120,255,0.15)]",
                                 className
                         )}
                 >
@@ -76,17 +77,17 @@ export const DialogContent: React.FC<DialogContentProps> = ({ children, classNam
 };
 
 export const DialogHeader: React.FC<DialogHeaderProps> = ({ children, className }) => {
-        return <div className={cn("mb-4", className)}>{children}</div>;
+        return <div className={cn("mb-6", className)}>{children}</div>;
 };
 
 export const DialogFooter: React.FC<DialogFooterProps> = ({ children, className }) => {
-        return <div className={cn("flex justify-end space-x-2 mt-6", className)}>{children}</div>;
+        return <div className={cn("mt-8 flex justify-end space-x-4", className)}>{children}</div>;
 };
 
 export const DialogTitle: React.FC<DialogTitleProps> = ({ children, className }) => {
-        return <h3 className={cn("text-xl font-semibold text-white", className)}>{children}</h3>;
+        return <h3 className={cn("text-2xl font-semibold text-white", className)}>{children}</h3>;
 };
 
 export const DialogDescription: React.FC<DialogDescriptionProps> = ({ children, className }) => {
-        return <p className={cn("text-gray-300 mt-2", className)}>{children}</p>;
+        return <p className={cn("text-gray-300 mt-3 leading-relaxed", className)}>{children}</p>;
 };

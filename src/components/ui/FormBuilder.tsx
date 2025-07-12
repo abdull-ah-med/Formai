@@ -153,16 +153,14 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                                 {/* Revision Form */}
                                 {showRevisionForm && (
                                         <div className="mt-6 border-t pt-6">
-                                                <h3 className="text-lg font-medium mb-2">
-                                                        What would you like to change?
-                                                </h3>
+                                                <h3 className="text-lg font-medium mb-2">Make changes</h3>
                                                 <form onSubmit={handleRevisionSubmit}>
                                                         <textarea
                                                                 className="w-full p-3 border rounded mb-4"
                                                                 rows={3}
                                                                 value={revisionPrompt}
                                                                 onChange={(e) => setRevisionPrompt(e.target.value)}
-                                                                placeholder="E.g., Add a question about dietary preferences, make the email field required"
+                                                                placeholder="Describe the changes you want to make to the form"
                                                         ></textarea>
                                                         <div className="flex justify-end gap-2">
                                                                 <button
