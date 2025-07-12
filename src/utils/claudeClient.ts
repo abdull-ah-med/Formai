@@ -16,10 +16,17 @@ export interface FormField {
         options?: Array<string | { text?: string; label?: string }>;
 }
 
+export interface FormSection {
+        title: string;
+        description?: string;
+        fields: FormField[];
+}
+
 export interface FormSchema {
         title: string;
         description: string;
-        fields: FormField[];
+        fields?: FormField[]; // For backward compatibility
+        sections?: FormSection[];
 }
 
 export async function generateSchemaFromPrompt(prompt: string): Promise<FormSchema> {
@@ -68,7 +75,7 @@ ${JSON.stringify(previousSchema, null, 2)}
 
 The user wants to make the following changes to the form: "${revisionPrompt}"
 
-Please apply these changes and return the new, complete JSON schema. Do not output any extra text, only the JSON object.
+Please apply these changes and return the new, complete JSON schema. Maintain the same structure (using sections if the original had sections, or fields if it used fields). Do not output any extra text, only the JSON object.
 `;
 
         try {
