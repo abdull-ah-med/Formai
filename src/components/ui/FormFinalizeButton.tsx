@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api";
 import { checkGoogleFormsPermission, getPermissionErrorMessage } from "../../utils/googleFormsHelper";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./dialog";
+import { getGoogleOAuthURL } from "../../auth/googleOAuth";
 
 interface FormFinalizeButtonProps {
         formId: string;
@@ -79,7 +80,7 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                 localStorage.setItem("redirectAfterAuth", window.location.pathname);
 
                 // Redirect to Google auth
-                const googleOAuthURL = "/api/auth/google";
+                const googleOAuthURL = getGoogleOAuthURL();
                 window.location.href = googleOAuthURL;
         };
 
