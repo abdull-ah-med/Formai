@@ -1,7 +1,8 @@
 import { BarChart, CheckSquare, Flag, Home, MessageSquare, Settings, Users } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { generateForm, reviseForm, finalizeForm } from "../../api";
+import { useForm } from "../../contexts/FormContext";
+import { generateForm, reviseForm, finalizeForm, saveFormToHistory } from "../../api";
 import {
         FormSchema,
         FormSection,
@@ -16,16 +17,24 @@ import DOMPurify from "dompurify";
 
 const UserDashboard: React.FC = () => {
         const { user } = useAuth();
+        const { formSchema: savedFormSchema, formId: savedFormId, setFormData, clearFormData } = useForm();
         const navigate = useNavigate();
         const [prompt, setPrompt] = useState("");
         const [response, setResponse] = useState("");
         const [isLoading, setIsLoading] = useState(false);
-        const [formSchema, setFormSchema] = useState<FormSchema | null>(null);
-        const [formId, setFormId] = useState<string | null>(null);
+        const [formSchema, setFormSchema] = useState<FormSchema | null>(savedFormSchema);
+        const [formId, setFormId] = useState<string | null>(savedFormId);
         const [error, setError] = useState("");
         const [showRevisionForm, setShowRevisionForm] = useState(false);
         const [revisionPrompt, setRevisionPrompt] = useState("");
         const [revisionsRemaining, setRevisionsRemaining] = useState(3);
+
+        // Update form context when local state changes
+        useEffect(() => {
+                if (formSchema && formId) {
+                        setFormData(formSchema, formId);
+                }
+        }, [formSchema, formId, setFormData]);
 
         const handleSubmit = async (e: React.FormEvent) => {
                 e.preventDefault();
@@ -44,6 +53,14 @@ const UserDashboard: React.FC = () => {
                                 setFormSchema(response.data.schema);
                                 setFormId(response.data.formId);
                                 setResponse(""); // Clear response when form is displayed
+
+                                // Save form to history
+                                try {
+                                        await saveFormToHistory(response.data.formId, response.data.schema.title);
+                                } catch (historyError) {
+                                        console.error("Failed to save form to history:", historyError);
+                                        // Don't show error to user as this is a background operation
+                                }
                         } else {
                                 setError(response.error || "Failed to generate form");
                                 setResponse(`Error: ${response.error || "Failed to generate form"}`);
@@ -104,6 +121,7 @@ const UserDashboard: React.FC = () => {
                 setFormId(null);
                 setResponse("");
                 setPrompt("");
+                clearFormData();
         };
 
         const handleRevisionSubmit = (e: React.FormEvent) => {
@@ -290,8 +308,7 @@ const UserDashboard: React.FC = () => {
                                                                         ? "Describe changes you want to make to the form..."
                                                                         : "Describe the form you want to create..."
                                                         }
-                                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 pr-24 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"
-                                                        rows={3}
+                                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 pr-24 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner h-[72px] resize-none overflow-auto"
                                                 />
                                                 <button
                                                         type="submit"

@@ -7,6 +7,7 @@ import AppRoutes from "./routes";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import SessionManager from "./components/SessionManager";
 import { AuthProvider } from "./contexts/AuthContext";
+import { FormProvider } from "./contexts/FormContext";
 
 function App() {
         useEffect(() => {
@@ -18,14 +19,16 @@ function App() {
                 <ErrorBoundary>
                         <Router>
                                 <AuthProvider>
-                                        <SmoothScroll>
-                                                <div className="min-h-screen bg-black text-white">
-                                                        <SessionManager />
-                                                        <Navbar />
-                                                        <AppRoutes />
-                                                        <Footer />
-                                                </div>
-                                        </SmoothScroll>
+                                        <FormProvider>
+                                                <SmoothScroll>
+                                                        <div className="min-h-screen bg-black text-white">
+                                                                <SessionManager />
+                                                                <Navbar />
+                                                                <AppRoutes />
+                                                                <Footer />
+                                                        </div>
+                                                </SmoothScroll>
+                                        </FormProvider>
                                 </AuthProvider>
                         </Router>
                 </ErrorBoundary>

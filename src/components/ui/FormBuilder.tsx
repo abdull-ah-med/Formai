@@ -83,6 +83,27 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                                                 })}
                                         </div>
                                 );
+                        case "select":
+                                return (
+                                        <div>
+                                                <select className="w-full p-2 border rounded" disabled>
+                                                        <option value="" disabled>
+                                                                Select an option
+                                                        </option>
+                                                        {field.options?.map((option: any, i: number) => {
+                                                                const label =
+                                                                        typeof option === "string"
+                                                                                ? option
+                                                                                : option.label || option.text;
+                                                                return (
+                                                                        <option key={i} value={i}>
+                                                                                {DOMPurify.sanitize(label)}
+                                                                        </option>
+                                                                );
+                                                        })}
+                                                </select>
+                                        </div>
+                                );
                         case "rating":
                                 return (
                                         <div className="flex space-x-2">

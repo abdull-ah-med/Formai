@@ -34,12 +34,6 @@ const Navbar = () => {
         const navItems = isAuthenticated
                 ? [
                           {
-                                  name: "Home",
-                                  href: "/",
-                                  isRouterLink: true,
-                                  icon: <Home className="w-5 h-5" />,
-                          },
-                          {
                                   name: "Chat",
                                   href: "/dashboard",
                                   isRouterLink: true,
