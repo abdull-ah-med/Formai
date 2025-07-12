@@ -2,10 +2,17 @@ import { BarChart, CheckSquare, Flag, Home, MessageSquare, Settings, Users } fro
 import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { generateForm, reviseForm, finalizeForm } from "../../api";
-import { FormSchema, GenerateFormResponse, ReviseFormResponse, FinalizeFormResponse } from "../../types/form";
+import {
+        FormSchema,
+        FormSection,
+        GenerateFormResponse,
+        ReviseFormResponse,
+        FinalizeFormResponse,
+} from "../../types/form";
 import { useNavigate } from "react-router-dom";
 import FormBuilder from "./FormBuilder";
 import FormFinalizeButton from "./FormFinalizeButton";
+import DOMPurify from "dompurify";
 
 const UserDashboard: React.FC = () => {
         const { user } = useAuth();
@@ -24,12 +31,15 @@ const UserDashboard: React.FC = () => {
                 e.preventDefault();
                 if (!prompt.trim()) return;
 
+                // Sanitize user input
+                const sanitizedPrompt = DOMPurify.sanitize(prompt.trim());
+
                 setIsLoading(true);
                 setError("");
-                setResponse(`Creating a form for: "${prompt}"`);
+                setResponse(`Creating a form for: "${sanitizedPrompt}"`);
 
                 try {
-                        const response = (await generateForm(prompt.trim())) as GenerateFormResponse;
+                        const response = (await generateForm(sanitizedPrompt)) as GenerateFormResponse;
                         if (response.success) {
                                 setFormSchema(response.data.schema);
                                 setFormId(response.data.formId);
@@ -59,11 +69,14 @@ const UserDashboard: React.FC = () => {
         const handleRevise = async (revisionPrompt: string) => {
                 if (!formId) return;
 
+                // Sanitize user input
+                const sanitizedPrompt = DOMPurify.sanitize(revisionPrompt);
+
                 setIsLoading(true);
                 setError("");
 
                 try {
-                        const response = (await reviseForm(formId, revisionPrompt)) as ReviseFormResponse;
+                        const response = (await reviseForm(formId, sanitizedPrompt)) as ReviseFormResponse;
 
                         if (response.success) {
                                 setFormSchema(response.data.schema);
@@ -97,15 +110,20 @@ const UserDashboard: React.FC = () => {
                 e.preventDefault();
                 if (!revisionPrompt.trim() || !formId) return;
 
+                // Sanitize user input
+                const sanitizedPrompt = DOMPurify.sanitize(revisionPrompt.trim());
+
                 setIsLoading(true);
                 setError("");
 
-                reviseForm(formId, revisionPrompt)
+                reviseForm(formId, sanitizedPrompt)
                         .then((response: any) => {
                                 const typedResponse = response as ReviseFormResponse;
                                 if (typedResponse.success) {
                                         setFormSchema(typedResponse.data.schema);
-                                        setRevisionsRemaining(typedResponse.data.revisionsRemaining);
+                                        if (typedResponse.data.revisionsRemaining !== null) {
+                                                setRevisionsRemaining(typedResponse.data.revisionsRemaining);
+                                        }
                                         setRevisionPrompt("");
                                         setShowRevisionForm(false);
                                 } else {
@@ -120,18 +138,80 @@ const UserDashboard: React.FC = () => {
                         });
         };
 
+        // Render form content with sections support
+        const renderFormContent = () => {
+                if (!formSchema) return null;
+
+                if (formSchema.sections && formSchema.sections.length > 0) {
+                        // Render sections
+                        return (
+                                <div className="space-y-8">
+                                        {formSchema.sections.map((section, sectionIndex) => (
+                                                <div
+                                                        key={sectionIndex}
+                                                        className="bg-white/5 border border-white/10 rounded-xl p-6"
+                                                >
+                                                        <h3 className="text-xl font-semibold mb-2">
+                                                                {DOMPurify.sanitize(section.title)}
+                                                        </h3>
+                                                        {section.description && (
+                                                                <p className="text-gray-400 mb-4">
+                                                                        {DOMPurify.sanitize(section.description)}
+                                                                </p>
+                                                        )}
+                                                        <div className="space-y-4">
+                                                                {section.fields.map((field, fieldIndex) => (
+                                                                        <div
+                                                                                key={fieldIndex}
+                                                                                className="p-3 bg-white/5 rounded-lg"
+                                                                        >
+                                                                                <p className="font-medium">
+                                                                                        {DOMPurify.sanitize(
+                                                                                                field.label
+                                                                                        )}
+                                                                                        {field.required && (
+                                                                                                <span className="text-red-400 ml-1">
+                                                                                                        *
+                                                                                                </span>
+                                                                                        )}
+                                                                                </p>
+                                                                                <p className="text-xs text-gray-400">
+                                                                                        Type: {field.type}
+                                                                                </p>
+                                                                        </div>
+                                                                ))}
+                                                        </div>
+                                                </div>
+                                        ))}
+                                </div>
+                        );
+                } else if (formSchema.fields && formSchema.fields.length > 0) {
+                        // Fallback to old fields array for backward compatibility
+                        return (
+                                <div className="space-y-4 mb-6">
+                                        {formSchema.fields.map((field, index) => (
+                                                <div key={index} className="p-3 bg-white/5 rounded-lg">
+                                                        <p className="font-medium">
+                                                                {DOMPurify.sanitize(field.label)}
+                                                                {field.required && (
+                                                                        <span className="text-red-400 ml-1">*</span>
+                                                                )}
+                                                        </p>
+                                                        <p className="text-xs text-gray-400">Type: {field.type}</p>
+                                                </div>
+                                        ))}
+                                </div>
+                        );
+                } else {
+                        return <p className="text-gray-400">No form fields found.</p>;
+                }
+        };
+
         return (
                 <div className="min-h-screen bg-black text-white flex flex-col pt-16">
-                        <main className="flex-1 p-4 md:p-6 lg:p-8">
+                        <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24">
                                 <div className="max-w-4xl mx-auto">
-                                        <div className="text-center mb-8">
-                                                <h1 className="text-4xl font-bold">
-                                                        Welcome back, {user?.fullName || "User"}!
-                                                </h1>
-                                                <p className="text-gray-400 mt-2">What can I help you create today?</p>
-                                        </div>
-
-                                        {/* Response Display Area */}
+                                        {/* Response Display Area - only show if not displaying a form */}
                                         {!formSchema && (
                                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 min-h-[200px] mb-6 shadow-lg">
                                                         {isLoading ? (
@@ -170,123 +250,65 @@ const UserDashboard: React.FC = () => {
 
                                                         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 mb-6">
                                                                 <h3 className="text-xl font-semibold mb-2">
-                                                                        {formSchema.title}
+                                                                        {DOMPurify.sanitize(formSchema.title)}
                                                                 </h3>
                                                                 <p className="text-gray-400 mb-4">
-                                                                        {formSchema.description}
+                                                                        {DOMPurify.sanitize(formSchema.description)}
                                                                 </p>
 
-                                                                <div className="space-y-4 mb-6">
-                                                                        {formSchema.fields.map((field, index) => (
-                                                                                <div
-                                                                                        key={index}
-                                                                                        className="p-3 bg-white/5 rounded-lg"
-                                                                                >
-                                                                                        <p className="font-medium">
-                                                                                                {field.label}
-                                                                                                {field.required && (
-                                                                                                        <span className="text-red-400 ml-1">
-                                                                                                                *
-                                                                                                        </span>
-                                                                                                )}
-                                                                                        </p>
-                                                                                        <p className="text-xs text-gray-400">
-                                                                                                Type: {field.type}
-                                                                                        </p>
-                                                                                </div>
-                                                                        ))}
-                                                                </div>
+                                                                {renderFormContent()}
 
-                                                                <div className="flex justify-between items-center mt-6">
-                                                                        <button
-                                                                                onClick={() =>
-                                                                                        setShowRevisionForm(true)
-                                                                                }
-                                                                                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-white"
-                                                                                disabled={isLoading}
-                                                                        >
-                                                                                Edit Form
-                                                                        </button>
-
+                                                                <div className="flex justify-end items-center mt-6">
                                                                         <FormFinalizeButton
                                                                                 formId={formId}
                                                                                 onSuccess={handleFormSuccess}
                                                                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white"
                                                                         />
                                                                 </div>
-
-                                                                {/* Revision Form */}
-                                                                {showRevisionForm && (
-                                                                        <div className="mt-6 border-t border-white/10 pt-6">
-                                                                                <h3 className="text-lg font-medium mb-2 text-white">
-                                                                                        Make changes
-                                                                                </h3>
-                                                                                <form onSubmit={handleRevisionSubmit}>
-                                                                                        <textarea
-                                                                                                className="w-full p-3 bg-white/5 border border-white/10 rounded text-white mb-4"
-                                                                                                rows={3}
-                                                                                                value={revisionPrompt}
-                                                                                                onChange={(e) =>
-                                                                                                        setRevisionPrompt(
-                                                                                                                e.target
-                                                                                                                        .value
-                                                                                                        )
-                                                                                                }
-                                                                                                placeholder="Describe the changes you want to make to the form"
-                                                                                        ></textarea>
-                                                                                        <div className="flex justify-end gap-2">
-                                                                                                <button
-                                                                                                        type="button"
-                                                                                                        onClick={() =>
-                                                                                                                setShowRevisionForm(
-                                                                                                                        false
-                                                                                                                )
-                                                                                                        }
-                                                                                                        className="px-4 py-2 border border-white/20 rounded text-white"
-                                                                                                >
-                                                                                                        Cancel
-                                                                                                </button>
-                                                                                                <button
-                                                                                                        type="submit"
-                                                                                                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                                                                                        disabled={
-                                                                                                                !revisionPrompt.trim() ||
-                                                                                                                isLoading
-                                                                                                        }
-                                                                                                >
-                                                                                                        {isLoading
-                                                                                                                ? "Submitting..."
-                                                                                                                : "Submit Changes"}
-                                                                                                </button>
-                                                                                        </div>
-                                                                                </form>
-                                                                        </div>
-                                                                )}
                                                         </div>
                                                 </div>
                                         )}
-
-                                        {/* Prompt Input Form - Only show if no form is displayed or there's an error */}
-                                        {!formSchema && (
-                                                <form onSubmit={handleSubmit} className="relative">
-                                                        <textarea
-                                                                value={prompt}
-                                                                onChange={(e) => setPrompt(e.target.value)}
-                                                                placeholder="Describe the form you want to create..."
-                                                                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 pr-24 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"
-                                                                rows={3}
-                                                        />
-                                                        <button
-                                                                type="submit"
-                                                                className="absolute right-4 bottom-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md disabled:opacity-50"
-                                                                disabled={isLoading || !prompt}
-                                                        >
-                                                                {isLoading ? "Generating..." : "Generate"}
-                                                        </button>
-                                                </form>
-                                        )}
                                 </div>
                         </main>
+
+                        {/* Sticky Input Box - Always visible */}
+                        <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/10 p-4">
+                                <div className="max-w-4xl mx-auto">
+                                        <form
+                                                onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
+                                                className="relative"
+                                        >
+                                                <textarea
+                                                        value={formSchema ? revisionPrompt : prompt}
+                                                        onChange={(e) =>
+                                                                formSchema
+                                                                        ? setRevisionPrompt(e.target.value)
+                                                                        : setPrompt(e.target.value)
+                                                        }
+                                                        placeholder={
+                                                                formSchema
+                                                                        ? "Describe changes you want to make to the form..."
+                                                                        : "Describe the form you want to create..."
+                                                        }
+                                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 pr-24 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"
+                                                        rows={3}
+                                                />
+                                                <button
+                                                        type="submit"
+                                                        className="absolute right-4 bottom-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md disabled:opacity-50"
+                                                        disabled={isLoading || (formSchema ? !revisionPrompt : !prompt)}
+                                                >
+                                                        {isLoading
+                                                                ? formSchema
+                                                                        ? "Updating..."
+                                                                        : "Generating..."
+                                                                : formSchema
+                                                                ? "Update Form"
+                                                                : "Generate"}
+                                                </button>
+                                        </form>
+                                </div>
+                        </div>
                 </div>
         );
 };

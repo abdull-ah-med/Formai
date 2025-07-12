@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { Mail, Twitter } from "lucide-react";
 import FormaiLogo from "@/assets/Formai.svg";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Footer = () => {
+        const { isAuthenticated, logout } = useAuth();
+
         return (
                 <footer className="relative bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden">
                         {/* Background overlay for translucent effect */}
@@ -36,16 +39,32 @@ const Footer = () => {
                                         <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-36 text-sm w-full md:w-auto">
                                                 {/* Sitemap */}
                                                 <div className="space-y-3 text-center md:text-left">
-                                                        <h3 className="text-white font-semibold mb-4">
-                                                                Sitemap
-                                                        </h3>
+                                                        <h3 className="text-white font-semibold mb-4">Sitemap</h3>
                                                         <div className="space-y-2">
-                                                                <Link
-                                                                        to="/signup"
-                                                                        className="block text-gray-400 hover:text-white transition-colors"
-                                                                >
-                                                                        Sign Up
-                                                                </Link>
+                                                                {!isAuthenticated ? (
+                                                                        <>
+                                                                                <Link
+                                                                                        to="/signup"
+                                                                                        className="block text-gray-400 hover:text-white transition-colors"
+                                                                                >
+                                                                                        Sign Up
+                                                                                </Link>
+                                                                                <Link
+                                                                                        to="/signin"
+                                                                                        className="block text-gray-400 hover:text-white transition-colors"
+                                                                                >
+                                                                                        Sign In
+                                                                                </Link>
+                                                                        </>
+                                                                ) : (
+                                                                        <Link
+                                                                                to="/"
+                                                                                className="block text-gray-400 hover:text-white transition-colors"
+                                                                                onClick={logout}
+                                                                        >
+                                                                                Logout
+                                                                        </Link>
+                                                                )}
                                                                 <Link
                                                                         to="/about"
                                                                         className="block text-gray-400 hover:text-white transition-colors"
@@ -57,63 +76,39 @@ const Footer = () => {
 
                                                 {/* Legal */}
                                                 <div className="space-y-3 text-center md:text-left">
-                                                        <h3 className="text-white font-semibold mb-4">
-                                                                Legal
-                                                        </h3>
+                                                        <h3 className="text-white font-semibold mb-4">Legal</h3>
                                                         <div className="space-y-2">
                                                                 <Link
                                                                         to="/privacy"
                                                                         className="block text-gray-400 hover:text-white transition-colors"
                                                                 >
-                                                                        Privacy
-                                                                        Policy
+                                                                        Privacy Policy
                                                                 </Link>
                                                                 <Link
                                                                         to="/terms"
                                                                         className="block text-gray-400 hover:text-white transition-colors"
                                                                 >
-                                                                        Terms of
-                                                                        Service
+                                                                        Terms of Service
                                                                 </Link>
                                                                 <Link
                                                                         to="/cookies"
                                                                         className="block text-gray-400 hover:text-white transition-colors"
                                                                 >
-                                                                        Cookie
-                                                                        Policy
+                                                                        Cookie Policy
                                                                 </Link>
                                                         </div>
                                                 </div>
 
                                                 {/* Contact & Social */}
                                                 <div className="space-y-3 text-center md:text-left">
-                                                        <h3 className="text-white font-semibold mb-4">
-                                                                Contact
-                                                        </h3>
+                                                        <h3 className="text-white font-semibold mb-4">Contact</h3>
                                                         <div className="space-y-4">
                                                                 <a
-                                                                        href="mailto:hello@brand.com"
+                                                                        href="mailto:reachformaihere@gmail.com"
                                                                         className="flex items-center justify-center md:justify-start gap-2 text-gray-400 hover:text-white transition-colors"
                                                                 >
-                                                                        <Mail
-                                                                                size={
-                                                                                        16
-                                                                                }
-                                                                        />
-                                                                        hello@brand.com
-                                                                </a>
-                                                                <a
-                                                                        href="https://twitter.com/brand"
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className="flex items-center justify-center md:justify-start gap-2 text-gray-400 hover:text-white transition-colors"
-                                                                >
-                                                                        <Twitter
-                                                                                size={
-                                                                                        16
-                                                                                }
-                                                                        />
-                                                                        @brand
+                                                                        <Mail size={16} />
+                                                                        reachformaihere@gmail.com
                                                                 </a>
                                                         </div>
                                                 </div>

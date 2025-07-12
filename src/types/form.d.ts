@@ -13,11 +13,19 @@ interface FormField {
         options?: FormOption[];
 }
 
+// Form section interface
+export interface FormSection {
+        title: string;
+        description?: string;
+        fields: FormField[];
+}
+
 // Complete form schema
 export interface FormSchema {
         title: string;
         description: string;
-        fields: FormField[];
+        fields: FormField[]; // For backward compatibility
+        sections?: FormSection[]; // New sections structure
 }
 
 // API response interfaces

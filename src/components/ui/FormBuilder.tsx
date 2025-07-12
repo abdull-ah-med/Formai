@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { FormSchema } from "../../types/form";
+import { FormSchema, FormSection } from "../../types/form";
 import FormFinalizeButton from "./FormFinalizeButton";
+import DOMPurify from "dompurify";
 
 interface FormBuilderProps {
         schema: FormSchema;
@@ -25,7 +26,11 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
         const handleRevisionSubmit = (e: React.FormEvent) => {
                 e.preventDefault();
                 if (!revisionPrompt.trim()) return;
-                onRevise(revisionPrompt);
+
+                // Sanitize user input
+                const sanitizedPrompt = DOMPurify.sanitize(revisionPrompt.trim());
+
+                onRevise(sanitizedPrompt);
                 setRevisionPrompt("");
                 setShowRevisionForm(false);
         };
@@ -72,7 +77,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                                                                                 className="mr-2"
                                                                                 disabled
                                                                         />
-                                                                        <span>{label}</span>
+                                                                        <span>{DOMPurify.sanitize(label)}</span>
                                                                 </div>
                                                         );
                                                 })}
@@ -97,19 +102,57 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 }
         };
 
-        return (
-                <div className="bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
-                        <div className="p-6">
-                                <h1 className="text-3xl font-bold mb-2">{schema.title}</h1>
-                                <p className="text-gray-600 mb-6">{schema.description}</p>
+        // Sanitize form title and description
+        const sanitizedTitle = DOMPurify.sanitize(schema.title);
+        const sanitizedDescription = DOMPurify.sanitize(schema.description);
 
-                                {/* Form Preview */}
-                                <div className="border rounded-lg p-6 bg-gray-50 mb-8">
-                                        <h2 className="text-lg font-medium text-gray-700 mb-4">Form Preview</h2>
+        // Render form sections or fallback to fields if no sections
+        const renderFormContent = () => {
+                if (schema.sections && schema.sections.length > 0) {
+                        return (
+                                <>
+                                        {schema.sections.map((section, sectionIndex) => (
+                                                <div key={sectionIndex} className="mb-8 border-b pb-6">
+                                                        <h3 className="text-xl font-semibold mb-3">
+                                                                {DOMPurify.sanitize(section.title)}
+                                                        </h3>
+                                                        {section.description && (
+                                                                <p className="text-gray-600 mb-4">
+                                                                        {DOMPurify.sanitize(section.description)}
+                                                                </p>
+                                                        )}
+                                                        <div className="space-y-4">
+                                                                {section.fields.map((field, fieldIndex) => (
+                                                                        <div
+                                                                                key={fieldIndex}
+                                                                                className="p-4 bg-white border rounded-md"
+                                                                        >
+                                                                                <label className="block text-lg font-medium mb-2">
+                                                                                        {DOMPurify.sanitize(
+                                                                                                field.label
+                                                                                        )}
+                                                                                        {field.required && (
+                                                                                                <span className="text-red-500 ml-1">
+                                                                                                        *
+                                                                                                </span>
+                                                                                        )}
+                                                                                </label>
+                                                                                {renderField(field, fieldIndex)}
+                                                                        </div>
+                                                                ))}
+                                                        </div>
+                                                </div>
+                                        ))}
+                                </>
+                        );
+                } else {
+                        // Fallback to the old fields array for backward compatibility
+                        return (
+                                <>
                                         {schema.fields?.map((field, index) => (
                                                 <div key={index} className="mb-6 p-4 bg-white border rounded-md">
                                                         <label className="block text-lg font-medium mb-2">
-                                                                {field.label}
+                                                                {DOMPurify.sanitize(field.label)}
                                                                 {field.required && (
                                                                         <span className="text-red-500 ml-1">*</span>
                                                                 )}
@@ -117,6 +160,21 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                                                         {renderField(field, index)}
                                                 </div>
                                         ))}
+                                </>
+                        );
+                }
+        };
+
+        return (
+                <div className="bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
+                        <div className="p-6">
+                                <h1 className="text-3xl font-bold mb-2">{sanitizedTitle}</h1>
+                                <p className="text-gray-600 mb-6">{sanitizedDescription}</p>
+
+                                {/* Form Preview */}
+                                <div className="border rounded-lg p-6 bg-gray-50 mb-8">
+                                        <h2 className="text-lg font-medium text-gray-700 mb-4">Form Preview</h2>
+                                        {renderFormContent()}
                                 </div>
 
                                 {/* Action Buttons */}

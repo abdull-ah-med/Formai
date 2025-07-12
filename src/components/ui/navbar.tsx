@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "./button";
-import { LogOut, Settings, User, ChevronDown, Menu, X, MessageSquare, History } from "lucide-react";
+import { LogOut, Settings, User, ChevronDown, Menu, X, MessageSquare, History, Home } from "lucide-react";
 import FormaiLogo from "../../assets/Formai.svg";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -33,6 +33,12 @@ const Navbar = () => {
 
         const navItems = isAuthenticated
                 ? [
+                          {
+                                  name: "Home",
+                                  href: "/",
+                                  isRouterLink: true,
+                                  icon: <Home className="w-5 h-5" />,
+                          },
                           {
                                   name: "Chat",
                                   href: "/dashboard",
