@@ -17,11 +17,18 @@ export const googleCallback = async (req: Request, res: Response) => {
                         state?: string;
                 };
                 if (!code) {
-                        return res.status(400).json({ message: "Missing code" });
+                        return res.status(400).json({
+                                success: false,
+                                error: "Missing authorization code",
+                                message: "No authorization code was provided in the callback",
+                        });
                 }
+
+                console.log("Processing Google OAuth callback with code");
 
                 // Use environment variable for redirect URI, ensuring no trailing slash
                 const redirectUri = `${(FRONTEND_URL || "").replace(/\/$/, "")}/auth/google/callback`;
+                console.log("Using redirect URI:", redirectUri);
 
                 // Include clientSecret in production for secure exchanges
                 const client = new OAuth2Client({
@@ -31,10 +38,25 @@ export const googleCallback = async (req: Request, res: Response) => {
                 });
 
                 // Exchange code for tokens, explicitly passing redirectUri
+                console.log("Exchanging code for tokens...");
                 const { tokens } = await client.getToken({
                         code,
                         redirect_uri: redirectUri,
                 });
+
+                if (!tokens.access_token) {
+                        console.error("No access token received from Google");
+                        return res.status(400).json({
+                                success: false,
+                                error: "No access token received",
+                                message: "Failed to obtain access token from Google",
+                        });
+                }
+
+                console.log("Received tokens from Google. Verifying ID token...");
+                // Check if we got a refresh token (needed for Google Forms API)
+                const hasRefreshToken = !!tokens.refresh_token;
+                console.log("Refresh token received:", hasRefreshToken ? "Yes" : "No");
 
                 // Verify the ID token
                 const ticket = await client.verifyIdToken({
@@ -44,12 +66,19 @@ export const googleCallback = async (req: Request, res: Response) => {
 
                 const payload = ticket.getPayload();
                 if (!payload?.email) {
-                        return res.status(400).json({ message: "Invalid Google user" });
+                        return res.status(400).json({
+                                success: false,
+                                error: "Invalid Google user",
+                                message: "Could not retrieve email from Google account",
+                        });
                 }
+
+                console.log("Google account verified for email:", payload.email);
 
                 // Find or create user in your DB
                 let user = await User.findOne({ email: payload.email });
                 if (!user) {
+                        console.log("Creating new user for:", payload.email);
                         user = await User.create({
                                 fullName: payload.name || "Google User",
                                 email: payload.email,
@@ -61,11 +90,14 @@ export const googleCallback = async (req: Request, res: Response) => {
                                 },
                         });
                 } else {
+                        console.log("Updating existing user:", payload.email);
                         // Check if user already has a different Google ID linked
                         if (user.googleId && user.googleId !== payload.sub) {
-                                return res
-                                        .status(400)
-                                        .send("This account is already linked to a different Google account.");
+                                return res.status(400).json({
+                                        success: false,
+                                        error: "Account conflict",
+                                        message: "This account is already linked to a different Google account.",
+                                });
                         }
 
                         // If no Google ID yet, link it
@@ -98,14 +130,30 @@ export const googleCallback = async (req: Request, res: Response) => {
                         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
                 });
 
+                console.log("Authentication successful, returning token");
+
                 // Finally redirect back to your frontend app
                 return res.status(200).json({
                         success: true,
                         message: "Login successful",
                         token,
+                        hasFormsScope: true, // We requested the forms scope in the OAuth URL
+                        hasRefreshToken,
                 });
-        } catch (err) {
+        } catch (err: any) {
                 console.error("Google OAuth callback error:", err);
-                return res.status(500).send("OAuth callback failed");
+
+                // Log detailed error information
+                if (err.response) {
+                        console.error("Error response data:", err.response.data);
+                }
+
+                // Return a more helpful error message
+                return res.status(500).json({
+                        success: false,
+                        error: "OAuth callback failed",
+                        message: err.message || "An error occurred during Google authentication",
+                        details: process.env.NODE_ENV !== "production" ? err.toString() : undefined,
+                });
         }
 };

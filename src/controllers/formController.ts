@@ -160,10 +160,21 @@ export const finalizeForm = async (req: Request, res: Response) => {
                                 ? form.revisions[form.revisions.length - 1].claudeResponse
                                 : form.claudeResponse;
 
+                // Log the schema for debugging
+                console.log("Final schema for form creation:", JSON.stringify(finalSchema));
+
                 const oauth2Client = new OAuth2Client({
                         clientId: process.env.GOOGLE_CLIENT_ID,
                         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
                 });
+
+                if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+                        console.error("Missing Google OAuth credentials in environment variables");
+                        return res.status(500).json({
+                                success: false,
+                                error: "Server configuration error: Missing Google OAuth credentials",
+                        });
+                }
 
                 oauth2Client.setCredentials({
                         access_token: user.googleTokens.accessToken,
@@ -178,6 +189,7 @@ export const finalizeForm = async (req: Request, res: Response) => {
                         user.googleTokens.refreshToken
                 ) {
                         try {
+                                console.log("Refreshing expired Google token");
                                 const { credentials } = await oauth2Client.refreshAccessToken();
 
                                 // Update user's tokens in the database
@@ -188,6 +200,7 @@ export const finalizeForm = async (req: Request, res: Response) => {
                                 };
 
                                 await user.save();
+                                console.log("Token refreshed successfully");
 
                                 // Update the credentials in the oauth2Client
                                 oauth2Client.setCredentials({
@@ -195,8 +208,14 @@ export const finalizeForm = async (req: Request, res: Response) => {
                                         refresh_token: credentials.refresh_token || user.googleTokens.refreshToken,
                                         expiry_date: credentials.expiry_date,
                                 });
-                        } catch (refreshError) {
+                        } catch (refreshError: any) {
                                 console.error("Failed to refresh Google token:", refreshError);
+
+                                // Log detailed error information
+                                if (refreshError.response) {
+                                        console.error("Refresh error details:", refreshError.response.data);
+                                }
+
                                 return res.status(403).json({
                                         success: false,
                                         error: "GOOGLE_TOKEN_EXPIRED",
@@ -205,44 +224,84 @@ export const finalizeForm = async (req: Request, res: Response) => {
                         }
                 }
 
-                const googleForm = await createGoogleForm(finalSchema, oauth2Client);
+                try {
+                        const googleForm = await createGoogleForm(finalSchema, oauth2Client);
 
-                // Update the form with Google Form details
-                form.googleFormUrl = googleForm.responderUri;
-                await form.save();
+                        // Update the form with Google Form details
+                        form.googleFormUrl = googleForm.responderUri;
+                        await form.save();
 
-                // Add to user's form history
-                if (!user.formsHistory) user.formsHistory = [];
-                user.formsHistory.push({
-                        schema: finalSchema,
-                        formId: googleForm.formId,
-                        responderUri: googleForm.responderUri,
-                        finalizedAt: new Date(),
-                });
-                await user.save();
-
-                res.json({
-                        success: true,
-                        data: {
-                                formId: form._id,
-                                googleFormUrl: googleForm.responderUri,
+                        // Add to user's form history
+                        if (!user.formsHistory) user.formsHistory = [];
+                        user.formsHistory.push({
                                 schema: finalSchema,
-                        },
-                });
+                                formId: googleForm.formId,
+                                responderUri: googleForm.responderUri,
+                                finalizedAt: new Date(),
+                        });
+                        await user.save();
+
+                        res.json({
+                                success: true,
+                                data: {
+                                        formId: form._id,
+                                        googleFormUrl: googleForm.responderUri,
+                                        schema: finalSchema,
+                                },
+                        });
+                } catch (googleError: any) {
+                        console.error("Google Form creation error:", googleError);
+
+                        // Check for specific Google API errors
+                        if (googleError.message && googleError.message.includes("Permission denied")) {
+                                return res.status(403).json({
+                                        success: false,
+                                        error: "GOOGLE_PERMISSION_DENIED",
+                                        message: "You don't have permission to create Google Forms. Please check your Google account permissions.",
+                                });
+                        } else if (googleError.message && googleError.message.includes("Authentication failed")) {
+                                return res.status(403).json({
+                                        success: false,
+                                        error: "GOOGLE_TOKEN_EXPIRED",
+                                        message: "Your Google authentication has expired. Please reconnect your Google account.",
+                                });
+                        } else if (googleError.message && googleError.message.includes("Invalid form schema")) {
+                                return res.status(400).json({
+                                        success: false,
+                                        error: "INVALID_FORM_SCHEMA",
+                                        message: googleError.message,
+                                });
+                        }
+
+                        // Generic error
+                        return res.status(500).json({
+                                success: false,
+                                error: "GOOGLE_FORM_ERROR",
+                                message: googleError.message || "Failed to create Google Form.",
+                        });
+                }
         } catch (error) {
                 const e = error as any;
-                console.error(e);
+                console.error("Form finalization error:", e);
+
                 // Check if token is expired - Google API returns errors in a specific format
-                if (e.response?.data?.error === "invalid_grant" || e.message.includes("invalid_grant")) {
+                if (e.response?.data?.error === "invalid_grant" || (e.message && e.message.includes("invalid_grant"))) {
                         return res.status(403).json({
                                 success: false,
                                 error: "GOOGLE_TOKEN_EXPIRED",
                                 message: "Your Google authorization has expired. Please reconnect your Google account.",
                         });
                 }
+
+                // Log the full error for debugging
+                if (e.response) {
+                        console.error("Error response data:", e.response.data);
+                }
+
                 res.status(500).json({
                         success: false,
-                        error: "Failed to finalize form.",
+                        error: "SERVER_ERROR",
+                        message: "Failed to finalize form. Please try again later.",
                 });
         }
 };

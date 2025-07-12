@@ -201,10 +201,75 @@ function mapFieldToGoogleFormsRequest(field: FormField, index: number): forms_v1
         }
 }
 
+// Helper function to validate the form schema
+function validateFormSchema(schema: FormSchema): { valid: boolean; error?: string } {
+        try {
+                // Check for required top-level fields
+                if (!schema.title) {
+                        return { valid: false, error: "Form schema is missing title" };
+                }
+                if (!schema.description) {
+                        return { valid: false, error: "Form schema is missing description" };
+                }
+
+                // Check that either sections or fields exist
+                if (!schema.sections?.length && !schema.fields?.length) {
+                        return { valid: false, error: "Form schema must have either sections or fields" };
+                }
+
+                // If using sections, validate each section
+                if (schema.sections?.length) {
+                        for (const section of schema.sections) {
+                                if (!section.title) {
+                                        return { valid: false, error: "Section is missing title" };
+                                }
+                                if (!section.fields || !Array.isArray(section.fields) || section.fields.length === 0) {
+                                        return { valid: false, error: `Section "${section.title}" has no fields` };
+                                }
+
+                                // Validate each field in the section
+                                for (const field of section.fields) {
+                                        if (!field.label) {
+                                                return { valid: false, error: "Field is missing label" };
+                                        }
+                                        if (!field.type) {
+                                                return {
+                                                        valid: false,
+                                                        error: `Field "${field.label}" is missing type`,
+                                                };
+                                        }
+                                }
+                        }
+                }
+
+                // If using fields directly, validate each field
+                if (schema.fields?.length) {
+                        for (const field of schema.fields) {
+                                if (!field.label) {
+                                        return { valid: false, error: "Field is missing label" };
+                                }
+                                if (!field.type) {
+                                        return { valid: false, error: `Field "${field.label}" is missing type` };
+                                }
+                        }
+                }
+
+                return { valid: true };
+        } catch (error) {
+                return { valid: false, error: `Schema validation error: ${(error as Error).message}` };
+        }
+}
+
 export async function createGoogleForm(
         schema: FormSchema,
         oauth2Client: OAuth2Client
 ): Promise<{ formId: string; responderUri: string }> {
+        // Validate the schema first
+        const validation = validateFormSchema(schema);
+        if (!validation.valid) {
+                throw new Error(`Invalid form schema: ${validation.error}`);
+        }
+
         const forms = google.forms({
                 version: "v1",
                 auth: oauth2Client,
@@ -297,8 +362,32 @@ export async function createGoogleForm(
                 const responderUri = form.data.responderUri || "";
 
                 return { formId, responderUri };
-        } catch (error) {
+        } catch (error: any) {
                 console.error("Error creating Google Form:", error);
-                throw new Error("Failed to create Google Form.");
+
+                // Provide more detailed error information
+                if (error.response) {
+                        // Google API error with response
+                        const status = error.response.status;
+                        const errorDetails = error.response.data?.error || {};
+
+                        console.error(`Google Forms API error (${status}):`, errorDetails);
+
+                        if (status === 403) {
+                                throw new Error(
+                                        "Permission denied: You don't have permission to create Google Forms. Please check your Google account permissions."
+                                );
+                        } else if (status === 401) {
+                                throw new Error(
+                                        "Authentication failed: Your Google authentication has expired or is invalid. Please reconnect your Google account."
+                                );
+                        } else {
+                                throw new Error(
+                                        `Google Forms API error (${status}): ${errorDetails.message || "Unknown error"}`
+                                );
+                        }
+                }
+
+                throw new Error(`Failed to create Google Form: ${error.message || "Unknown error"}`);
         }
 }
