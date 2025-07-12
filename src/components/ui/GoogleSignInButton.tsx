@@ -2,11 +2,11 @@ import { Button } from "./button";
 import { getGoogleOAuthURL } from "../../auth/googleOAuth";
 import { cn } from "../../lib/utils";
 
-interface GoogleSignInButtonProps
-        extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface GoogleSignInButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
         variant?: "signin" | "signup"; // Controls label rendering
         label?: string; // Optional custom label
         disabled?: boolean;
+        onSuccess?: () => void; // Optional callback when Google auth succeeds
 }
 
 const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
@@ -14,20 +14,23 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         label: customLabel,
         className,
         disabled,
+        onSuccess,
         ...rest
 }) => {
         const handleGoogleSignIn = () => {
                 if (disabled) return;
                 localStorage.removeItem("nonPersistentAuth");
+
+                // If we have an onSuccess callback, store it to be called after redirect
+                if (onSuccess) {
+                        localStorage.setItem("pendingGoogleAuthCallback", "true");
+                }
+
                 const googleOAuthURL = getGoogleOAuthURL();
                 window.location.href = googleOAuthURL;
         };
 
-        const label =
-                customLabel ||
-                (variant === "signup"
-                        ? "Sign up with Google"
-                        : "Sign in with Google");
+        const label = customLabel || (variant === "signup" ? "Sign up with Google" : "Sign in with Google");
 
         return (
                 <Button
@@ -40,11 +43,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
                         {...rest}
                 >
                         {/* Google G logo */}
-                        <svg
-                                className="h-5 w-5 mr-2"
-                                viewBox="0 0 533.5 544.3"
-                                xmlns="http://www.w3.org/2000/svg"
-                        >
+                        <svg className="h-5 w-5 mr-2" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                         fill="#4285F4"
                                         d="M533.5 278.4c0-17.4-1.6-34-4.7-50.2H272v95h146.7c-6.4 34.3-25.1 63.4-53.5 83v68h86.7c50.7-46.7 81.6-115.5 81.6-195.8z"
