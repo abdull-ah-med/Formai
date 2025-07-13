@@ -64,28 +64,28 @@ const Navbar = () => {
                                   name: "Pricing",
                                   href: "/pricing",
                                   isRouterLink: true,
-                                  icon: null,
+                                  icon: <Home className="w-5 h-5" />,
                                   onClick: undefined,
                           },
                           {
                                   name: "About",
                                   href: "/about",
                                   isRouterLink: true,
-                                  icon: null,
+                                  icon: <MessageSquare className="w-5 h-5" />,
                                   onClick: undefined,
                           },
                           {
                                   name: "Sign In",
                                   href: "/signin",
                                   isRouterLink: true,
-                                  icon: null,
+                                  icon: <User className="w-5 h-5" />,
                                   onClick: undefined,
                           },
                           {
                                   name: "Sign Up",
                                   href: "/signup",
                                   isRouterLink: true,
-                                  icon: null,
+                                  icon: <User className="w-5 h-5" />,
                                   onClick: undefined,
                           },
                   ];
@@ -307,7 +307,7 @@ const Navbar = () => {
                                                                                                                                 false
                                                                                                                         );
                                                                                                                 }}
-                                                                                                                className="flex items-center space-x-4 p-4 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 group transform hover:scale-105"
+                                                                                                                className={`flex items-center space-x-4 p-4 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 group transform hover:scale-105`}
                                                                                                         >
                                                                                                                 <div className="p-2 rounded-lg bg-white/10 group-hover:bg-white/20 transition-all duration-200 group-hover:scale-110">
                                                                                                                         {
