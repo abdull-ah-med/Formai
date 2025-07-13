@@ -26,15 +26,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
 
                 try {
+                        console.log("Fetching user data...");
                         const res = await api.get<{ user: CurrentUser }>("/account");
+                        console.log("User data response:", res.data);
                         if (res.data.user) {
                                 setUser(res.data.user);
                         } else {
+                                console.error("No user data in response");
                                 setUser(null);
                                 setAuthToken(null); // Token is invalid, remove it
                         }
-                } catch (error) {
+                } catch (error: any) {
                         console.error("Failed to fetch user:", error);
+                        console.error("Error details:", error.response?.data || error.message);
                         setUser(null);
                         setAuthToken(null); // Token is invalid, remove it
                 } finally {

@@ -14,15 +14,22 @@ api.interceptors.request.use(
                 if (token && config.headers) {
                         config.headers.Authorization = `Bearer ${token}`;
                 }
+                console.log(`Making ${config.method?.toUpperCase()} request to: ${config.baseURL}${config.url}`);
                 return config;
         },
         (error) => {
+                console.error("Request error:", error);
                 return Promise.reject(error);
         }
 );
 api.interceptors.response.use(
         (res) => res,
         (err) => {
+                console.error("Response error:", err.message);
+                if (err.response) {
+                        console.error("Status:", err.response.status);
+                        console.error("Data:", err.response.data);
+                }
                 return Promise.reject(err);
         }
 );
