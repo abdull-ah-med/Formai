@@ -3,202 +3,95 @@ import { OAuth2Client } from "google-auth-library";
 import { FormSchema, FormField, FormSection } from "./claudeClient";
 
 function mapFieldToGoogleFormsRequest(field: FormField, index: number): forms_v1.Schema$Request {
+        const request: forms_v1.Schema$Request = {
+                createItem: {
+                        item: {
+                                title: field.label,
+                                questionItem: {
+                                        question: {
+                                                required: field.required === true,
+                                                // Type-specific question fields are set below
+                                        },
+                                },
+                        },
+                        location: { index },
+                },
+        };
+
+        // Set the specific question type
         switch (field.type) {
                 case "text":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                textQuestion: {},
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
-                        };
+                        request.createItem!.item!.questionItem!.question!.textQuestion = {};
+                        break;
                 case "textarea":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                textQuestion: {
-                                                                        paragraph: true,
-                                                                },
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
+                        request.createItem!.item!.questionItem!.question!.textQuestion = {
+                                paragraph: true,
                         };
+                        break;
                 case "email":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                textQuestion: {},
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
-                        };
+                        request.createItem!.item!.questionItem!.question!.textQuestion = {};
+                        break;
                 case "number":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                textQuestion: {},
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
-                        };
+                        request.createItem!.item!.questionItem!.question!.textQuestion = {};
+                        break;
                 case "tel":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                textQuestion: {},
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
-                        };
+                        request.createItem!.item!.questionItem!.question!.textQuestion = {};
+                        break;
                 case "date":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                dateQuestion: {},
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
-                        };
+                        request.createItem!.item!.questionItem!.question!.dateQuestion = {};
+                        break;
                 case "time":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                timeQuestion: {},
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
-                        };
+                        request.createItem!.item!.questionItem!.question!.timeQuestion = {};
+                        break;
                 case "url":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                textQuestion: {},
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
-                        };
+                        request.createItem!.item!.questionItem!.question!.textQuestion = {};
+                        break;
                 case "checkbox":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                choiceQuestion: {
-                                                                        type: "CHECKBOX",
-                                                                        options: [{ value: "Yes" }],
-                                                                },
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
+                        request.createItem!.item!.questionItem!.question!.choiceQuestion = {
+                                type: "CHECKBOX",
+                                options: [{ value: "Yes" }],
                         };
+                        break;
                 case "radio":
+                        request.createItem!.item!.questionItem!.question!.choiceQuestion = {
+                                type: "RADIO",
+                                options: field.options?.map((opt) => {
+                                        if (typeof opt === "string") {
+                                                return { value: opt };
+                                        } else {
+                                                return {
+                                                        value: opt.label || opt.text || "",
+                                                };
+                                        }
+                                }) || [{ value: "Option 1" }],
+                        };
+                        break;
                 case "select":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                choiceQuestion: {
-                                                                        type:
-                                                                                field.type === "radio"
-                                                                                        ? "RADIO"
-                                                                                        : "DROP_DOWN",
-                                                                        options: field.options?.map((opt) => {
-                                                                                if (typeof opt === "string") {
-                                                                                        return { value: opt };
-                                                                                } else {
-                                                                                        return {
-                                                                                                value:
-                                                                                                        opt.label ||
-                                                                                                        opt.text ||
-                                                                                                        "",
-                                                                                        };
-                                                                                }
-                                                                        }) || [{ value: "Option 1" }],
-                                                                },
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
+                        request.createItem!.item!.questionItem!.question!.choiceQuestion = {
+                                type: "DROP_DOWN",
+                                options: field.options?.map((opt) => {
+                                        if (typeof opt === "string") {
+                                                return { value: opt };
+                                        } else {
+                                                return {
+                                                        value: opt.label || opt.text || "",
+                                                };
+                                        }
+                                }) || [{ value: "Option 1" }],
                         };
+                        break;
                 case "rating":
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                scaleQuestion: {
-                                                                        low: 1,
-                                                                        high: field.scale || 5,
-                                                                },
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
+                        request.createItem!.item!.questionItem!.question!.scaleQuestion = {
+                                low: 1,
+                                high: field.scale || 5,
                         };
+                        break;
                 default:
-                        return {
-                                createItem: {
-                                        item: {
-                                                title: field.label,
-                                                questionItem: {
-                                                        question: {
-                                                                textQuestion: {},
-                                                        },
-                                                },
-                                        },
-                                        location: { index },
-                                },
-                        };
+                        request.createItem!.item!.questionItem!.question!.textQuestion = {};
+                        break;
         }
+
+        return request;
 }
 
 // Helper function to validate the form schema
@@ -310,26 +203,13 @@ export async function createGoogleForm(
 
                         // Add each section and its fields
                         schema.sections.forEach((section, sectionIndex) => {
-                                // Add section header if it's not the first section
-                                if (sectionIndex > 0) {
-                                        requests.push({
-                                                createItem: {
-                                                        item: {
-                                                                pageBreakItem: {},
-                                                        },
-                                                        location: { index: currentIndex++ },
-                                                },
-                                        });
-                                }
-
-                                // Add section title as a section header
+                                // Add section title and description as a text item
                                 requests.push({
                                         createItem: {
                                                 item: {
                                                         title: section.title,
                                                         description: section.description || "",
-                                                        // Use a page break item for section headers
-                                                        pageBreakItem: {},
+                                                        textItem: {},
                                                 },
                                                 location: { index: currentIndex++ },
                                         },
@@ -339,6 +219,18 @@ export async function createGoogleForm(
                                 section.fields.forEach((field) => {
                                         requests.push(mapFieldToGoogleFormsRequest(field, currentIndex++));
                                 });
+
+                                // Add page break after each section except the last one
+                                if (sectionIndex < schema.sections!.length - 1) {
+                                        requests.push({
+                                                createItem: {
+                                                        item: {
+                                                                pageBreakItem: {},
+                                                        },
+                                                        location: { index: currentIndex++ },
+                                                },
+                                        });
+                                }
                         });
                 } else if (schema.fields) {
                         // Fallback to the old fields array for backward compatibility
