@@ -153,32 +153,7 @@ const FormCreator: React.FC = () => {
                                         </div>
                                 ) : !formSchema ? (
                                         <div className="max-w-2xl mx-auto">
-                                                <form onSubmit={handleGenerate} className="mb-8 relative">
-                                                        <div className="relative">
-                                                                <input
-                                                                        id="prompt"
-                                                                        type="text"
-                                                                        className="w-full pl-4 pr-32 py-3 bg-gray-800 border border-gray-700 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 shadow-lg"
-                                                                        placeholder="e.g., a modern contact form for a portfolio website"
-                                                                        value={prompt}
-                                                                        onChange={(e) => setPrompt(e.target.value)}
-                                                                        disabled={isGenerating}
-                                                                />
-                                                                <button
-                                                                        type="submit"
-                                                                        className="absolute right-1 top-1/2 -translate-y-1/2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-full px-6 py-2 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 transition-all duration-300 transform hover:scale-105"
-                                                                        disabled={!prompt.trim() || isGenerating}
-                                                                >
-                                                                        {isGenerating ? "..." : "Generate"}
-                                                                </button>
-                                                        </div>
-
-                                                        {error && (
-                                                                <p className="mt-4 text-red-400 text-center">{error}</p>
-                                                        )}
-                                                </form>
-
-                                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 mb-8">
                                                         <h2 className="text-xl font-semibold mb-4">How It Works</h2>
                                                         <ol className="list-decimal pl-5 space-y-2 text-gray-300">
                                                                 <li>
@@ -200,6 +175,50 @@ const FormCreator: React.FC = () => {
                                                                 </li>
                                                         </ol>
                                                 </div>
+
+                                                <form onSubmit={handleGenerate} className="relative mt-6">
+                                                        <div className="relative border border-gray-700 rounded-lg bg-[#40414f] shadow-lg">
+                                                                <textarea
+                                                                        id="prompt"
+                                                                        className="w-full pl-4 pr-14 py-3 resize-none min-h-[52px] max-h-[200px] bg-transparent text-white focus:outline-none"
+                                                                        placeholder="Describe the form you need..."
+                                                                        value={prompt}
+                                                                        onChange={(e) => setPrompt(e.target.value)}
+                                                                        disabled={isGenerating}
+                                                                        rows={1}
+                                                                        style={{ overflow: "hidden" }}
+                                                                        onInput={(e) => {
+                                                                                const target =
+                                                                                        e.target as HTMLTextAreaElement;
+                                                                                target.style.height = "auto";
+                                                                                target.style.height = `${target.scrollHeight}px`;
+                                                                        }}
+                                                                ></textarea>
+                                                                <button
+                                                                        type="submit"
+                                                                        className="absolute right-2 bottom-1.5 p-1 rounded-md bg-transparent text-gray-400 hover:bg-gray-700 disabled:hover:bg-transparent disabled:opacity-40"
+                                                                        disabled={!prompt.trim() || isGenerating}
+                                                                >
+                                                                        <svg
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                viewBox="0 0 16 16"
+                                                                                fill="none"
+                                                                                className="h-4 w-4 m-1 md:m-0"
+                                                                                stroke="currentColor"
+                                                                                strokeWidth="2"
+                                                                        >
+                                                                                <path
+                                                                                        d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                                                                                        fill="currentColor"
+                                                                                ></path>
+                                                                        </svg>
+                                                                </button>
+                                                        </div>
+
+                                                        {error && (
+                                                                <p className="mt-4 text-red-400 text-center">{error}</p>
+                                                        )}
+                                                </form>
                                         </div>
                                 ) : (
                                         <>
