@@ -1,4 +1,4 @@
-import { BarChart, CheckSquare, Flag, Home, MessageSquare, Settings, Users } from "lucide-react";
+import { BarChart, CheckSquare, Flag, Home, MessageSquare, Settings, Users, Send, Edit2 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useForm } from "../../contexts/FormContext";
@@ -18,64 +18,46 @@ import DOMPurify from "dompurify";
 
 const UserDashboard: React.FC = () => {
         const { user } = useAuth();
-        const { formSchema: savedFormSchema, formId: savedFormId, setFormData, clearFormData } = useForm();
+        const { formSchema, formId, setFormData, clearFormData } = useForm();
         const navigate = useNavigate();
         const [prompt, setPrompt] = useState("");
         const [response, setResponse] = useState("");
         const [isLoading, setIsLoading] = useState(false);
-        const [formSchema, setFormSchema] = useState<FormSchema | null>(savedFormSchema);
-        const [formId, setFormId] = useState<string | null>(savedFormId);
         const [error, setError] = useState("");
         const [showRevisionForm, setShowRevisionForm] = useState(false);
         const [revisionPrompt, setRevisionPrompt] = useState("");
         const [revisionsRemaining, setRevisionsRemaining] = useState(3);
 
-        // Update form context when local state changes
         useEffect(() => {
-                if (formSchema && formId) {
-                        setFormData(formSchema, formId);
+                if (
+                        formSchema &&
+                        formSchema.questions &&
+                        Array.isArray(formSchema.questions) &&
+                        (!formSchema.fields || !formSchema.fields.length) &&
+                        (!formSchema.sections || !formSchema.sections.length)
+                ) {
+                        let processedSchema = { ...formSchema };
+                        // Convert questions to fields format
+                        processedSchema.fields = formSchema.questions.map((question: FormQuestion) => ({
+                                label: question.label,
+                                type: question.type === "dropdown" ? "select" : "text",
+                                required: false,
+                                options: question.options?.map((opt) => opt.text),
+                        }));
+
+                        // Create a section as well for compatibility
+                        processedSchema.sections = [
+                                {
+                                        title: formSchema.title,
+                                        description: formSchema.description,
+                                        fields: processedSchema.fields,
+                                },
+                        ];
+                        if (formId) {
+                                setFormData(processedSchema, formId);
+                        }
                 }
         }, [formSchema, formId, setFormData]);
-
-        // Handle form schema from history which might have a different structure
-        useEffect(() => {
-                if (savedFormSchema && savedFormId) {
-                        // Convert history schema format if needed
-                        let processedSchema = { ...savedFormSchema };
-
-                        // If the schema has questions array (from history) but no fields or sections
-                        if (
-                                savedFormSchema.questions &&
-                                Array.isArray(savedFormSchema.questions) &&
-                                (!savedFormSchema.fields || !savedFormSchema.fields.length) &&
-                                (!savedFormSchema.sections || !savedFormSchema.sections.length)
-                        ) {
-                                // Convert questions to fields format
-                                processedSchema.fields = savedFormSchema.questions.map((question: FormQuestion) => ({
-                                        label: question.label,
-                                        type: question.type === "dropdown" ? "select" : "text",
-                                        required: false,
-                                        options: question.options?.map((opt) => opt.text),
-                                }));
-
-                                // Create a section as well for compatibility
-                                processedSchema.sections = [
-                                        {
-                                                title: savedFormSchema.title,
-                                                description: savedFormSchema.description,
-                                                fields: processedSchema.fields,
-                                        },
-                                ];
-                        }
-
-                        setFormSchema(processedSchema);
-                        setFormId(savedFormId);
-                } else {
-                        // Ensure local state is cleared if context is cleared
-                        setFormSchema(null);
-                        setFormId(null);
-                }
-        }, [savedFormSchema, savedFormId]);
 
         const handleSubmit = async (e: React.FormEvent) => {
                 e.preventDefault();
@@ -91,8 +73,7 @@ const UserDashboard: React.FC = () => {
                 try {
                         const response = (await generateForm(sanitizedPrompt)) as GenerateFormResponse;
                         if (response.success) {
-                                setFormSchema(response.data.schema);
-                                setFormId(response.data.formId);
+                                setFormData(response.data.schema, response.data.formId);
                                 setResponse(""); // Clear response when form is displayed
                         } else {
                                 setError(response.error || "Failed to generate form");
@@ -129,7 +110,7 @@ const UserDashboard: React.FC = () => {
                         const response = (await reviseForm(formId, sanitizedPrompt)) as ReviseFormResponse;
 
                         if (response.success) {
-                                setFormSchema(response.data.schema);
+                                setFormData(response.data.schema, formId);
                         } else {
                                 setError(response.error || "Failed to revise form");
                         }
@@ -142,8 +123,6 @@ const UserDashboard: React.FC = () => {
 
         const handleFormSuccess = (googleFormUrl: string) => {
                 // Reset form state
-                setFormSchema(null);
-                setFormId(null);
                 setResponse("");
                 setPrompt("");
                 clearFormData();
@@ -153,8 +132,6 @@ const UserDashboard: React.FC = () => {
         };
 
         const resetForm = () => {
-                setFormSchema(null);
-                setFormId(null);
                 setResponse("");
                 setPrompt("");
                 clearFormData();
@@ -174,7 +151,7 @@ const UserDashboard: React.FC = () => {
                         .then((response: any) => {
                                 const typedResponse = response as ReviseFormResponse;
                                 if (typedResponse.success) {
-                                        setFormSchema(typedResponse.data.schema);
+                                        setFormData(typedResponse.data.schema, formId);
                                         if (typedResponse.data.revisionsRemaining !== null) {
                                                 setRevisionsRemaining(typedResponse.data.revisionsRemaining);
                                         }
@@ -362,25 +339,18 @@ const UserDashboard: React.FC = () => {
                                                         />
                                                         <button
                                                                 type="submit"
-                                                                className="h-[72px] px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center gap-2"
+                                                                className="h-[72px] w-[72px] flex-shrink-0 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center"
                                                                 disabled={
                                                                         isLoading ||
                                                                         (formSchema ? !revisionPrompt : !prompt)
                                                                 }
                                                         >
                                                                 {isLoading ? (
-                                                                        <>
-                                                                                <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full"></span>
-                                                                                <span>
-                                                                                        {formSchema
-                                                                                                ? "Updating..."
-                                                                                                : "Generating..."}
-                                                                                </span>
-                                                                        </>
+                                                                        <span className="animate-spin h-5 w-5 border-2 border-white/30 border-t-white rounded-full"></span>
+                                                                ) : formSchema ? (
+                                                                        <Edit2 className="h-6 w-6" />
                                                                 ) : (
-                                                                        <span>
-                                                                                {formSchema ? "Update" : "Generate"}
-                                                                        </span>
+                                                                        <Send className="h-6 w-6" />
                                                                 )}
                                                         </button>
                                                 </div>
