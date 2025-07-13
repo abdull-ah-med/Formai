@@ -7,24 +7,14 @@ import { verifyRecaptcha } from "../../utils/recaptcha";
 
 dotenv.config(); // must come first
 
-
-
 export const loginUser = async (req: Request, res: Response) => {
-        const {
-                email,
-                password,
-                rememberMe,
-                website: honeypot,
-                recaptchaToken,
-        } = req.body;
+        const { email, password, rememberMe, website: honeypot, recaptchaToken } = req.body;
 
         // ------------------------------------------------------------------
         // Honeypot check – bots usually fill hidden fields
         // ------------------------------------------------------------------
         if (honeypot && honeypot !== "") {
-                return res
-                        .status(400)
-                        .json({ message: "Bot detected (honeypot triggered)" });
+                return res.status(400).json({ message: "Bot detected (honeypot triggered)" });
         }
 
         // ------------------------------------------------------------------
@@ -32,9 +22,7 @@ export const loginUser = async (req: Request, res: Response) => {
         // ------------------------------------------------------------------
         const captchaValid = await verifyRecaptcha(recaptchaToken);
         if (!captchaValid) {
-                return res
-                        .status(400)
-                        .json({ message: "Failed CAPTCHA validation" });
+                return res.status(400).json({ message: "Failed CAPTCHA validation" });
         }
 
         const user = await User.findOne({ email });
@@ -55,27 +43,20 @@ export const loginUser = async (req: Request, res: Response) => {
         const JWT_SECRET = process.env.JWT_SECRET;
         if (!JWT_SECRET) {
                 console.error("JWT_SECRET is undefined");
-                return res
-                        .status(500)
-                        .json({ message: "Server misconfiguration" });
+                return res.status(500).json({ message: "Server misconfiguration" });
         }
 
-        const token = jwt.sign(
-                { sub: user._id, email: user.email, role: user.role },
-                JWT_SECRET,
-                {
-                        expiresIn: rememberMe ? "30d" : "1d",
-                        audience: "api:auth",
-                        issuer: "auth-service",
-                }
-        );
+        const token = jwt.sign({ sub: user._id, email: user.email, role: user.role }, JWT_SECRET, {
+                expiresIn: rememberMe ? "30d" : "1d",
+                audience: "api:auth",
+                issuer: "auth-service",
+        });
 
         // Set cookie with proper cross-domain settings for production
         res.cookie("token", token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite:
-                        process.env.NODE_ENV === "production" ? "none" : "lax",
+                secure: true, // Always use secure for production
+                sameSite: "none", // Required for cross-domain cookies
                 path: "/",
                 maxAge: rememberMe
                         ? 30 * 24 * 60 * 60 * 1000 // 30 days
