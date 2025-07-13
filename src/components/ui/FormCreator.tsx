@@ -75,13 +75,14 @@ const FormCreator: React.FC = () => {
                 try {
                         const response = (await finalizeForm(formId)) as FinalizeFormResponse;
                         if (response.success) {
-                                // Successfully created Google Form
-                                navigate("/forms/success", {
-                                        state: {
-                                                formUrl: response.data.googleFormUrl,
-                                                formTitle: response.data.schema.title,
-                                        },
-                                });
+                                // Show success message instead of navigating
+                                setFormSchema(null);
+                                setFormId(null);
+                                setPrompt("");
+
+                                // Display success message
+                                setError("");
+                                alert("Form creation successful!");
                         } else {
                                 // Handle specific errors
                                 if (response.error === "CONNECT_GOOGLE") {

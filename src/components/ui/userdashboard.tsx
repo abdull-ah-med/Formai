@@ -108,12 +108,15 @@ const UserDashboard: React.FC = () => {
         };
 
         const handleFormSuccess = (googleFormUrl: string) => {
-                navigate("/forms/success", {
-                        state: {
-                                formUrl: googleFormUrl,
-                                formTitle: formSchema?.title || "Your Form",
-                        },
-                });
+                // Reset form state
+                setFormSchema(null);
+                setFormId(null);
+                setResponse("");
+                setPrompt("");
+                clearFormData();
+
+                // Show success message
+                alert("Form creation successful!");
         };
 
         const resetForm = () => {
@@ -290,7 +293,7 @@ const UserDashboard: React.FC = () => {
                         </main>
 
                         {/* Sticky Input Box - Always visible */}
-                        <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/10 p-4">
+                        <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/10 p-4 z-50">
                                 <div className="max-w-4xl mx-auto">
                                         <form
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}

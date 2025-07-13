@@ -52,7 +52,7 @@ export const finalizeForm = async (formId: string) => {
 
 export const saveFormToHistory = async (formId: string, formTitle: string) => {
         try {
-                const response = await api.post("/forms/history", { formId, title: formTitle });
+                const response = await api.post("/form/forms/history", { formId, title: formTitle });
                 return response.data;
         } catch (error) {
                 console.error("Error saving form to history:", error);
@@ -62,7 +62,7 @@ export const saveFormToHistory = async (formId: string, formTitle: string) => {
 
 export const getFormHistory = async () => {
         try {
-                const response = await api.get("/forms/history");
+                const response = await api.get("/form/forms/history");
                 return response.data;
         } catch (error) {
                 console.error("Error fetching form history:", error);

@@ -20,10 +20,7 @@ export default function AppRoutes() {
                         <Route path="/" element={<Home />} />
                         <Route path="/signup" element={<Signup />} />
                         <Route path="/signin" element={<Signin />} />
-                        <Route
-                                path="/auth/google/callback"
-                                element={<GoogleAuthCallback />}
-                        />
+                        <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/privacy" element={<Privacy />} />
                         <Route path="/terms" element={<Terms />} />
@@ -31,18 +28,9 @@ export default function AppRoutes() {
                         <Route path="/pricing" element={<Pricing />} />
                         <Route element={<DashboardLayout />}>
                                 <Route element={<ProtectedRoute />}>
-                                        <Route
-                                                path="/dashboard"
-                                                element={<UserDashboard />}
-                                        />
-                                        <Route
-                                                path="/history"
-                                                element={<History />}
-                                        />
-                                        <Route
-                                                path="/account-settings"
-                                                element={<AccountSettings />}
-                                        />
+                                        <Route path="/dashboard" element={<UserDashboard />} />
+                                        <Route path="/history" element={<History />} />
+                                        <Route path="/account-settings" element={<AccountSettings />} />
                                 </Route>
                         </Route>
                 </Routes>
