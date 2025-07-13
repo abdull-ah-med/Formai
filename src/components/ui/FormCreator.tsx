@@ -181,7 +181,10 @@ const FormCreator: React.FC = () => {
                                                                 <div className="relative flex items-end border border-gray-600/50 rounded-lg bg-[#40414f] shadow-[0_0_15px_rgba(0,0,0,0.1)] mb-4">
                                                                         <textarea
                                                                                 id="prompt"
-                                                                                className="w-full pl-4 pr-12 py-3 resize-none min-h-[52px] max-h-[200px] bg-transparent text-white focus:outline-none overflow-y-hidden"
+                                                                                className="w-full pl-4 pr-12 py-3 resize-none min-h-[52px] max-h-[200px] 
+             bg-[#343541] text-white placeholder-gray-400 
+             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+             rounded-md transition-all duration-200 shadow-inner"
                                                                                 placeholder="Describe the form you need..."
                                                                                 value={prompt}
                                                                                 onChange={(e) =>
@@ -199,9 +202,12 @@ const FormCreator: React.FC = () => {
                                                                                         )}px`;
                                                                                 }}
                                                                         ></textarea>
+
                                                                         <button
                                                                                 type="submit"
-                                                                                className="absolute right-2 bottom-2 p-1 rounded-md text-gray-400 hover:bg-gray-700 disabled:hover:bg-transparent disabled:opacity-40 transition-colors"
+                                                                                className="absolute right-2 bottom-2 p-2 rounded-md text-white bg-[#19c37d] 
+             hover:bg-[#15ab6d] disabled:bg-[#19c37d]/50 
+             disabled:cursor-not-allowed transition-colors duration-200 shadow-md"
                                                                                 disabled={
                                                                                         !prompt.trim() || isGenerating
                                                                                 }
