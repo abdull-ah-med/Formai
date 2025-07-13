@@ -16,7 +16,7 @@ const FormCreator: React.FC = () => {
         const [error, setError] = useState("");
         const [formSchema, setFormSchema] = useState<FormSchema | null>(null);
         const [formId, setFormId] = useState<string | null>(null);
-        const [revisionsRemaining, setRevisionsRemaining] = useState(3);
+        const [revisionsRemaining, setRevisionsRemaining] = useState<number | null>(3);
         const [needsGoogleAuth, setNeedsGoogleAuth] = useState(false);
 
         const handleGenerate = async (e: React.FormEvent) => {
@@ -153,32 +153,25 @@ const FormCreator: React.FC = () => {
                                         </div>
                                 ) : !formSchema ? (
                                         <div className="max-w-2xl mx-auto">
-                                                <form onSubmit={handleGenerate} className="mb-8">
-                                                        <div className="mb-4">
-                                                                <label
-                                                                        htmlFor="prompt"
-                                                                        className="block mb-2 font-medium"
-                                                                >
-                                                                        What kind of form do you need?
-                                                                </label>
-                                                                <textarea
+                                                <form onSubmit={handleGenerate} className="mb-8 relative">
+                                                        <div className="relative">
+                                                                <input
                                                                         id="prompt"
-                                                                        rows={4}
-                                                                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                                        placeholder="Describe the form you want to create..."
+                                                                        type="text"
+                                                                        className="w-full pl-4 pr-32 py-3 bg-gray-800 border border-gray-700 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 shadow-lg"
+                                                                        placeholder="e.g., a modern contact form for a portfolio website"
                                                                         value={prompt}
                                                                         onChange={(e) => setPrompt(e.target.value)}
                                                                         disabled={isGenerating}
                                                                 />
+                                                                <button
+                                                                        type="submit"
+                                                                        className="absolute right-1 top-1/2 -translate-y-1/2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-full px-6 py-2 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 transition-all duration-300 transform hover:scale-105"
+                                                                        disabled={!prompt.trim() || isGenerating}
+                                                                >
+                                                                        {isGenerating ? "..." : "Generate"}
+                                                                </button>
                                                         </div>
-
-                                                        <button
-                                                                type="submit"
-                                                                className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50"
-                                                                disabled={!prompt.trim() || isGenerating}
-                                                        >
-                                                                {isGenerating ? "Generating..." : "Generate Form"}
-                                                        </button>
 
                                                         {error && (
                                                                 <p className="mt-4 text-red-400 text-center">{error}</p>
