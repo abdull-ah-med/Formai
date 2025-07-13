@@ -20,12 +20,24 @@ export interface FormSection {
         fields: FormField[];
 }
 
+// Question interface for history form schemas
+export interface FormQuestion {
+        id: string;
+        type: "short_answer" | "dropdown";
+        label: string;
+        options?: {
+                id: string;
+                text: string;
+        }[];
+}
+
 // Complete form schema
 export interface FormSchema {
         title: string;
         description: string;
         fields: FormField[]; // For backward compatibility
         sections?: FormSection[]; // New sections structure
+        questions?: FormQuestion[]; // For history items
 }
 
 // API response interfaces

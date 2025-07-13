@@ -61,7 +61,6 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                                         </div>
                                 );
                         case "radio":
-                        case "select":
                                 return (
                                         <div className="space-y-2">
                                                 {field.options?.map((option: any, i: number) => {

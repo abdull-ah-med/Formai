@@ -6,6 +6,7 @@ import { generateForm, reviseForm, finalizeForm, saveFormToHistory } from "../..
 import {
         FormSchema,
         FormSection,
+        FormQuestion,
         GenerateFormResponse,
         ReviseFormResponse,
         FinalizeFormResponse,
@@ -35,6 +36,42 @@ const UserDashboard: React.FC = () => {
                         setFormData(formSchema, formId);
                 }
         }, [formSchema, formId, setFormData]);
+
+        // Handle form schema from history which might have a different structure
+        useEffect(() => {
+                if (savedFormSchema && savedFormId) {
+                        // Convert history schema format if needed
+                        let processedSchema = { ...savedFormSchema };
+
+                        // If the schema has questions array (from history) but no fields or sections
+                        if (
+                                savedFormSchema.questions &&
+                                Array.isArray(savedFormSchema.questions) &&
+                                (!savedFormSchema.fields || !savedFormSchema.fields.length) &&
+                                (!savedFormSchema.sections || !savedFormSchema.sections.length)
+                        ) {
+                                // Convert questions to fields format
+                                processedSchema.fields = savedFormSchema.questions.map((question: FormQuestion) => ({
+                                        label: question.label,
+                                        type: question.type === "dropdown" ? "select" : "text",
+                                        required: false,
+                                        options: question.options?.map((opt) => opt.text),
+                                }));
+
+                                // Create a section as well for compatibility
+                                processedSchema.sections = [
+                                        {
+                                                title: savedFormSchema.title,
+                                                description: savedFormSchema.description,
+                                                fields: processedSchema.fields,
+                                        },
+                                ];
+                        }
+
+                        setFormSchema(processedSchema);
+                        setFormId(savedFormId);
+                }
+        }, [savedFormSchema, savedFormId]);
 
         const handleSubmit = async (e: React.FormEvent) => {
                 e.preventDefault();
@@ -299,33 +336,45 @@ const UserDashboard: React.FC = () => {
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
                                                 className="relative"
                                         >
-                                                <textarea
-                                                        value={formSchema ? revisionPrompt : prompt}
-                                                        onChange={(e) =>
-                                                                formSchema
-                                                                        ? setRevisionPrompt(e.target.value)
-                                                                        : setPrompt(e.target.value)
-                                                        }
-                                                        placeholder={
-                                                                formSchema
-                                                                        ? "Describe changes you want to make to the form..."
-                                                                        : "Describe the form you want to create..."
-                                                        }
-                                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 pr-24 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 shadow-inner h-[72px] resize-none scrollbar-hide transition-all duration-200"
-                                                />
-                                                <button
-                                                        type="submit"
-                                                        className="absolute right-4 bottom-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md disabled:opacity-50 transition-colors duration-200 shadow-md"
-                                                        disabled={isLoading || (formSchema ? !revisionPrompt : !prompt)}
-                                                >
-                                                        {isLoading
-                                                                ? formSchema
-                                                                        ? "Updating..."
-                                                                        : "Generating..."
-                                                                : formSchema
-                                                                ? "Update Form"
-                                                                : "Generate"}
-                                                </button>
+                                                <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden shadow-inner transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500/50 focus-within:border-blue-500/50">
+                                                        <textarea
+                                                                value={formSchema ? revisionPrompt : prompt}
+                                                                onChange={(e) =>
+                                                                        formSchema
+                                                                                ? setRevisionPrompt(e.target.value)
+                                                                                : setPrompt(e.target.value)
+                                                                }
+                                                                placeholder={
+                                                                        formSchema
+                                                                                ? "Describe changes you want to make to the form..."
+                                                                                : "Describe the form you want to create..."
+                                                                }
+                                                                className="flex-grow bg-transparent p-4 text-white placeholder-gray-400 focus:outline-none h-[72px] resize-none scrollbar-hide"
+                                                        />
+                                                        <button
+                                                                type="submit"
+                                                                className="h-[72px] px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center gap-2"
+                                                                disabled={
+                                                                        isLoading ||
+                                                                        (formSchema ? !revisionPrompt : !prompt)
+                                                                }
+                                                        >
+                                                                {isLoading ? (
+                                                                        <>
+                                                                                <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full"></span>
+                                                                                <span>
+                                                                                        {formSchema
+                                                                                                ? "Updating..."
+                                                                                                : "Generating..."}
+                                                                                </span>
+                                                                        </>
+                                                                ) : (
+                                                                        <span>
+                                                                                {formSchema ? "Update" : "Generate"}
+                                                                        </span>
+                                                                )}
+                                                        </button>
+                                                </div>
                                         </form>
                                 </div>
                         </div>
