@@ -118,7 +118,7 @@ const formQuestionSchema = new Schema<Question>(
 const formSchema = new Schema<FormSchema>(
         {
                 title: { type: String, required: true },
-                description: { type: String, required: true },
+                description: { type: String, required: false },
                 questions: [formQuestionSchema],
         },
         { _id: false }
