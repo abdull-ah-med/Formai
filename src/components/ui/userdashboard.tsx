@@ -368,7 +368,7 @@ const UserDashboard: React.FC = () => {
                                                         />
                                                         <button
                                                                 type="submit"
-                                                                className="h-[60px] w-[60px] flex-shrink-0 bg-white/10 hover:bg-white/20 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center rounded-r-xl disabled:bg-white/5"
+                                                                className="h-[60px] w-[60px] flex-shrink-0 bg-white/20 hover:bg-white/30 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center rounded-r-xl disabled:bg-white/5"
                                                                 disabled={
                                                                         isLoading ||
                                                                         (formSchema ? !revisionPrompt : !prompt)
