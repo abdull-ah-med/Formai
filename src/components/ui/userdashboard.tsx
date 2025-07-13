@@ -29,31 +29,41 @@ const UserDashboard: React.FC = () => {
         const [revisionsRemaining, setRevisionsRemaining] = useState(3);
 
         useEffect(() => {
-                if (
-                        formSchema &&
-                        formSchema.questions &&
-                        Array.isArray(formSchema.questions) &&
-                        (!formSchema.fields || !formSchema.fields.length) &&
-                        (!formSchema.sections || !formSchema.sections.length)
-                ) {
+                if (formSchema && formId) {
                         let processedSchema = { ...formSchema };
-                        // Convert questions to fields format
-                        processedSchema.fields = formSchema.questions.map((question: FormQuestion) => ({
-                                label: question.label,
-                                type: question.type === "dropdown" ? "select" : "text",
-                                required: false,
-                                options: question.options?.map((opt) => opt.text),
-                        }));
 
-                        // Create a section as well for compatibility
-                        processedSchema.sections = [
-                                {
-                                        title: formSchema.title,
-                                        description: formSchema.description,
-                                        fields: processedSchema.fields,
-                                },
-                        ];
-                        if (formId) {
+                        // Handle case when form is loaded from history without proper sections
+                        if (!processedSchema.sections || !processedSchema.sections.length) {
+                                // Create sections from fields if they exist
+                                if (processedSchema.fields && processedSchema.fields.length) {
+                                        processedSchema.sections = [
+                                                {
+                                                        title: processedSchema.title,
+                                                        description: processedSchema.description,
+                                                        fields: processedSchema.fields,
+                                                },
+                                        ];
+                                }
+                                // Convert questions to fields format if they exist
+                                else if (processedSchema.questions && Array.isArray(processedSchema.questions)) {
+                                        processedSchema.fields = processedSchema.questions.map(
+                                                (question: FormQuestion) => ({
+                                                        label: question.label,
+                                                        type: question.type === "dropdown" ? "select" : "text",
+                                                        required: false,
+                                                        options: question.options?.map((opt) => opt.text),
+                                                })
+                                        );
+
+                                        processedSchema.sections = [
+                                                {
+                                                        title: processedSchema.title,
+                                                        description: processedSchema.description,
+                                                        fields: processedSchema.fields,
+                                                },
+                                        ];
+                                }
+
                                 setFormData(processedSchema, formId);
                         }
                 }
@@ -197,22 +207,42 @@ const UserDashboard: React.FC = () => {
                                 case "select":
                                 case "dropdown":
                                         return (
-                                                <div className="mt-2 bg-white/10 rounded p-2 flex justify-between items-center">
-                                                        <span className="text-gray-400 text-sm">Select an option</span>
-                                                        <svg
-                                                                className="w-4 h-4 text-gray-400"
-                                                                fill="none"
-                                                                stroke="currentColor"
-                                                                viewBox="0 0 24 24"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                        >
-                                                                <path
-                                                                        strokeLinecap="round"
-                                                                        strokeLinejoin="round"
-                                                                        strokeWidth={2}
-                                                                        d="M19 9l-7 7-7-7"
-                                                                />
-                                                        </svg>
+                                                <div className="mt-2">
+                                                        <div className="bg-white/10 rounded p-2 flex justify-between items-center mb-2">
+                                                                <span className="text-gray-400 text-sm">
+                                                                        Select an option
+                                                                </span>
+                                                                <svg
+                                                                        className="w-4 h-4 text-gray-400"
+                                                                        fill="none"
+                                                                        stroke="currentColor"
+                                                                        viewBox="0 0 24 24"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                >
+                                                                        <path
+                                                                                strokeLinecap="round"
+                                                                                strokeLinejoin="round"
+                                                                                strokeWidth={2}
+                                                                                d="M19 9l-7 7-7-7"
+                                                                        />
+                                                                </svg>
+                                                        </div>
+                                                        <div className="pl-2 space-y-1">
+                                                                {(field.options || []).map((option: any, i: number) => {
+                                                                        const optionText =
+                                                                                typeof option === "string"
+                                                                                        ? option
+                                                                                        : option.text || option.label;
+                                                                        return (
+                                                                                <div
+                                                                                        key={i}
+                                                                                        className="text-gray-300 text-sm"
+                                                                                >
+                                                                                        {optionText}
+                                                                                </div>
+                                                                        );
+                                                                })}
+                                                        </div>
                                                 </div>
                                         );
                                 case "checkbox":
