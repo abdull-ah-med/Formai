@@ -11,7 +11,7 @@ export function getGoogleOAuthURL() {
                 client_id: clientId,
                 redirect_uri: redirectUri,
                 response_type: "code",
-                scope: "openid email profile https://www.googleapis.com/auth/forms",
+                scope: "openid email profile https://www.googleapis.com/auth/forms.body",
                 access_type: "offline",
                 include_granted_scopes: "true",
         });

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "./button";
 import { useNavigate } from "react-router-dom";
-import api from "../../api";
-import { checkGoogleFormsPermission, getPermissionErrorMessage } from "../../utils/googleFormsHelper";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./dialog";
 import { getGoogleOAuthURL } from "../../auth/googleOAuth";
 import { finalizeForm } from "../../api";
@@ -21,6 +19,7 @@ interface FormFinalizeResponse {
                 schema: any;
         };
         error?: string;
+        message?: string;
 }
 
 const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSuccess, className }) => {
@@ -33,20 +32,9 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
         const handleFinalize = async () => {
                 setIsLoading(true);
                 setError(null);
+                setPermissionError("");
 
                 try {
-                        // First check if user has Google Forms permissions
-                        const permissionCheck = await checkGoogleFormsPermission();
-
-                        if (!permissionCheck.hasPermission) {
-                                setPermissionError(getPermissionErrorMessage(permissionCheck));
-                                setShowPermissionDialog(true);
-                                setIsLoading(false);
-                                return;
-                        }
-
-                        // If they have permission, proceed with form finalization
-                        // Use the proper API endpoint
                         const response = (await finalizeForm(formId)) as FormFinalizeResponse;
 
                         if (response.success && response.data) {
@@ -54,23 +42,33 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                 if (onSuccess) {
                                         onSuccess(googleFormUrl);
                                 } else {
-                                        // Redirect to the form or show success message
                                         window.open(googleFormUrl, "_blank");
                                 }
                         } else {
-                                setError(response.error || "Failed to finalize form");
+                                if (response.error === "CONNECT_GOOGLE") {
+                                        setPermissionError("Please connect your Google account to create forms.");
+                                        setShowPermissionDialog(true);
+                                } else if (response.error === "GOOGLE_TOKEN_EXPIRED") {
+                                        setPermissionError(
+                                                "Your Google authorization has expired. Please reconnect your Google account."
+                                        );
+                                        setShowPermissionDialog(true);
+                                } else {
+                                        setError(response.message || response.error || "Failed to finalize form");
+                                }
                         }
                 } catch (err: any) {
-                        if (err.response?.data?.error === "CONNECT_GOOGLE") {
+                        const errData = err.response?.data;
+                        if (errData?.error === "CONNECT_GOOGLE") {
                                 setPermissionError("Please connect your Google account to create forms.");
                                 setShowPermissionDialog(true);
-                        } else if (err.response?.data?.error === "GOOGLE_TOKEN_EXPIRED") {
+                        } else if (errData?.error === "GOOGLE_TOKEN_EXPIRED") {
                                 setPermissionError(
                                         "Your Google authorization has expired. Please reconnect your Google account."
                                 );
                                 setShowPermissionDialog(true);
                         } else {
-                                setError(err.response?.data?.message || err.message || "An error occurred");
+                                setError(errData?.message || err.message || "An error occurred");
                         }
                 } finally {
                         setIsLoading(false);
@@ -78,10 +76,7 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
         };
 
         const handleConnectGoogle = () => {
-                // Store current location to redirect back after Google auth
                 localStorage.setItem("redirectAfterAuth", window.location.pathname);
-
-                // Redirect to Google auth
                 const googleOAuthURL = getGoogleOAuthURL();
                 window.location.href = googleOAuthURL;
         };
@@ -112,7 +107,7 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                                                         <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm1-11v6h-2v-6H7l5-5 5 5h-4z"></path>
                                                                 </svg>
                                                         </div>
-                                                        <DialogTitle>Google Forms Permission Required</DialogTitle>
+                                                        <DialogTitle>Google Permission Required</DialogTitle>
                                                 </div>
                                                 <DialogDescription>{permissionError}</DialogDescription>
                                         </DialogHeader>

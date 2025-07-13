@@ -21,6 +21,11 @@ export function getAuthToken(): string | null {
 
 export async function logout() {
         setAuthToken(null); // Clear the token from localStorage
+
+        // Clear form-related localStorage items
+        localStorage.removeItem("formSchema");
+        localStorage.removeItem("formId");
+
         try {
                 await api.post("/auth/logout"); // clears HttpOnly cookie on server
         } catch (error) {
@@ -33,6 +38,11 @@ export async function logoutAndRedirect(redirectTo: string | null = "/signin") {
                 await logout();
 
                 localStorage.removeItem("nonPersistentAuth");
+
+                // Clear any additional form data or user-specific data
+                localStorage.removeItem("formSchema");
+                localStorage.removeItem("formId");
+                localStorage.removeItem("pendingGoogleAuthCallback");
 
                 window.dispatchEvent(
                         new CustomEvent("authchange", {

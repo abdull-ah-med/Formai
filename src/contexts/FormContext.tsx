@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, { ReactNode, createContext, useContext, useState, useEffect } from "react";
 import { FormSchema } from "../types/form";
+import { useAuth } from "./AuthContext";
 
 interface FormContextType {
         formSchema: FormSchema | null;
@@ -13,6 +14,7 @@ const FormContext = createContext<FormContextType | undefined>(undefined);
 export const FormProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         const [formSchema, setFormSchema] = useState<FormSchema | null>(null);
         const [formId, setFormId] = useState<string | null>(null);
+        const { user } = useAuth();
 
         const setFormData = (schema: FormSchema | null, id: string | null) => {
                 setFormSchema(schema);
@@ -46,6 +48,11 @@ export const FormProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                         console.error("Error loading form data from localStorage:", error);
                 }
         }, []);
+
+        // Clear form data when user changes
+        useEffect(() => {
+                clearFormData();
+        }, [user?.id]);
 
         return (
                 <FormContext.Provider value={{ formSchema, formId, setFormData, clearFormData }}>
