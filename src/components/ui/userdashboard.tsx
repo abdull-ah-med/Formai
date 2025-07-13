@@ -2,7 +2,7 @@ import { BarChart, CheckSquare, Flag, Home, MessageSquare, Settings, Users } fro
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useForm } from "../../contexts/FormContext";
-import { generateForm, reviseForm, finalizeForm, saveFormToHistory } from "../../api";
+import { generateForm, reviseForm, finalizeForm } from "../../api";
 import {
         FormSchema,
         FormSection,
@@ -70,6 +70,10 @@ const UserDashboard: React.FC = () => {
 
                         setFormSchema(processedSchema);
                         setFormId(savedFormId);
+                } else {
+                        // Ensure local state is cleared if context is cleared
+                        setFormSchema(null);
+                        setFormId(null);
                 }
         }, [savedFormSchema, savedFormId]);
 
@@ -195,44 +199,57 @@ const UserDashboard: React.FC = () => {
                 if (formSchema.sections && formSchema.sections.length > 0) {
                         // Render sections
                         return (
-                                <div className="space-y-8">
-                                        {formSchema.sections.map((section, sectionIndex) => (
-                                                <div
-                                                        key={sectionIndex}
-                                                        className="bg-white/5 border border-white/10 rounded-xl p-6"
-                                                >
-                                                        <h3 className="text-xl font-semibold mb-2">
-                                                                {DOMPurify.sanitize(section.title)}
-                                                        </h3>
-                                                        {section.description && (
-                                                                <p className="text-gray-400 mb-4">
-                                                                        {DOMPurify.sanitize(section.description)}
-                                                                </p>
-                                                        )}
-                                                        <div className="space-y-4">
-                                                                {section.fields.map((field, fieldIndex) => (
-                                                                        <div
-                                                                                key={fieldIndex}
-                                                                                className="p-3 bg-white/5 rounded-lg"
-                                                                        >
-                                                                                <p className="font-medium">
+                                <div className="space-y-4">
+                                        {formSchema.sections.map((section, sectionIndex) => {
+                                                const isDefaultSection =
+                                                        formSchema.sections &&
+                                                        formSchema.sections.length === 1 &&
+                                                        section.title === formSchema.title &&
+                                                        section.description === formSchema.description;
+
+                                                return (
+                                                        <div key={sectionIndex}>
+                                                                {!isDefaultSection && (
+                                                                        <div className="pt-6">
+                                                                                <h3 className="text-xl font-semibold mb-2">
                                                                                         {DOMPurify.sanitize(
-                                                                                                field.label
+                                                                                                section.title
                                                                                         )}
-                                                                                        {field.required && (
-                                                                                                <span className="text-red-400 ml-1">
-                                                                                                        *
-                                                                                                </span>
-                                                                                        )}
-                                                                                </p>
-                                                                                <p className="text-xs text-gray-400">
-                                                                                        Type: {field.type}
-                                                                                </p>
+                                                                                </h3>
+                                                                                {section.description && (
+                                                                                        <p className="text-gray-400 mb-4">
+                                                                                                {DOMPurify.sanitize(
+                                                                                                        section.description
+                                                                                                )}
+                                                                                        </p>
+                                                                                )}
                                                                         </div>
-                                                                ))}
+                                                                )}
+                                                                <div className="space-y-4">
+                                                                        {section.fields.map((field, fieldIndex) => (
+                                                                                <div
+                                                                                        key={fieldIndex}
+                                                                                        className="p-3 bg-white/5 rounded-lg"
+                                                                                >
+                                                                                        <p className="font-medium">
+                                                                                                {DOMPurify.sanitize(
+                                                                                                        field.label
+                                                                                                )}
+                                                                                                {field.required && (
+                                                                                                        <span className="text-red-400 ml-1">
+                                                                                                                *
+                                                                                                        </span>
+                                                                                                )}
+                                                                                        </p>
+                                                                                        <p className="text-xs text-gray-400">
+                                                                                                Type: {field.type}
+                                                                                        </p>
+                                                                                </div>
+                                                                        ))}
+                                                                </div>
                                                         </div>
-                                                </div>
-                                        ))}
+                                                );
+                                        })}
                                 </div>
                         );
                 } else if (formSchema.fields && formSchema.fields.length > 0) {

@@ -41,6 +41,12 @@ const Footer = () => {
                                                                 {!isAuthenticated ? (
                                                                         <>
                                                                                 <Link
+                                                                                        to="/"
+                                                                                        className="block text-gray-400 hover:text-white transition-colors"
+                                                                                >
+                                                                                        Home
+                                                                                </Link>
+                                                                                <Link
                                                                                         to="/signup"
                                                                                         className="block text-gray-400 hover:text-white transition-colors"
                                                                                 >

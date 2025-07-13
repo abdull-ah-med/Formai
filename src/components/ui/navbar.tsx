@@ -61,8 +61,8 @@ const Navbar = () => {
                   ]
                 : [
                           {
-                                  name: "Pricing",
-                                  href: "/pricing",
+                                  name: "Home",
+                                  href: "/",
                                   isRouterLink: true,
                                   icon: <Home className="w-5 h-5" />,
                                   onClick: undefined,
