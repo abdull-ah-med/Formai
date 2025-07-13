@@ -260,12 +260,46 @@ const UserDashboard: React.FC = () => {
                                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 min-h-[200px] mb-6 shadow-lg">
                                                         {isLoading ? (
                                                                 <div className="flex items-center justify-center h-full">
-                                                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                                                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
                                                                 </div>
                                                         ) : response ? (
                                                                 <p className="text-gray-200">{response}</p>
                                                         ) : (
-                                                                <p></p>
+                                                                <div>
+                                                                        <h2 className="text-2xl font-bold mb-3">
+                                                                                Welcome, {user?.fullName || "there"}!
+                                                                        </h2>
+                                                                        <p className="text-gray-300 mb-6">
+                                                                                Create custom forms with AI in seconds.
+                                                                                Just describe what you need below.
+                                                                        </p>
+
+                                                                        <h3 className="text-xl font-semibold mb-4">
+                                                                                How It Works
+                                                                        </h3>
+                                                                        <ol className="list-decimal pl-5 space-y-2 text-gray-300">
+                                                                                <li>
+                                                                                        Describe the form you need in
+                                                                                        plain English (e.g., "Create a
+                                                                                        job application form with fields
+                                                                                        for work experience")
+                                                                                </li>
+                                                                                <li>
+                                                                                        Our AI will generate a form
+                                                                                        based on your description
+                                                                                </li>
+                                                                                <li>
+                                                                                        Review the form and make
+                                                                                        revisions if needed (up to 3
+                                                                                        times)
+                                                                                </li>
+                                                                                <li>
+                                                                                        When you're satisfied, click
+                                                                                        "Create Google Form" to publish
+                                                                                        it to your Google account
+                                                                                </li>
+                                                                        </ol>
+                                                                </div>
                                                         )}
                                                 </div>
                                         )}
@@ -311,15 +345,13 @@ const UserDashboard: React.FC = () => {
                                         )}
                                 </div>
                         </main>
-
-                        {/* Input Box - Sticky to content, not fixed */}
                         <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-black to-black/90 backdrop-blur-lg border-t border-white/10 p-4 shadow-lg">
                                 <div className="max-w-4xl mx-auto">
                                         <form
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
                                                 className="relative"
                                         >
-                                                <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden shadow-inner transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500/50 focus-within:border-blue-500/50">
+                                                <div className="flex items-center bg-transparent border-0 rounded-xl overflow-hidden shadow-none transition-all duration-200">
                                                         <textarea
                                                                 value={formSchema ? revisionPrompt : prompt}
                                                                 onChange={(e) =>
@@ -332,11 +364,11 @@ const UserDashboard: React.FC = () => {
                                                                                 ? "Describe changes you want to make to the form..."
                                                                                 : "Describe the form you want to create..."
                                                                 }
-                                                                className="flex-grow bg-transparent p-4 text-white placeholder-gray-400 focus:outline-none h-[72px] resize-none scrollbar-hide"
+                                                                className="flex-grow bg-black/50 backdrop-blur-md p-4 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide rounded-l-xl border border-white/5 hover:border-white/10 transition-all"
                                                         />
                                                         <button
                                                                 type="submit"
-                                                                className="h-[72px] w-[72px] flex-shrink-0 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center"
+                                                                className="h-[60px] w-[60px] flex-shrink-0 bg-white/10 hover:bg-white/20 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center rounded-r-xl disabled:bg-white/5"
                                                                 disabled={
                                                                         isLoading ||
                                                                         (formSchema ? !revisionPrompt : !prompt)
@@ -345,12 +377,18 @@ const UserDashboard: React.FC = () => {
                                                                 {isLoading ? (
                                                                         <span className="animate-spin h-5 w-5 border-2 border-white/30 border-t-white rounded-full"></span>
                                                                 ) : formSchema ? (
-                                                                        <Edit2 className="h-6 w-6" />
+                                                                        <Edit2 className="h-5 w-5" />
                                                                 ) : (
-                                                                        <Send className="h-6 w-6" />
+                                                                        <Send className="h-5 w-5" />
                                                                 )}
                                                         </button>
                                                 </div>
+                                                {!formSchema && (
+                                                        <p className="text-xs text-center text-gray-500 mt-2">
+                                                                Formai may produce inaccurate information about forms,
+                                                                people, or facts.
+                                                        </p>
+                                                )}
                                         </form>
                                 </div>
                         </div>
