@@ -5,6 +5,7 @@ import FormModel from "../models/form.model";
 import UserModel from "../models/user.model";
 import { OAuth2Client } from "google-auth-library";
 import { AuthTokenPayload } from "../middleware/verifyJWT";
+import { convertClaudeSchemaToUserSchema } from "../utils/formSchemaConverter";
 
 export const generateForm = async (req: Request, res: Response) => {
         const { prompt } = req.body;
@@ -155,13 +156,16 @@ export const finalizeForm = async (req: Request, res: Response) => {
                 }
 
                 // Get the final schema (either the original or the last revision)
-                const finalSchema =
+                const finalClaudeSchema =
                         form.revisions.length > 0
                                 ? form.revisions[form.revisions.length - 1].claudeResponse
                                 : form.claudeResponse;
 
+                // Convert Claude schema to user schema format for storage
+                const finalUserSchema = convertClaudeSchemaToUserSchema(finalClaudeSchema);
+
                 // Log the schema for debugging
-                console.log("Final schema for form creation:", JSON.stringify(finalSchema));
+                console.log("Final schema for form creation:", JSON.stringify(finalClaudeSchema));
 
                 const oauth2Client = new OAuth2Client({
                         clientId: process.env.GOOGLE_CLIENT_ID,
@@ -225,7 +229,7 @@ export const finalizeForm = async (req: Request, res: Response) => {
                 }
 
                 try {
-                        const googleForm = await createGoogleForm(finalSchema, oauth2Client);
+                        const googleForm = await createGoogleForm(finalClaudeSchema, oauth2Client);
 
                         // Update the form with Google Form details
                         form.googleFormUrl = googleForm.responderUri;
@@ -234,7 +238,7 @@ export const finalizeForm = async (req: Request, res: Response) => {
                         // Add to user's form history
                         if (!user.formsHistory) user.formsHistory = [];
                         user.formsHistory.push({
-                                schema: finalSchema,
+                                schema: finalUserSchema,
                                 formId: googleForm.formId,
                                 responderUri: googleForm.responderUri,
                                 finalizedAt: new Date(),
@@ -246,7 +250,7 @@ export const finalizeForm = async (req: Request, res: Response) => {
                                 data: {
                                         formId: form._id,
                                         googleFormUrl: googleForm.responderUri,
-                                        schema: finalSchema,
+                                        schema: finalClaudeSchema,
                                 },
                         });
                 } catch (googleError: any) {

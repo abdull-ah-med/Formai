@@ -1,12 +1,34 @@
-import {
-        Schema,
-        model,
-        Document,
-        connect,
-        connections,
-        Types,
-        Model,
-} from "mongoose";
+import { Schema, model, Document, connect, connections, Types, Model } from "mongoose";
+import crypto from "crypto";
+
+const ALGORITHM = "aes-256-cbc";
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "default_encryption_key_32_chars_"; // 32 chars
+const IV_LENGTH = 16;
+
+const encrypt = (text: string) => {
+        const iv = crypto.randomBytes(IV_LENGTH);
+        const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY), iv);
+        let encrypted = cipher.update(text);
+        encrypted = Buffer.concat([encrypted, cipher.final()]);
+        return iv.toString("hex") + ":" + encrypted.toString("hex");
+};
+
+const decrypt = (text: string) => {
+        if (!text || !text.includes(":")) {
+                return text; // Not encrypted or invalid format, return as is
+        }
+        try {
+                const textParts = text.split(":");
+                const iv = Buffer.from(textParts.shift()!, "hex");
+                const encryptedText = Buffer.from(textParts.join(":"), "hex");
+                const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY), iv);
+                let decrypted = decipher.update(encryptedText);
+                decrypted = Buffer.concat([decrypted, decipher.final()]);
+                return decrypted.toString();
+        } catch (error) {
+                return text; // Return original text if decryption fails
+        }
+};
 
 // Form schema interfaces as per prompt
 interface Option {
@@ -19,13 +41,13 @@ interface Question {
         label: string;
         options?: Option[];
 }
-interface FormSchema {
+export interface FormSchema {
         title: string;
         description: string;
         questions: Question[];
 }
 
-// 1) User Interface
+// User Interface
 export interface IUser extends Document {
         fullName: string;
         email: string;
@@ -102,7 +124,7 @@ const formSchema = new Schema<FormSchema>(
         { _id: false }
 );
 
-// 2) Schema
+// Schema
 const userSchema = new Schema<IUser>(
         {
                 fullName: { type: String, required: true },
@@ -164,8 +186,8 @@ const userSchema = new Schema<IUser>(
                 },
                 googleId: { type: String, unique: true, sparse: true },
                 googleTokens: {
-                        accessToken: { type: String },
-                        refreshToken: { type: String },
+                        accessToken: { type: String, set: encrypt, get: decrypt },
+                        refreshToken: { type: String, set: encrypt, get: decrypt },
                         expiryDate: { type: Number },
                 },
                 formsHistory: [
@@ -180,7 +202,7 @@ const userSchema = new Schema<IUser>(
         { timestamps: true }
 );
 
-// 3) Model - Create and export the User model
+// Model - Create and export the User model
 let UserModel: Model<IUser>;
 
 // Check if the model is already defined (for hot reloading)
@@ -190,7 +212,7 @@ if (connections[0]?.readyState && connections[0].models.User) {
         UserModel = model<IUser>("User", userSchema);
 }
 
-// 4) DB connect helper (reused across requests)
+// DB connect helper (reused across requests)
 export async function dbConnect(uri: string) {
         try {
                 if (connections[0]?.readyState) {

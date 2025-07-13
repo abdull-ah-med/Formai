@@ -39,10 +39,26 @@ export const googleCallback = async (req: Request, res: Response) => {
 
                 // Exchange code for tokens, explicitly passing redirectUri
                 console.log("Exchanging code for tokens...");
-                const { tokens } = await client.getToken({
-                        code,
-                        redirect_uri: redirectUri,
-                });
+
+                let tokens;
+                try {
+                        const response = await client.getToken({
+                                code,
+                                redirect_uri: redirectUri,
+                        });
+                        tokens = response.tokens;
+                        console.log("Token exchange successful");
+                } catch (tokenError: any) {
+                        console.error("Token exchange error:", tokenError.message);
+                        if (tokenError.response?.data) {
+                                console.error("Token error details:", tokenError.response.data);
+                        }
+                        return res.status(400).json({
+                                success: false,
+                                error: "Token exchange failed",
+                                message: tokenError.message || "Failed to exchange authorization code for tokens",
+                        });
+                }
 
                 if (!tokens.access_token) {
                         console.error("No access token received from Google");
@@ -59,10 +75,21 @@ export const googleCallback = async (req: Request, res: Response) => {
                 console.log("Refresh token received:", hasRefreshToken ? "Yes" : "No");
 
                 // Verify the ID token
-                const ticket = await client.verifyIdToken({
-                        idToken: tokens.id_token!,
-                        audience: GOOGLE_CLIENT_ID,
-                });
+                let ticket;
+                try {
+                        ticket = await client.verifyIdToken({
+                                idToken: tokens.id_token!,
+                                audience: GOOGLE_CLIENT_ID,
+                        });
+                        console.log("ID token verification successful");
+                } catch (verifyError: any) {
+                        console.error("ID token verification error:", verifyError.message);
+                        return res.status(400).json({
+                                success: false,
+                                error: "ID token verification failed",
+                                message: verifyError.message || "Failed to verify ID token",
+                        });
+                }
 
                 const payload = ticket.getPayload();
                 if (!payload?.email) {
@@ -76,19 +103,39 @@ export const googleCallback = async (req: Request, res: Response) => {
                 console.log("Google account verified for email:", payload.email);
 
                 // Find or create user in your DB
-                let user = await User.findOne({ email: payload.email });
+                let user;
+                try {
+                        user = await User.findOne({ email: payload.email });
+                } catch (dbError: any) {
+                        console.error("Database error when finding user:", dbError.message);
+                        return res.status(500).json({
+                                success: false,
+                                error: "Database error",
+                                message: "Failed to query user database",
+                        });
+                }
+
                 if (!user) {
                         console.log("Creating new user for:", payload.email);
-                        user = await User.create({
-                                fullName: payload.name || "Google User",
-                                email: payload.email,
-                                googleId: payload.sub,
-                                googleTokens: {
-                                        accessToken: tokens.access_token!,
-                                        refreshToken: tokens.refresh_token,
-                                        expiryDate: tokens.expiry_date || Date.now() + 3600 * 1000,
-                                },
-                        });
+                        try {
+                                user = await User.create({
+                                        fullName: payload.name || "Google User",
+                                        email: payload.email,
+                                        googleId: payload.sub,
+                                        googleTokens: {
+                                                accessToken: tokens.access_token!,
+                                                refreshToken: tokens.refresh_token,
+                                                expiryDate: tokens.expiry_date || Date.now() + 3600 * 1000,
+                                        },
+                                });
+                        } catch (createError: any) {
+                                console.error("Error creating new user:", createError.message);
+                                return res.status(500).json({
+                                        success: false,
+                                        error: "User creation failed",
+                                        message: createError.message || "Failed to create new user account",
+                                });
+                        }
                 } else {
                         console.log("Updating existing user:", payload.email);
                         // Check if user already has a different Google ID linked
@@ -111,15 +158,34 @@ export const googleCallback = async (req: Request, res: Response) => {
                         };
 
                         user.lastLogin = new Date();
-                        await user.save();
+                        try {
+                                await user.save();
+                        } catch (saveError: any) {
+                                console.error("Error saving user updates:", saveError.message);
+                                return res.status(500).json({
+                                        success: false,
+                                        error: "User update failed",
+                                        message: saveError.message || "Failed to update user account",
+                                });
+                        }
                 }
 
                 // Sign your JWT
-                const token = jwt.sign({ sub: user._id, email: user.email, role: user.role }, JWT_SECRET, {
-                        expiresIn: "30d",
-                        audience: "api:auth",
-                        issuer: "auth-service",
-                });
+                let token;
+                try {
+                        token = jwt.sign({ sub: user._id, email: user.email, role: user.role }, JWT_SECRET, {
+                                expiresIn: "30d",
+                                audience: "api:auth",
+                                issuer: "auth-service",
+                        });
+                } catch (jwtError: any) {
+                        console.error("JWT signing error:", jwtError.message);
+                        return res.status(500).json({
+                                success: false,
+                                error: "JWT creation failed",
+                                message: jwtError.message || "Failed to create authentication token",
+                        });
+                }
 
                 // Set cookie with proper cross-domain settings for production
                 res.cookie("token", token, {
@@ -132,7 +198,7 @@ export const googleCallback = async (req: Request, res: Response) => {
 
                 console.log("Authentication successful, returning token");
 
-                // Finally redirect back to your frontend app
+                // Finally return JSON response
                 return res.status(200).json({
                         success: true,
                         message: "Login successful",
@@ -146,6 +212,10 @@ export const googleCallback = async (req: Request, res: Response) => {
                 // Log detailed error information
                 if (err.response) {
                         console.error("Error response data:", err.response.data);
+                }
+
+                if (err.stack) {
+                        console.error("Error stack trace:", err.stack);
                 }
 
                 // Return a more helpful error message
