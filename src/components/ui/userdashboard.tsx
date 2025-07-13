@@ -265,10 +265,7 @@ const UserDashboard: React.FC = () => {
                                                         ) : response ? (
                                                                 <p className="text-gray-200">{response}</p>
                                                         ) : (
-                                                                <p className="text-gray-500 text-center">
-                                                                        Type a prompt like "create a form for swe role"
-                                                                        to get started
-                                                                </p>
+                                                                <p></p>
                                                         )}
                                                 </div>
                                         )}
