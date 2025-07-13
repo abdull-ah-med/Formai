@@ -12,6 +12,9 @@ const GoogleAuthCallback: React.FC = () => {
 
         useEffect(() => {
                 const handleCallback = async () => {
+                        // Prevent re-running if the process has already started
+                        if (!isProcessing) return;
+
                         const params = new URLSearchParams(location.search);
                         const code = params.get("code");
                         const error = params.get("error");
@@ -75,7 +78,7 @@ const GoogleAuthCallback: React.FC = () => {
                 };
 
                 handleCallback();
-        }, [navigate, location, login]);
+        }, [navigate, location, login, isProcessing]);
 
         return (
                 <div className="flex items-center justify-center h-screen bg-black">
