@@ -230,7 +230,7 @@ const UserDashboard: React.FC = () => {
 
         return (
                 <div className="min-h-screen bg-black text-white flex flex-col pt-16">
-                        <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24">
+                        <main className="flex-1 p-4 md:p-6 lg:p-8 pb-32">
                                 <div className="max-w-4xl mx-auto">
                                         {/* Response Display Area - only show if not displaying a form */}
                                         {!formSchema && (
@@ -292,8 +292,8 @@ const UserDashboard: React.FC = () => {
                                 </div>
                         </main>
 
-                        {/* Sticky Input Box - Always visible */}
-                        <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/10 p-4 z-50">
+                        {/* Input Box - Sticky to content, not fixed */}
+                        <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-black to-black/90 backdrop-blur-lg border-t border-white/10 p-4 shadow-lg">
                                 <div className="max-w-4xl mx-auto">
                                         <form
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
@@ -311,11 +311,11 @@ const UserDashboard: React.FC = () => {
                                                                         ? "Describe changes you want to make to the form..."
                                                                         : "Describe the form you want to create..."
                                                         }
-                                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 pr-24 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner h-[72px] resize-none overflow-auto"
+                                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 pr-24 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 shadow-inner h-[72px] resize-none scrollbar-hide transition-all duration-200"
                                                 />
                                                 <button
                                                         type="submit"
-                                                        className="absolute right-4 bottom-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md disabled:opacity-50"
+                                                        className="absolute right-4 bottom-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md disabled:opacity-50 transition-colors duration-200 shadow-md"
                                                         disabled={isLoading || (formSchema ? !revisionPrompt : !prompt)}
                                                 >
                                                         {isLoading
