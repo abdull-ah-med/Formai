@@ -173,6 +173,60 @@ const UserDashboard: React.FC = () => {
         const renderFormContent = () => {
                 if (!formSchema) return null;
 
+                const renderFieldPreview = (field: any) => {
+                        switch (field.type) {
+                                case "radio":
+                                        return (
+                                                <div className="mt-2 space-y-2">
+                                                        {(field.options || []).map((option: any, i: number) => {
+                                                                const optionText =
+                                                                        typeof option === "string"
+                                                                                ? option
+                                                                                : option.text || option.label;
+                                                                return (
+                                                                        <div key={i} className="flex items-center">
+                                                                                <div className="w-4 h-4 rounded-full border border-white/30 mr-2"></div>
+                                                                                <span className="text-gray-300 text-sm">
+                                                                                        {optionText}
+                                                                                </span>
+                                                                        </div>
+                                                                );
+                                                        })}
+                                                </div>
+                                        );
+                                case "select":
+                                case "dropdown":
+                                        return (
+                                                <div className="mt-2 bg-white/10 rounded p-2 flex justify-between items-center">
+                                                        <span className="text-gray-400 text-sm">Select an option</span>
+                                                        <svg
+                                                                className="w-4 h-4 text-gray-400"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                                <path
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        strokeWidth={2}
+                                                                        d="M19 9l-7 7-7-7"
+                                                                />
+                                                        </svg>
+                                                </div>
+                                        );
+                                case "checkbox":
+                                        return (
+                                                <div className="mt-2 flex items-center">
+                                                        <div className="w-4 h-4 border border-white/30 mr-2"></div>
+                                                        <span className="text-gray-300 text-sm">Yes</span>
+                                                </div>
+                                        );
+                                default:
+                                        return null;
+                        }
+                };
+
                 if (formSchema.sections && formSchema.sections.length > 0) {
                         // Render sections
                         return (
@@ -218,9 +272,10 @@ const UserDashboard: React.FC = () => {
                                                                                                         </span>
                                                                                                 )}
                                                                                         </p>
-                                                                                        <p className="text-xs text-gray-400">
+                                                                                        <p className="text-xs text-gray-400 mb-1">
                                                                                                 Type: {field.type}
                                                                                         </p>
+                                                                                        {renderFieldPreview(field)}
                                                                                 </div>
                                                                         ))}
                                                                 </div>
@@ -241,7 +296,8 @@ const UserDashboard: React.FC = () => {
                                                                         <span className="text-red-400 ml-1">*</span>
                                                                 )}
                                                         </p>
-                                                        <p className="text-xs text-gray-400">Type: {field.type}</p>
+                                                        <p className="text-xs text-gray-400 mb-1">Type: {field.type}</p>
+                                                        {renderFieldPreview(field)}
                                                 </div>
                                         ))}
                                 </div>
