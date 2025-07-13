@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../contexts/AuthContext";
@@ -9,11 +9,12 @@ const GoogleAuthCallback: React.FC = () => {
         const { login } = useAuth();
         const [error, setError] = useState<string | null>(null);
         const [isProcessing, setIsProcessing] = useState(true);
+        const codeProcessed = useRef(false);
 
         useEffect(() => {
                 const handleCallback = async () => {
                         // Prevent re-running if the process has already started
-                        if (!isProcessing) return;
+                        if (!isProcessing || codeProcessed.current) return;
 
                         const params = new URLSearchParams(location.search);
                         const code = params.get("code");
@@ -31,6 +32,9 @@ const GoogleAuthCallback: React.FC = () => {
                                 setIsProcessing(false);
                                 return;
                         }
+
+                        // Mark the code as being processed to prevent duplicate requests
+                        codeProcessed.current = true;
 
                         try {
                                 console.log("Sending code to backend for verification...");
@@ -74,6 +78,8 @@ const GoogleAuthCallback: React.FC = () => {
                                                 "Failed to connect your Google account. Please try again."
                                 );
                                 setIsProcessing(false);
+                                // Reset the flag so the user can try again
+                                codeProcessed.current = false;
                         }
                 };
 
