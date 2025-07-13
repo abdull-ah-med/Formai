@@ -34,8 +34,7 @@ const AccountSettings: React.FC = () => {
 
         const [fullName, setFullName] = useState("");
         const [email, setEmail] = useState("");
-        const [subscription, setSubscription] =
-                useState<SubscriptionInfo | null>(null);
+        const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
         const [googleLinked, setGoogleLinked] = useState<boolean>(false);
 
         // Password form state
@@ -43,28 +42,21 @@ const AccountSettings: React.FC = () => {
         const [newPassword, setNewPassword] = useState("");
         const [confirmPassword, setConfirmPassword] = useState("");
         const [passwordError, setPasswordError] = useState<string | null>(null);
-        const [passwordSuccess, setPasswordSuccess] = useState<string | null>(
-                null
-        );
+        const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
 
         // Fetch user info on mount
         useEffect(() => {
                 (async () => {
                         try {
-                                const { data } = await api.get<UserResponse>(
-                                        "/account"
-                                );
+                                const { data } = await api.get<UserResponse>("/account");
                                 const { user } = data;
+                                console.log("User data from /account:", user);
                                 setFullName(user.fullName);
                                 setEmail(user.email);
                                 setSubscription(user.subscription || null);
                                 setGoogleLinked(Boolean(user.googleId));
                         } catch (err: any) {
-                                setError(
-                                        err.response?.data?.message ||
-                                                err.message ||
-                                                "Failed to load account data"
-                                );
+                                setError(err.response?.data?.message || err.message || "Failed to load account data");
                         } finally {
                                 setLoading(false);
                         }
@@ -77,11 +69,7 @@ const AccountSettings: React.FC = () => {
                 try {
                         await api.put("/account", { fullName });
                 } catch (err: any) {
-                        setError(
-                                err.response?.data?.message ||
-                                        err.message ||
-                                        "Failed to save changes"
-                        );
+                        setError(err.response?.data?.message || err.message || "Failed to save changes");
                 } finally {
                         setSaving(false);
                 }
@@ -102,9 +90,7 @@ const AccountSettings: React.FC = () => {
                 // Basic strength check: replicate backend regex
                 const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
                 if (!strong.test(newPassword)) {
-                        setPasswordError(
-                                "Password must be 8+ chars with upper, lower and number."
-                        );
+                        setPasswordError("Password must be 8+ chars with upper, lower and number.");
                         return;
                 }
 
@@ -118,42 +104,26 @@ const AccountSettings: React.FC = () => {
                         setNewPassword("");
                         setConfirmPassword("");
                 } catch (err: any) {
-                        setPasswordError(
-                                err.response?.data?.message ||
-                                        err.message ||
-                                        "Failed to update password"
-                        );
+                        setPasswordError(err.response?.data?.message || err.message || "Failed to update password");
                 }
         };
 
         if (loading) {
-                return (
-                        <div className="min-h-screen flex items-center justify-center">
-                                Loading account…
-                        </div>
-                );
+                return <div className="min-h-screen flex items-center justify-center">Loading account…</div>;
         }
 
         if (error) {
-                return (
-                        <div className="min-h-screen flex items-center justify-center text-red-500">
-                                {error}
-                        </div>
-                );
+                return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;
         }
 
         return (
                 <div className="w-full max-w-4xl mx-auto p-6 pt-20">
-                        <h1 className="text-3xl font-bold mb-6 text-white">
-                                Account Settings
-                        </h1>
+                        <h1 className="text-3xl font-bold mb-6 text-white">Account Settings</h1>
 
                         <div className="space-y-8">
                                 {/* Profile Section */}
                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-                                        <h2 className="text-xl font-medium text-white mb-4">
-                                                Profile Information
-                                        </h2>
+                                        <h2 className="text-xl font-medium text-white mb-4">Profile Information</h2>
                                         <div className="space-y-4">
                                                 <div>
                                                         <label className="block text-sm text-gray-400 mb-1">
@@ -163,13 +133,7 @@ const AccountSettings: React.FC = () => {
                                                                 type="text"
                                                                 className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                                                                 value={fullName}
-                                                                onChange={(e) =>
-                                                                        setFullName(
-                                                                                e
-                                                                                        .target
-                                                                                        .value
-                                                                        )
-                                                                }
+                                                                onChange={(e) => setFullName(e.target.value)}
                                                         />
                                                 </div>
                                                 <div>
@@ -183,8 +147,7 @@ const AccountSettings: React.FC = () => {
                                                                 disabled
                                                         />
                                                         <p className="text-xs text-gray-500 mt-1">
-                                                                Email cannot be
-                                                                changed
+                                                                Email cannot be changed
                                                         </p>
                                                 </div>
                                         </div>
@@ -194,9 +157,7 @@ const AccountSettings: React.FC = () => {
                                                         onClick={handleSave}
                                                         disabled={saving}
                                                 >
-                                                        {saving
-                                                                ? "Saving…"
-                                                                : "Save Changes"}
+                                                        {saving ? "Saving…" : "Save Changes"}
                                                 </Button>
                                                 {error && (
                                                         <span className="text-sm text-red-500 self-center">
@@ -208,27 +169,16 @@ const AccountSettings: React.FC = () => {
 
                                 {/* Subscription Section */}
                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-                                        <h2 className="text-xl font-medium text-white mb-4">
-                                                Subscription
-                                        </h2>
+                                        <h2 className="text-xl font-medium text-white mb-4">Subscription</h2>
                                         {subscription ? (
                                                 <div className="space-y-2 text-white/90">
                                                         <p>
                                                                 Plan:{" "}
                                                                 <span className="font-semibold capitalize">
-                                                                        {
-                                                                                subscription.tier
-                                                                        }
+                                                                        {subscription.tier}
                                                                 </span>
                                                         </p>
-                                                        {subscription.status && (
-                                                                <p>
-                                                                        Status:{" "}
-                                                                        {
-                                                                                subscription.status
-                                                                        }
-                                                                </p>
-                                                        )}
+                                                        {subscription.status && <p>Status: {subscription.status}</p>}
                                                         {subscription.currentPeriodEnd && (
                                                                 <p>
                                                                         Renewal:{" "}
@@ -239,46 +189,21 @@ const AccountSettings: React.FC = () => {
                                                         )}
                                                         {subscription.paymentMethod && (
                                                                 <p>
-                                                                        Card:{" "}
-                                                                        {
-                                                                                subscription
-                                                                                        .paymentMethod
-                                                                                        .brand
-                                                                        }{" "}
-                                                                        ••••
-                                                                        {
-                                                                                subscription
-                                                                                        .paymentMethod
-                                                                                        .last4
-                                                                        }{" "}
-                                                                        exp{" "}
-                                                                        {
-                                                                                subscription
-                                                                                        .paymentMethod
-                                                                                        .expMonth
-                                                                        }
-                                                                        /
-                                                                        {
-                                                                                subscription
-                                                                                        .paymentMethod
-                                                                                        .expYear
-                                                                        }
+                                                                        Card: {subscription.paymentMethod.brand} ••••
+                                                                        {subscription.paymentMethod.last4} exp{" "}
+                                                                        {subscription.paymentMethod.expMonth}/
+                                                                        {subscription.paymentMethod.expYear}
                                                                 </p>
                                                         )}
                                                 </div>
                                         ) : (
-                                                <p className="text-gray-400">
-                                                        No subscription data
-                                                        available.
-                                                </p>
+                                                <p className="text-gray-400">No subscription data available.</p>
                                         )}
                                 </div>
 
                                 {/* Linked Accounts Section */}
                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-                                        <h2 className="text-xl font-medium text-white mb-4">
-                                                Linked Accounts
-                                        </h2>
+                                        <h2 className="text-xl font-medium text-white mb-4">Linked Accounts</h2>
                                         <div className="space-y-4">
                                                 <GoogleSignInButton
                                                         variant="signup"
@@ -288,17 +213,11 @@ const AccountSettings: React.FC = () => {
                                                                         : "Connect your Google account"
                                                         }
                                                         disabled={googleLinked}
-                                                        className={
-                                                                googleLinked
-                                                                        ? "opacity-60 cursor-not-allowed"
-                                                                        : ""
-                                                        }
+                                                        className={googleLinked ? "opacity-60 cursor-not-allowed" : ""}
                                                 />
                                                 {googleLinked && (
                                                         <p className="text-gray-400 text-sm">
-                                                                Your account is
-                                                                already linked
-                                                                with Google.
+                                                                Your account is already linked with Google.
                                                         </p>
                                                 )}
                                         </div>
@@ -306,105 +225,62 @@ const AccountSettings: React.FC = () => {
 
                                 {/* Password Section */}
                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-                                        <h2 className="text-xl font-medium text-white mb-4">
-                                                Password
-                                        </h2>
+                                        <h2 className="text-xl font-medium text-white mb-4">Password</h2>
                                         {googleLinked ? (
                                                 <p className="text-gray-400">
-                                                        You signed in with
-                                                        Google, which means no
-                                                        password juggling here!
-                                                        Let Google be your
-                                                        bouncer at the door. 🕺
+                                                        You signed in with Google, which means no password juggling
+                                                        here! Let Google be your bouncer at the door. 🕺
                                                 </p>
                                         ) : (
                                                 <div className="space-y-4 max-w-sm">
                                                         <div>
                                                                 <label className="block text-sm text-gray-400 mb-1">
-                                                                        Current
-                                                                        Password
+                                                                        Current Password
                                                                 </label>
                                                                 <input
                                                                         type="password"
                                                                         className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                                                                        value={
-                                                                                currentPassword
-                                                                        }
-                                                                        onChange={(
-                                                                                e
-                                                                        ) =>
-                                                                                setCurrentPassword(
-                                                                                        e
-                                                                                                .target
-                                                                                                .value
-                                                                                )
+                                                                        value={currentPassword}
+                                                                        onChange={(e) =>
+                                                                                setCurrentPassword(e.target.value)
                                                                         }
                                                                 />
                                                         </div>
                                                         <div>
                                                                 <label className="block text-sm text-gray-400 mb-1">
-                                                                        New
-                                                                        Password
+                                                                        New Password
                                                                 </label>
                                                                 <input
                                                                         type="password"
                                                                         className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                                                                        value={
-                                                                                newPassword
-                                                                        }
-                                                                        onChange={(
-                                                                                e
-                                                                        ) =>
-                                                                                setNewPassword(
-                                                                                        e
-                                                                                                .target
-                                                                                                .value
-                                                                                )
-                                                                        }
+                                                                        value={newPassword}
+                                                                        onChange={(e) => setNewPassword(e.target.value)}
                                                                 />
                                                         </div>
                                                         <div>
                                                                 <label className="block text-sm text-gray-400 mb-1">
-                                                                        Confirm
-                                                                        New
-                                                                        Password
+                                                                        Confirm New Password
                                                                 </label>
                                                                 <input
                                                                         type="password"
                                                                         className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
-                                                                        value={
-                                                                                confirmPassword
-                                                                        }
-                                                                        onChange={(
-                                                                                e
-                                                                        ) =>
-                                                                                setConfirmPassword(
-                                                                                        e
-                                                                                                .target
-                                                                                                .value
-                                                                                )
+                                                                        value={confirmPassword}
+                                                                        onChange={(e) =>
+                                                                                setConfirmPassword(e.target.value)
                                                                         }
                                                                 />
                                                         </div>
                                                         {passwordError && (
-                                                                <p className="text-red-500 text-sm">
-                                                                        {
-                                                                                passwordError
-                                                                        }
-                                                                </p>
+                                                                <p className="text-red-500 text-sm">{passwordError}</p>
                                                         )}
                                                         {passwordSuccess && (
                                                                 <p className="text-green-400 text-sm">
-                                                                        {
-                                                                                passwordSuccess
-                                                                        }
+                                                                        {passwordSuccess}
                                                                 </p>
                                                         )}
                                                         <Button
                                                                 className="bg-white text-black hover:bg-gray-200"
-                                                                onClick={
-                                                                        handlePasswordUpdate
-                                                                }
+                                                                onClick={handlePasswordUpdate}
                                                         >
                                                                 Update Password
                                                         </Button>
