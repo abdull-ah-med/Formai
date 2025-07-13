@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getFormHistory } from "../../api";
 import { useForm } from "../../contexts/FormContext";
+import { Loader } from "./loader";
 
 interface FormHistoryItem {
         id: string;
@@ -68,7 +69,7 @@ const History: React.FC = () => {
 
                         {isLoading ? (
                                 <div className="flex justify-center items-center py-12">
-                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                                        <Loader variant="dots" size="lg" />
                                 </div>
                         ) : error ? (
                                 <div className="bg-red-900/50 border border-red-500/50 rounded-xl p-4 text-red-200">

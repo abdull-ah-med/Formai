@@ -8,6 +8,7 @@ import GoogleSignInButton from "./GoogleSignInButton";
 import React, { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useAuth } from "../../contexts/AuthContext";
+import { Loader } from "./loader";
 
 // Ensure Vite env types are available
 /// <reference types="vite/client" />
@@ -38,7 +39,11 @@ const Signin = () => {
         }, [isAuthenticated, loading, navigate]);
 
         if (loading) {
-                return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+                return (
+                        <div className="min-h-screen flex items-center justify-center">
+                                <Loader variant="pulse" size="lg" />
+                        </div>
+                );
         }
 
         const handleSubmit = async (values: typeof initialValues, { setSubmitting, setFieldError }: any) => {

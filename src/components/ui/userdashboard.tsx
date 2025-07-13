@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import FormBuilder from "./FormBuilder";
 import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
+import { Loader } from "./loader";
 
 const UserDashboard: React.FC = () => {
         const { user } = useAuth();
@@ -346,7 +347,7 @@ const UserDashboard: React.FC = () => {
                                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 min-h-[200px] mb-6 shadow-lg">
                                                         {isLoading ? (
                                                                 <div className="flex items-center justify-center h-full">
-                                                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+                                                                        <Loader variant="spinner" size="lg" />
                                                                 </div>
                                                         ) : response ? (
                                                                 <p className="text-gray-200">{response}</p>
@@ -461,7 +462,7 @@ const UserDashboard: React.FC = () => {
                                                                 }
                                                         >
                                                                 {isLoading ? (
-                                                                        <span className="animate-spin h-5 w-5 border-2 border-white/30 border-t-white rounded-full"></span>
+                                                                        <Loader variant="spinner" size="sm" />
                                                                 ) : formSchema ? (
                                                                         <Edit2 className="h-5 w-5" />
                                                                 ) : (
