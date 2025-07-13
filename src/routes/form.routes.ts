@@ -123,10 +123,9 @@ router.post("/forms/history", async (req: Request, res: Response) => {
                         });
                 }
 
-                // Initialize formsHistory array if it doesn't exist
-                if (!user.formsHistory) {
-                        user.formsHistory = [];
-                }
+                // Create a minimal entry since we don't have the full form data yet
+                // This will be completed when the form is finalized
+                if (!user.formsHistory) user.formsHistory = [];
 
                 // Create a minimal FormSchema with required properties
                 const minimalSchema: FormSchema = {
@@ -143,16 +142,7 @@ router.post("/forms/history", async (req: Request, res: Response) => {
                 };
 
                 user.formsHistory.push(historyEntry);
-
-                try {
-                        await user.save();
-                } catch (saveError) {
-                        console.error("Error saving user with form history:", saveError);
-                        return res.status(500).json({
-                                success: false,
-                                error: "Database error while saving form to history",
-                        });
-                }
+                await user.save();
 
                 return res.status(201).json({
                         success: true,
