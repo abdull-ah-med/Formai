@@ -24,6 +24,7 @@ interface UserResponse {
                 subscription?: SubscriptionInfo;
                 createdAt: string;
                 googleId?: string;
+                hasPassword?: boolean;
         };
 }
 
@@ -36,6 +37,11 @@ const AccountSettings: React.FC = () => {
         const [email, setEmail] = useState("");
         const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
         const [googleLinked, setGoogleLinked] = useState<boolean>(false);
+        const [hasPassword, setHasPassword] = useState<boolean>(false);
+        const [delinkStatus, setDelinkStatus] = useState<{
+                loading: boolean;
+                error: string | null;
+        }>({ loading: false, error: null });
 
         // Password form state
         const [currentPassword, setCurrentPassword] = useState("");
@@ -50,11 +56,11 @@ const AccountSettings: React.FC = () => {
                         try {
                                 const { data } = await api.get<UserResponse>("/account");
                                 const { user } = data;
-                                console.log("User data from /account:", user);
                                 setFullName(user.fullName);
                                 setEmail(user.email);
                                 setSubscription(user.subscription || null);
                                 setGoogleLinked(Boolean(user.googleId));
+                                setHasPassword(user.hasPassword || false);
                         } catch (err: any) {
                                 setError(err.response?.data?.message || err.message || "Failed to load account data");
                         } finally {
@@ -72,6 +78,31 @@ const AccountSettings: React.FC = () => {
                         setError(err.response?.data?.message || err.message || "Failed to save changes");
                 } finally {
                         setSaving(false);
+                }
+        };
+
+        const handleDelinkGoogle = async () => {
+                setDelinkStatus({ loading: true, error: null });
+
+                if (
+                        !window.confirm(
+                                "Are you sure you want to delink your Google account? You will need to use your password to sign in."
+                        )
+                ) {
+                        setDelinkStatus({ loading: false, error: null });
+                        return;
+                }
+
+                try {
+                        await api.delete("/account/google-link");
+                        setGoogleLinked(false);
+                } catch (err: any) {
+                        setDelinkStatus({
+                                loading: false,
+                                error: err.response?.data?.message || "Failed to delink Google account.",
+                        });
+                } finally {
+                        setDelinkStatus((s) => ({ ...s, loading: false }));
                 }
         };
 
@@ -219,6 +250,28 @@ const AccountSettings: React.FC = () => {
                                                         <p className="text-gray-400 text-sm">
                                                                 Your account is already linked with Google.
                                                         </p>
+                                                )}
+                                                {googleLinked && hasPassword && (
+                                                        <div className="pt-4 border-t border-white/10">
+                                                                <Button
+                                                                        variant="destructive"
+                                                                        onClick={handleDelinkGoogle}
+                                                                        disabled={delinkStatus.loading}
+                                                                        className="text-sm"
+                                                                >
+                                                                        {delinkStatus.loading
+                                                                                ? "Delinking..."
+                                                                                : "Delink Google Account"}
+                                                                </Button>
+                                                                <p className="text-xs text-gray-400 mt-2">
+                                                                        You can delink because you have a password set.
+                                                                </p>
+                                                                {delinkStatus.error && (
+                                                                        <p className="text-red-500 text-sm mt-2">
+                                                                                {delinkStatus.error}
+                                                                        </p>
+                                                                )}
+                                                        </div>
                                                 )}
                                         </div>
                                 </div>
