@@ -5,6 +5,7 @@ import { generateForm, reviseForm, finalizeForm } from "../../api";
 import { FormSchema, GenerateFormResponse, ReviseFormResponse, FinalizeFormResponse } from "../../types/form";
 import FormBuilder from "./FormBuilder";
 import GoogleSignInButton from "./GoogleSignInButton";
+import { Textarea } from "./textarea";
 
 const FormCreator: React.FC = () => {
         const { user } = useAuth();
@@ -153,32 +154,54 @@ const FormCreator: React.FC = () => {
                                         </div>
                                 ) : !formSchema ? (
                                         <div className="max-w-2xl mx-auto">
-                                                <form onSubmit={handleGenerate} className="mb-8 relative">
-                                                        <div className="relative">
-                                                                <input
-                                                                        id="prompt"
-                                                                        type="text"
-                                                                        className="w-full pl-4 pr-32 py-3 bg-gray-800 border border-gray-700 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 shadow-lg"
-                                                                        placeholder="e.g., a modern contact form for a portfolio website"
-                                                                        value={prompt}
-                                                                        onChange={(e) => setPrompt(e.target.value)}
-                                                                        disabled={isGenerating}
-                                                                />
-                                                                <button
-                                                                        type="submit"
-                                                                        className="absolute right-1 top-1/2 -translate-y-1/2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-full px-6 py-2 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 transition-all duration-300 transform hover:scale-105"
-                                                                        disabled={!prompt.trim() || isGenerating}
+                                                <form
+                                                        onSubmit={handleGenerate}
+                                                        className="relative w-full max-w-2xl mx-auto"
+                                                >
+                                                        <Textarea
+                                                                id="prompt"
+                                                                rows={1}
+                                                                className="w-full pl-4 pr-16 py-3 bg-gray-800 border border-gray-700 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 shadow-lg resize-none"
+                                                                placeholder="e.g., a modern contact form for a portfolio website"
+                                                                value={prompt}
+                                                                onChange={(e) => setPrompt(e.target.value)}
+                                                                disabled={isGenerating}
+                                                                onKeyDown={(e) => {
+                                                                        if (e.key === "Enter" && !e.shiftKey) {
+                                                                                e.preventDefault();
+                                                                                handleGenerate(e as any);
+                                                                        }
+                                                                }}
+                                                                style={{
+                                                                        minHeight: "52px",
+                                                                        maxHeight: "200px",
+                                                                }}
+                                                        />
+                                                        <button
+                                                                type="submit"
+                                                                className="absolute right-3 top-1/2 -translate-y-1/2 bg-purple-600 text-white rounded-lg w-8 h-8 flex items-center justify-center hover:bg-purple-700 disabled:opacity-50 transition-all duration-300"
+                                                                disabled={!prompt.trim() || isGenerating}
+                                                        >
+                                                                <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        className="w-4 h-4"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        stroke="currentColor"
                                                                 >
-                                                                        {isGenerating ? "..." : "Generate"}
-                                                                </button>
-                                                        </div>
-
-                                                        {error && (
-                                                                <p className="mt-4 text-red-400 text-center">{error}</p>
-                                                        )}
+                                                                        <path
+                                                                                strokeLinecap="round"
+                                                                                strokeLinejoin="round"
+                                                                                strokeWidth={2}
+                                                                                d="M5 12h14M12 5l7 7-7 7"
+                                                                        />
+                                                                </svg>
+                                                        </button>
                                                 </form>
 
-                                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                                                {error && <p className="mt-4 text-red-400 text-center">{error}</p>}
+
+                                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 mt-8">
                                                         <h2 className="text-xl font-semibold mb-4">How It Works</h2>
                                                         <ol className="list-decimal pl-5 space-y-2 text-gray-300">
                                                                 <li>
