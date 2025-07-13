@@ -90,14 +90,6 @@ const UserDashboard: React.FC = () => {
                                 setFormSchema(response.data.schema);
                                 setFormId(response.data.formId);
                                 setResponse(""); // Clear response when form is displayed
-
-                                // Save form to history
-                                try {
-                                        await saveFormToHistory(response.data.formId, response.data.schema.title);
-                                } catch (historyError) {
-                                        console.error("Failed to save form to history:", historyError);
-                                        // Don't show error to user as this is a background operation
-                                }
                         } else {
                                 setError(response.error || "Failed to generate form");
                                 setResponse(`Error: ${response.error || "Failed to generate form"}`);
