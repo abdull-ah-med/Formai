@@ -439,44 +439,48 @@ const UserDashboard: React.FC = () => {
                                                 className="relative"
                                         >
                                                 <div
-                                                        className={`relative flex items-center bg-black/50 rounded-xl ${
+                                                        className={`relative rounded-xl overflow-hidden ${
                                                                 isInputFocused
                                                                         ? "border border-white"
-                                                                        : "gradient-border"
+                                                                        : "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-[1px]"
                                                         }`}
                                                 >
-                                                        <textarea
-                                                                value={formSchema ? revisionPrompt : prompt}
-                                                                onChange={(e) =>
-                                                                        formSchema
-                                                                                ? setRevisionPrompt(e.target.value)
-                                                                                : setPrompt(e.target.value)
-                                                                }
-                                                                onFocus={() => setIsInputFocused(true)}
-                                                                onBlur={() => setIsInputFocused(false)}
-                                                                placeholder={
-                                                                        formSchema
-                                                                                ? "Describe changes you want to make to the form..."
-                                                                                : "Describe the form you want to create..."
-                                                                }
-                                                                className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide rounded-xl w-full"
-                                                        />
-                                                        <button
-                                                                type="submit"
-                                                                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 flex-shrink-0 bg-white/20 hover:bg-white/30 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center rounded-full disabled:bg-white/5"
-                                                                disabled={
-                                                                        isLoading ||
-                                                                        (formSchema ? !revisionPrompt : !prompt)
-                                                                }
-                                                        >
-                                                                {isLoading ? (
-                                                                        <Loader variant="spinner" size="sm" />
-                                                                ) : formSchema ? (
-                                                                        <Edit2 className="h-5 w-5" />
-                                                                ) : (
-                                                                        <Send className="h-5 w-5" />
-                                                                )}
-                                                        </button>
+                                                        <div className="bg-black/50 rounded-xl relative">
+                                                                <textarea
+                                                                        value={formSchema ? revisionPrompt : prompt}
+                                                                        onChange={(e) =>
+                                                                                formSchema
+                                                                                        ? setRevisionPrompt(
+                                                                                                  e.target.value
+                                                                                          )
+                                                                                        : setPrompt(e.target.value)
+                                                                        }
+                                                                        onFocus={() => setIsInputFocused(true)}
+                                                                        onBlur={() => setIsInputFocused(false)}
+                                                                        placeholder={
+                                                                                formSchema
+                                                                                        ? "Describe changes you want to make to the form..."
+                                                                                        : "Describe the form you want to create..."
+                                                                        }
+                                                                        className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide rounded-xl w-full"
+                                                                />
+                                                                <button
+                                                                        type="submit"
+                                                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 flex-shrink-0 bg-white/20 hover:bg-white/30 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center rounded-full disabled:bg-white/5"
+                                                                        disabled={
+                                                                                isLoading ||
+                                                                                (formSchema ? !revisionPrompt : !prompt)
+                                                                        }
+                                                                >
+                                                                        {isLoading ? (
+                                                                                <Loader variant="spinner" size="sm" />
+                                                                        ) : formSchema ? (
+                                                                                <Edit2 className="h-5 w-5" />
+                                                                        ) : (
+                                                                                <Send className="h-5 w-5" />
+                                                                        )}
+                                                                </button>
+                                                        </div>
                                                 </div>
                                                 {!formSchema && (
                                                         <p className="text-xs text-center text-gray-500 mt-2">
