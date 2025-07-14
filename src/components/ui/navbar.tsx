@@ -1,7 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "./button";
-import { LogOut, Settings, User, ChevronDown, Menu, X, MessageSquare, History, Home } from "lucide-react";
+import {
+        LogOut,
+        Settings,
+        User,
+        ChevronDown,
+        Menu,
+        X,
+        MessageSquare,
+        History,
+        Home,
+        Info,
+        UserPlus,
+} from "lucide-react";
 import FormaiLogo from "../../assets/Formai.svg";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -71,7 +83,7 @@ const Navbar = () => {
                                   name: "About",
                                   href: "/about",
                                   isRouterLink: true,
-                                  icon: <MessageSquare className="w-5 h-5" />,
+                                  icon: <Info className="w-5 h-5" />,
                                   onClick: undefined,
                           },
                           {
@@ -85,7 +97,7 @@ const Navbar = () => {
                                   name: "Sign Up",
                                   href: "/signup",
                                   isRouterLink: true,
-                                  icon: <User className="w-5 h-5" />,
+                                  icon: <UserPlus className="w-5 h-5" />,
                                   onClick: undefined,
                           },
                   ];
