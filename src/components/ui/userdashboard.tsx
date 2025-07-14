@@ -441,13 +441,26 @@ const UserDashboard: React.FC = () => {
                                         >
                                                 <div className="flex items-center bg-transparent rounded-xl overflow-hidden shadow-lg transition-all duration-200">
                                                         <div className="relative flex-grow">
+                                                                {/* Static border - always visible */}
                                                                 <div
                                                                         className={`absolute inset-0 rounded-l-xl border-2 transition-all duration-300 ${
                                                                                 isFocused
                                                                                         ? "border-white shadow-glow"
-                                                                                        : "border-white/50 animate-spin-slow"
+                                                                                        : "border-white/20"
                                                                         }`}
                                                                 ></div>
+
+                                                                {/* Spinning overlay - only when not focused */}
+                                                                {!isFocused && (
+                                                                        <div
+                                                                                className="absolute inset-0 rounded-l-xl border-2 border-transparent animate-spin-slow pointer-events-none"
+                                                                                style={{
+                                                                                        borderImage:
+                                                                                                "linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.1)) 1",
+                                                                                }}
+                                                                        ></div>
+                                                                )}
+
                                                                 <textarea
                                                                         value={formSchema ? revisionPrompt : prompt}
                                                                         onChange={(e) =>
