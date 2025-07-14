@@ -255,16 +255,9 @@ export async function createGoogleForm(
 
                 return { formId, responderUri };
         } catch (error: any) {
-                console.error("Error creating Google Form:", error);
-
-                // Provide more detailed error information
                 if (error.response) {
-                        // Google API error with response
                         const status = error.response.status;
                         const errorDetails = error.response.data?.error || {};
-
-                        console.error(`Google Forms API error (${status}):`, errorDetails);
-
                         if (status === 403) {
                                 throw new Error(
                                         "Permission denied: You don't have permission to create Google Forms. Please check your Google account permissions."

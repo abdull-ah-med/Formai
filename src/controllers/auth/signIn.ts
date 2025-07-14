@@ -42,7 +42,6 @@ export const loginUser = async (req: Request, res: Response) => {
 
         const JWT_SECRET = process.env.JWT_SECRET;
         if (!JWT_SECRET) {
-                console.error("JWT_SECRET is undefined");
                 return res.status(500).json({ message: "Server misconfiguration" });
         }
 

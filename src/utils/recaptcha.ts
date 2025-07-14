@@ -12,9 +12,6 @@ export const verifyRecaptcha = async (token: string): Promise<boolean> => {
 
         const secret = process.env.RECAPTCHA_SECRET_KEY;
         if (!secret) {
-                console.error(
-                        "RECAPTCHA_SECRET_KEY environment variable is not set"
-                );
                 return false;
         }
 
@@ -23,17 +20,13 @@ export const verifyRecaptcha = async (token: string): Promise<boolean> => {
                 params.append("secret", secret);
                 params.append("response", token);
 
-                const response = await fetch(
-                        "https://www.google.com/recaptcha/api/siteverify",
-                        {
-                                method: "POST",
-                                headers: {
-                                        "Content-Type":
-                                                "application/x-www-form-urlencoded",
-                                },
-                                body: params.toString(),
-                        }
-                );
+                const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+                        method: "POST",
+                        headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: params.toString(),
+                });
 
                 const data = (await response.json()) as {
                         success: boolean;
@@ -43,7 +36,6 @@ export const verifyRecaptcha = async (token: string): Promise<boolean> => {
 
                 return data.success === true;
         } catch (error) {
-                console.error("Failed to validate reCAPTCHA:", error);
                 return false;
         }
 };

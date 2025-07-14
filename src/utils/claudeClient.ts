@@ -58,7 +58,6 @@ export async function generateSchemaFromPrompt(prompt: string): Promise<FormSche
 
                 return JSON.parse(jsonString);
         } catch (error) {
-                console.error("Error calling Claude API:", error);
                 throw new Error("Failed to generate form schema from Claude API.");
         }
 }
@@ -103,7 +102,6 @@ Please apply these changes and return the new, complete JSON schema. Maintain th
 
                 return JSON.parse(jsonString);
         } catch (error) {
-                console.error("Error calling Claude API during revision:", error);
                 throw new Error("Failed to revise form schema with Claude API.");
         }
 }

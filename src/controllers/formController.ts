@@ -36,7 +36,6 @@ export const generateForm = async (req: Request, res: Response) => {
                         },
                 });
         } catch (error) {
-                console.error(error);
                 res.status(500).json({
                         success: false,
                         error: "Failed to generate form.",
@@ -103,7 +102,6 @@ export const reviseForm = async (req: Request, res: Response) => {
                         },
                 });
         } catch (error) {
-                console.error(error);
                 res.status(500).json({
                         success: false,
                         error: "Failed to revise form.",
@@ -154,18 +152,11 @@ export const finalizeForm = async (req: Request, res: Response) => {
                                 error: "CONNECT_GOOGLE",
                         });
                 }
-
-                // Get the final schema (either the original or the last revision)
                 const finalClaudeSchema =
                         form.revisions.length > 0
                                 ? form.revisions[form.revisions.length - 1].claudeResponse
                                 : form.claudeResponse;
-
-                // Convert Claude schema to user schema format for storage
                 const finalUserSchema = convertClaudeSchemaToUserSchema(finalClaudeSchema);
-
-                // Log the schema for debugging
-                console.log("Final schema for form creation:", JSON.stringify(finalClaudeSchema));
 
                 const oauth2Client = new OAuth2Client({
                         clientId: process.env.GOOGLE_CLIENT_ID,
@@ -173,7 +164,6 @@ export const finalizeForm = async (req: Request, res: Response) => {
                 });
 
                 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-                        console.error("Missing Google OAuth credentials in environment variables");
                         return res.status(500).json({
                                 success: false,
                                 error: "Server configuration error: Missing Google OAuth credentials",
@@ -185,15 +175,12 @@ export const finalizeForm = async (req: Request, res: Response) => {
                         refresh_token: user.googleTokens.refreshToken,
                         expiry_date: user.googleTokens.expiryDate,
                 });
-
-                // Check if token is expired and refresh if needed
                 if (
                         user.googleTokens.expiryDate &&
                         user.googleTokens.expiryDate <= Date.now() &&
                         user.googleTokens.refreshToken
                 ) {
                         try {
-                                console.log("Refreshing expired Google token");
                                 const { credentials } = await oauth2Client.refreshAccessToken();
 
                                 // Update user's tokens in the database
@@ -204,22 +191,12 @@ export const finalizeForm = async (req: Request, res: Response) => {
                                 };
 
                                 await user.save();
-                                console.log("Token refreshed successfully");
-
-                                // Update the credentials in the oauth2Client
                                 oauth2Client.setCredentials({
                                         access_token: credentials.access_token!,
                                         refresh_token: credentials.refresh_token || user.googleTokens.refreshToken,
                                         expiry_date: credentials.expiry_date,
                                 });
                         } catch (refreshError: any) {
-                                console.error("Failed to refresh Google token:", refreshError);
-
-                                // Log detailed error information
-                                if (refreshError.response) {
-                                        console.error("Refresh error details:", refreshError.response.data);
-                                }
-
                                 return res.status(403).json({
                                         success: false,
                                         error: "GOOGLE_TOKEN_EXPIRED",
@@ -254,8 +231,6 @@ export const finalizeForm = async (req: Request, res: Response) => {
                                 },
                         });
                 } catch (googleError: any) {
-                        console.error("Google Form creation error:", googleError);
-
                         // Check for specific Google API errors
                         if (googleError.message && googleError.message.includes("Permission denied")) {
                                 return res.status(403).json({
@@ -286,9 +261,6 @@ export const finalizeForm = async (req: Request, res: Response) => {
                 }
         } catch (error) {
                 const e = error as any;
-                console.error("Form finalization error:", e);
-
-                // Check if token is expired - Google API returns errors in a specific format
                 if (e.response?.data?.error === "invalid_grant" || (e.message && e.message.includes("invalid_grant"))) {
                         return res.status(403).json({
                                 success: false,
@@ -296,12 +268,6 @@ export const finalizeForm = async (req: Request, res: Response) => {
                                 message: "Your Google authorization has expired. Please reconnect your Google account.",
                         });
                 }
-
-                // Log the full error for debugging
-                if (e.response) {
-                        console.error("Error response data:", e.response.data);
-                }
-
                 res.status(500).json({
                         success: false,
                         error: "SERVER_ERROR",

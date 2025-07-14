@@ -43,7 +43,6 @@ router.get("/forms/history", async (req: Request, res: Response) => {
                         data: formHistory,
                 });
         } catch (error: any) {
-                console.error("Error fetching form history:", error);
                 return res.status(500).json({
                         success: false,
                         error: "Failed to fetch form history",

@@ -31,17 +31,13 @@ app.use(helmet());
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
-// Connect DB and start server
 const startServer = async () => {
         try {
                 await connectDB();
 
-                const PORT = process.env.PORT || 4000;
-                app.listen(PORT, () => {
-                        console.log(`Server running at http://localhost:${PORT}`);
-                });
+                const PORT = process.env.PORT;
+                app.listen(PORT);
         } catch (error) {
-                console.error("Failed to start server:", error);
                 process.exit(1);
         }
 };

@@ -33,11 +33,10 @@ export const getAccount = async (req: Request, res: Response) => {
                                 hasPassword: !!user.password,
                                 createdAt: user.createdAt,
                                 updatedAt: user.updatedAt,
-				isGoogleLinked: !!user.googleId,
+                                isGoogleLinked: !!user.googleId,
                         },
                 });
         } catch (error: any) {
-                console.error("Error fetching user account:", error);
                 return res.status(500).json({
                         success: false,
                         message: "Server error while fetching account",

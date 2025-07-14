@@ -22,7 +22,6 @@ export default function verifyJWT(req: Request, res: Response, next: NextFunctio
         try {
                 const secret = process.env.JWT_SECRET;
                 if (!secret) {
-                        console.error("JWT_SECRET env var is not set");
                         return res.status(500).json({ error: "Server configuration error" });
                 }
 
@@ -30,7 +29,6 @@ export default function verifyJWT(req: Request, res: Response, next: NextFunctio
                 req.user = decoded;
                 next();
         } catch (err) {
-                console.error("JWT verification failed:", err);
                 res.status(401).json({ error: "Invalid or expired token." });
         }
 }
