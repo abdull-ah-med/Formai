@@ -72,19 +72,15 @@ const Home = () => {
                                 <div className="relative z-10 max-w-7xl mx-auto w-full">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                                                 {/* Left Side - Tagline */}
-                                                <div className="text-left" onMouseMove={handleMouseMove}>
-                                                        <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight leading-none">
-                                                                forms.
+                                                <div className="text-left">
+                                                        <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight leading-[1.1]">
+                                                                <span className="text-white">forms.</span>
                                                                 <br />
-                                                                <span
-                                                                        ref={spanRef}
-                                                                        className="bg-[radial-gradient(circle_at_var(--x)_var(--y),white,black)] bg-clip-text text-transparent transition duration-300"
-                                                                >
+                                                                <span className="bg-gradient-to-r from-white via-gray-300 to-white/20 bg-clip-text text-transparent">
                                                                         reimagined.
                                                                 </span>
                                                         </h1>
                                                 </div>
-
                                                 {/* Right Side - Content */}
                                                 <div className="text-left">
                                                         <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
