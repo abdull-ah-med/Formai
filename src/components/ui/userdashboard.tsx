@@ -12,7 +12,6 @@ import {
         FinalizeFormResponse,
 } from "../../types/form";
 import { useNavigate } from "react-router-dom";
-import FormBuilder from "./FormBuilder";
 import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
 import { Loader } from "./loader";
@@ -28,6 +27,7 @@ const UserDashboard: React.FC = () => {
         const [showRevisionForm, setShowRevisionForm] = useState(false);
         const [revisionPrompt, setRevisionPrompt] = useState("");
         const [revisionsRemaining, setRevisionsRemaining] = useState(3);
+        const [isInputFocused, setIsInputFocused] = useState(false);
 
         useEffect(() => {
                 if (formSchema && formId) {
@@ -438,7 +438,13 @@ const UserDashboard: React.FC = () => {
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
                                                 className="relative"
                                         >
-                                                <div className="relative flex items-center bg-black/50 rounded-xl border border-white">
+                                                <div
+                                                        className={`relative flex items-center bg-black/50 rounded-xl ${
+                                                                isInputFocused
+                                                                        ? "border border-white"
+                                                                        : "gradient-border"
+                                                        }`}
+                                                >
                                                         <textarea
                                                                 value={formSchema ? revisionPrompt : prompt}
                                                                 onChange={(e) =>
@@ -446,12 +452,14 @@ const UserDashboard: React.FC = () => {
                                                                                 ? setRevisionPrompt(e.target.value)
                                                                                 : setPrompt(e.target.value)
                                                                 }
+                                                                onFocus={() => setIsInputFocused(true)}
+                                                                onBlur={() => setIsInputFocused(false)}
                                                                 placeholder={
                                                                         formSchema
                                                                                 ? "Describe changes you want to make to the form..."
                                                                                 : "Describe the form you want to create..."
                                                                 }
-                                                                className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide"
+                                                                className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide rounded-xl w-full"
                                                         />
                                                         <button
                                                                 type="submit"
