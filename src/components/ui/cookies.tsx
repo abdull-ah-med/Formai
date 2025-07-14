@@ -71,7 +71,7 @@ const Cookies = () => {
                                                                         </ul>
                                                                         <p>
                                                                                 We do
-                                                                                <strong>not</strong> use cookies for:
+                                                                                <strong> not</strong> use cookies for:
                                                                         </p>
                                                                         <ul className="list-disc list-inside space-y-2 ml-4">
                                                                                 <li>
