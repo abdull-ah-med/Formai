@@ -81,8 +81,4 @@
         .scrollbar-hide::-webkit-scrollbar {
                 display: none; /* Chrome, Safari and Opera */
         }
-
-        .shadow-glow {
-                box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.5);
-        }
 }

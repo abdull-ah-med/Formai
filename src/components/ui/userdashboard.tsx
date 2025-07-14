@@ -28,7 +28,6 @@ const UserDashboard: React.FC = () => {
         const [showRevisionForm, setShowRevisionForm] = useState(false);
         const [revisionPrompt, setRevisionPrompt] = useState("");
         const [revisionsRemaining, setRevisionsRemaining] = useState(3);
-        const [isFocused, setIsFocused] = useState(false);
 
         useEffect(() => {
                 if (formSchema && formId) {
@@ -439,47 +438,21 @@ const UserDashboard: React.FC = () => {
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
                                                 className="relative"
                                         >
-                                                <div className="flex items-center bg-transparent rounded-xl overflow-hidden shadow-lg transition-all duration-200">
-                                                        <div className="relative flex-grow">
-                                                                {/* Static border - always visible */}
-                                                                <div
-                                                                        className={`absolute inset-0 rounded-l-xl border-2 transition-all duration-300 ${
-                                                                                isFocused
-                                                                                        ? "border-white shadow-glow"
-                                                                                        : "border-white/20"
-                                                                        }`}
-                                                                ></div>
-
-                                                                {/* Spinning overlay - only when not focused */}
-                                                                {!isFocused && (
-                                                                        <div
-                                                                                className="absolute inset-0 rounded-l-xl border-2 border-transparent animate-spin-slow pointer-events-none"
-                                                                                style={{
-                                                                                        borderImage:
-                                                                                                "linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.1)) 1",
-                                                                                }}
-                                                                        ></div>
-                                                                )}
-
-                                                                <textarea
-                                                                        value={formSchema ? revisionPrompt : prompt}
-                                                                        onChange={(e) =>
-                                                                                formSchema
-                                                                                        ? setRevisionPrompt(
-                                                                                                  e.target.value
-                                                                                          )
-                                                                                        : setPrompt(e.target.value)
-                                                                        }
-                                                                        onFocus={() => setIsFocused(true)}
-                                                                        onBlur={() => setIsFocused(false)}
-                                                                        placeholder={
-                                                                                formSchema
-                                                                                        ? "Describe changes you want to make to the form..."
-                                                                                        : "Describe the form you want to create..."
-                                                                        }
-                                                                        className="relative z-10 w-full bg-black/50 backdrop-blur-md p-4 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide rounded-l-xl transition-all"
-                                                                />
-                                                        </div>
+                                                <div className="flex items-center bg-transparent border-0 rounded-xl overflow-hidden shadow-none transition-all duration-200">
+                                                        <textarea
+                                                                value={formSchema ? revisionPrompt : prompt}
+                                                                onChange={(e) =>
+                                                                        formSchema
+                                                                                ? setRevisionPrompt(e.target.value)
+                                                                                : setPrompt(e.target.value)
+                                                                }
+                                                                placeholder={
+                                                                        formSchema
+                                                                                ? "Describe changes you want to make to the form..."
+                                                                                : "Describe the form you want to create..."
+                                                                }
+                                                                className="flex-grow bg-black/50 backdrop-blur-md p-4 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide rounded-l-xl border border-white/5 hover:border-white/10 transition-all"
+                                                        />
                                                         <button
                                                                 type="submit"
                                                                 className="h-[60px] w-[60px] flex-shrink-0 bg-white/20 hover:bg-white/30 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center rounded-r-xl disabled:bg-white/5"
