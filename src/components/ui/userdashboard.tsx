@@ -424,7 +424,7 @@ const UserDashboard: React.FC = () => {
                                                                         <FormFinalizeButton
                                                                                 formId={formId}
                                                                                 onSuccess={handleFormSuccess}
-                                                                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white"
+                                                                                className="px-4 py-2 bg-white text-black rounded-md font-semibold hover:bg-neutral-200"
                                                                         />
                                                                 </div>
                                                         </div>
@@ -442,10 +442,10 @@ const UserDashboard: React.FC = () => {
                                                         className={`relative rounded-xl overflow-hidden ${
                                                                 isInputFocused
                                                                         ? "border border-white"
-                                                                        : "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-[1px]"
+                                                                        : "bg-gradient-to-r from-white to-black p-[1px]"
                                                         }`}
                                                 >
-                                                        <div className="bg-black/50 rounded-xl relative">
+                                                        <div className="bg-black rounded-xl relative">
                                                                 <textarea
                                                                         value={formSchema ? revisionPrompt : prompt}
                                                                         onChange={(e) =>
@@ -466,7 +466,7 @@ const UserDashboard: React.FC = () => {
                                                                 />
                                                                 <button
                                                                         type="submit"
-                                                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 flex-shrink-0 bg-white/20 hover:bg-white/30 text-white font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center rounded-full disabled:bg-white/5"
+                                                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 flex-shrink-0 bg-white hover:bg-neutral-200 text-black font-medium disabled:opacity-50 transition-all duration-200 flex items-center justify-center rounded-full"
                                                                         disabled={
                                                                                 isLoading ||
                                                                                 (formSchema ? !revisionPrompt : !prompt)
