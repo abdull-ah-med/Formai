@@ -426,10 +426,6 @@ const UserDashboard: React.FC = () => {
                                                     animation: aurora-spin 6s linear infinite;
                                                     z-index: 0; /* Behind the main content */
                                                 }
-                                                .aurora-border.focused::before {
-                                                    opacity: 0;
-                                                    transition: opacity 0.4s ease-out;
-                                                }
                                         `}
                                 </style>
                                 <div className="max-w-4xl mx-auto">
@@ -438,11 +434,7 @@ const UserDashboard: React.FC = () => {
                                                 className="relative"
                                         >
                                                 <div
-                                                        className={`relative rounded-xl overflow-hidden aurora-border transition-[box-shadow,border-color] duration-300 ${
-                                                                isInputFocused
-                                                                        ? "focused border border-indigo-400 shadow-[0_0_15px_rgba(129,140,248,0.4)]"
-                                                                        : "p-[2px]"
-                                                        }`}
+                                                        className="relative rounded-xl overflow-hidden aurora-border p-[2px]"
                                                 >
                                                         <div className="bg-black rounded-[10px] relative z-10">
                                                                 <textarea
@@ -454,14 +446,12 @@ const UserDashboard: React.FC = () => {
                                                                                           )
                                                                                         : setPrompt(e.target.value)
                                                                         }
-                                                                        onFocus={() => setIsInputFocused(true)}
-                                                                        onBlur={() => setIsInputFocused(false)}
                                                                         placeholder={
                                                                                 formSchema
                                                                                         ? "Describe changes you want to make to the form..."
                                                                                         : "Describe the form you want to create..."
                                                                         }
-                                                                        className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide rounded-xl w-full"
+                                                                        className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none h-12 resize-none scrollbar-hide rounded-xl w-full"
                                                                 />
                                                                 <button
                                                                         type="submit"
