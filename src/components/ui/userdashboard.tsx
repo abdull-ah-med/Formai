@@ -448,8 +448,8 @@ const UserDashboard: React.FC = () => {
                                                         position: absolute;
                                                         inset: 0;
                                                         border-radius: inherit;
-                                                        background: conic-gradient(from 180deg at 50% 50%, white, black, white);
-                                                        animation: rotate-gradient 4s linear infinite;
+                                                        background: conic-gradient(from 180deg at 50% 50%, #d8b4fe, #818cf8, #d8b4fe);
+                                                        animation: rotate-gradient 2s linear infinite;
                                                         z-index: 0;
                                                         opacity: 1;
                                                         transition: opacity 0.3s ease-in-out;
@@ -465,9 +465,9 @@ const UserDashboard: React.FC = () => {
                                                 className="relative"
                                         >
                                                 <div
-                                                        className={`relative rounded-xl overflow-hidden animated-border transition-all duration-300 ${
+                                                        className={`relative rounded-xl overflow-hidden animated-border transition-[box-shadow,border-color] duration-300 ${
                                                                 isInputFocused
-                                                                        ? "focused border border-white"
+                                                                        ? "focused border border-indigo-400 shadow-[0_0_15px_rgba(129,140,248,0.4)]"
                                                                         : "p-[1px]"
                                                         }`}
                                                 >
