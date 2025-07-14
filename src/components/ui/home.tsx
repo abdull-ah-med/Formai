@@ -82,16 +82,16 @@ const Home = () => {
                                                         <div className="flex flex-wrap gap-4">
                                                                 <Button
                                                                         size="lg"
-                                                                        className="bg-gradient-to-br from-white to-gray-100 text-black px-8 py-3 text-lg font-medium rounded-xl transition-all duration-300 hover:from-black hover:to-gray-900 hover:text-white hover:shadow-lg hover:border hover:border-white"
+                                                                        className="bg-white text-black border-none px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border hover:border-white"
                                                                         onClick={() => navigate("/signup")}
                                                                 >
                                                                         Get Started Free
-                                                                        <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+                                                                        <ArrowRight className="ml-2 w-5 h-5" />
                                                                 </Button>
 
                                                                 <Button
                                                                         size="lg"
-                                                                        className="bg-black text-white px-8 py-3 text-lg font-medium rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-white hover:to-gray-200 hover:text-black hover:shadow-inner"
+                                                                        className="bg-white text-black border-none px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border hover:border-white"
                                                                         onClick={() => navigate("/signin")}
                                                                 >
                                                                         Sign In
@@ -205,16 +205,16 @@ const Home = () => {
                                         <div className="flex flex-wrap justify-center gap-4">
                                                 <Button
                                                         size="lg"
-                                                        className="bg-gradient-to-br from-white to-gray-100 text-black px-8 py-3 text-lg font-medium rounded-xl transition-all duration-300 hover:from-black hover:to-gray-900 hover:text-white hover:shadow-lg hover:border hover:border-white"
+                                                        className="bg-white text-black border-none px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border hover:border-white"
                                                         onClick={() => navigate("/signup")}
                                                 >
                                                         Get Started Free
-                                                        <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+                                                        <ArrowRight className="ml-2 w-5 h-5" />
                                                 </Button>
 
                                                 <Button
                                                         size="lg"
-                                                        className="bg-black text-white px-8 py-3 text-lg font-medium rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-white hover:to-gray-200 hover:text-black hover:shadow-inner"
+                                                        className="bg-white text-black border-none px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border hover:border-white"
                                                         onClick={() => navigate("/signin")}
                                                 >
                                                         Sign In
