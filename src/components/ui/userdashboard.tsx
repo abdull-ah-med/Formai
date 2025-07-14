@@ -30,6 +30,13 @@ const UserDashboard: React.FC = () => {
         const [error, setError] = useState("");
         const [revisionPrompt, setRevisionPrompt] = useState("");
         const [isInputFocused, setIsInputFocused] = useState(false);
+	const [showWarning, setShowWarning] = useState(false);
+
+	useEffect(() => {
+		if (user && !user.isGoogleLinked) {
+			setShowWarning(true);
+		}
+	}, [user]);
 
         useEffect(() => {
                 if (formSchema && formId) {
@@ -314,6 +321,20 @@ const UserDashboard: React.FC = () => {
 
         return (
                 <div className="min-h-screen bg-black text-white flex flex-col pt-16">
+			<Dialog open={showWarning} onOpenChange={setShowWarning}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Google Account Not Linked</DialogTitle>
+						<DialogDescription>
+							Your Google account is not linked. You will not be able to create
+							Google Forms until you link your account.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<button onClick={() => setShowWarning(false)}>Close</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
                         <main className="flex-1 p-4 md:p-6 lg:p-8 pb-32">
                                 <div className="max-w-4xl mx-auto">
                                         {/* Response Display Area - only show if not displaying a form */}

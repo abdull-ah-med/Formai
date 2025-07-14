@@ -1,11 +1,7 @@
 // src/utils/auth.ts
 import api from "../api";
-export interface CurrentUser {
-        id: string;
-        email: string;
-        role: string;
-        fullName?: string;
-}
+import { CurrentUser } from "@formai/types";
+import { CurrentUser } from "@formai/types";
 
 export function setAuthToken(token: string | null) {
         if (token) {
