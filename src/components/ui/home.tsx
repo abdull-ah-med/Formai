@@ -1,15 +1,26 @@
 import { ArrowRight, CheckCircle, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { logoutAndRedirect } from "@/auth/authHelper";
 
 const Home = () => {
         const navigate = useNavigate();
         const { isAuthenticated, loading } = useAuth();
+        const spanRef = useRef<HTMLSpanElement | null>(null);
 
-        // Decide behavior based on session type when an authenticated user lands on Home.
+        const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+                const span = spanRef.current;
+                if (!span) return;
+
+                const rect = span.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                span.style.setProperty("--x", `${x}px`);
+                span.style.setProperty("--y", `${y}px`);
+        };
         useEffect(() => {
                 if (loading) {
                         return; // Wait until authentication status is resolved
@@ -61,11 +72,14 @@ const Home = () => {
                                 <div className="relative z-10 max-w-7xl mx-auto w-full">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                                                 {/* Left Side - Tagline */}
-                                                <div className="text-left">
+                                                <div className="text-left" onMouseMove={handleMouseMove}>
                                                         <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight leading-none">
                                                                 forms.
                                                                 <br />
-                                                                <span className="bg-gradient-to-r from-white/40 to-white text-transparent bg-clip-text">
+                                                                <span
+                                                                        ref={spanRef}
+                                                                        className="bg-[radial-gradient(circle_at_var(--x)_var(--y),white,black)] bg-clip-text text-transparent transition duration-300"
+                                                                >
                                                                         reimagined.
                                                                 </span>
                                                         </h1>
@@ -82,7 +96,7 @@ const Home = () => {
                                                         <div className="flex flex-wrap gap-4">
                                                                 <Button
                                                                         size="lg"
-                                                                        className="bg-white text-black border-none px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border hover:border-white"
+                                                                        className="bg-white text-black border border-transparent px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border-white"
                                                                         onClick={() => navigate("/signup")}
                                                                 >
                                                                         Get Started Free
@@ -91,7 +105,7 @@ const Home = () => {
 
                                                                 <Button
                                                                         size="lg"
-                                                                        className="bg-white text-black border-none px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border hover:border-white"
+                                                                        className="bg-white text-black border border-transparent px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border-white"
                                                                         onClick={() => navigate("/signin")}
                                                                 >
                                                                         Sign In
@@ -205,7 +219,7 @@ const Home = () => {
                                         <div className="flex flex-wrap justify-center gap-4">
                                                 <Button
                                                         size="lg"
-                                                        className="bg-white text-black border-none px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border hover:border-white"
+                                                        className="bg-white text-black border border-transparent px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border-white"
                                                         onClick={() => navigate("/signup")}
                                                 >
                                                         Get Started Free
@@ -214,7 +228,7 @@ const Home = () => {
 
                                                 <Button
                                                         size="lg"
-                                                        className="bg-white text-black border-none px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border hover:border-white"
+                                                        className="bg-white text-black border border-transparent px-8 py-3 text-lg font-semibold transition-all duration-300 ease-in-out hover:bg-black hover:text-white hover:border-white"
                                                         onClick={() => navigate("/signin")}
                                                 >
                                                         Sign In
