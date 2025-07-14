@@ -451,7 +451,7 @@ const UserDashboard: React.FC = () => {
                                                                                 ? "Describe changes you want to make to the form..."
                                                                                 : "Describe the form you want to create..."
                                                                 }
-                                                                className="flex-grow bg-black/50 backdrop-blur-md p-4 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide rounded-l-xl border border-white/5 hover:border-white/10 transition-all"
+                                                                className="flex-grow bg-black/50 backdrop-blur-md p-4 text-white placeholder-gray-400 focus:outline-none h-[60px] resize-none scrollbar-hide rounded-l-xl transition-all relative rotating-border"
                                                         />
                                                         <button
                                                                 type="submit"
