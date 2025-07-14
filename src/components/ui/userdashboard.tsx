@@ -4,6 +4,14 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useForm } from "../../contexts/FormContext";
 import { generateForm, reviseForm } from "../../api";
 import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogFooter,
+	DialogTitle,
+	DialogDescription,
+} from "./dialog";
+import {
         FormSchema,
         FormQuestion,
         GenerateFormResponse,
@@ -399,42 +407,14 @@ const UserDashboard: React.FC = () => {
                                 </div>
                         </main>
                         <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-black to-black/90 backdrop-blur-lg border-t border-white/10 p-4 shadow-lg">
-                                <style>
-                                        {`
-                                                @keyframes aurora-spin {
-                                                    from {
-                                                        transform: rotate(0deg);
-                                                    }
-                                                    to {
-                                                        transform: rotate(360deg);
-                                                    }
-                                                }
-                                                .aurora-border::before {
-                                                    content: "";
-                                                    position: absolute;
-                                                    top: 50%;
-                                                    left: 50%;
-                                                    width: 250%;
-                                                    height: 250%;
-                                                    background: conic-gradient(
-                                                        transparent,
-                                                        rgba(216, 180, 254, 0.7),
-                                                        rgba(129, 140, 248, 0.7),
-                                                        transparent 35%
-                                                    );
-                                                    transform: translate(-50%, -50%);
-                                                    animation: aurora-spin 6s linear infinite;
-                                                    z-index: 0; /* Behind the main content */
-                                                }
-                                        `}
-                                </style>
+                                
                                 <div className="max-w-4xl mx-auto">
                                         <form
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
                                                 className="relative"
                                         >
                                                 <div
-                                                        className="relative rounded-xl overflow-hidden aurora-border p-[2px]"
+                                                        className="relative rounded-xl overflow-hidden border border-white p-[1px]"
                                                 >
                                                         <div className="bg-black rounded-[10px] relative z-10">
                                                                 <textarea
