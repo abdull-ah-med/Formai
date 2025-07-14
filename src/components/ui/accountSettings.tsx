@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "./button";
-import api from "../../api";
+import api, { deleteAccount } from "../../api";
 import GoogleSignInButton from "./GoogleSignInButton";
+import { logoutAndRedirect } from "../../auth/authHelper";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogFooter,
+	DialogTitle,
+	DialogDescription,
+} from "./dialog";
 
 interface SubscriptionInfo {
         tier: "free" | "premium" | "enterprise";
@@ -49,6 +58,22 @@ const AccountSettings: React.FC = () => {
         const [confirmPassword, setConfirmPassword] = useState("");
         const [passwordError, setPasswordError] = useState<string | null>(null);
         const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+	const handleDeleteAccount = async () => {
+		setSaving(true); // Use saving state for delete operation
+		setError(null);
+		try {
+			await deleteAccount();
+			logoutAndRedirect("/signin");
+		} catch (err: any) {
+			setError(err.response?.data?.message || "Failed to delete account");
+		} finally {
+			setSaving(false);
+			setShowDeleteConfirm(false);
+		}
+	};
 
         // Fetch user info on mount
         useEffect(() => {
@@ -340,7 +365,49 @@ const AccountSettings: React.FC = () => {
                                                 </div>
                                         )}
                                 </div>
+
+                                {/* Delete Account Section */}
+                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                                        <h2 className="text-xl font-medium text-white mb-4">Danger Zone</h2>
+                                        <p className="text-gray-400 mb-4">
+                                                Permanently delete your account and all associated data.
+                                                This action cannot be undone.
+                                        </p>
+                                        <Button
+                                                variant="destructive"
+                                                onClick={() => setShowDeleteConfirm(true)}
+                                        >
+                                                Delete Account
+                                        </Button>
+                                </div>
                         </div>
+
+			<Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Confirm Account Deletion</DialogTitle>
+						<DialogDescription>
+							Are you sure you want to delete your account? This action is
+							irreversible and will delete all your forms and data.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button
+							onClick={() => setShowDeleteConfirm(false)}
+							className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600"
+						>
+							Cancel
+						</Button>
+						<Button
+							onClick={handleDeleteAccount}
+							className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+							disabled={saving}
+						>
+							{saving ? "Deleting..." : "Delete Account"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
                 </div>
         );
 };

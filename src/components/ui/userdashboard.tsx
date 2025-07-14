@@ -2,8 +2,7 @@ import { Send, Edit2 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useForm } from "../../contexts/FormContext";
-import { generateForm, reviseForm, deleteAccount } from "../../api";
-import { logoutAndRedirect } from "../../auth/authHelper";
+import { generateForm, reviseForm } from "../../api";
 import {
 	Dialog,
 	DialogContent,
@@ -32,21 +31,6 @@ const UserDashboard: React.FC = () => {
         const [revisionPrompt, setRevisionPrompt] = useState("");
         const [isInputFocused, setIsInputFocused] = useState(false);
 	const [showWarning, setShowWarning] = useState(false);
-	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-	const handleDeleteAccount = async () => {
-		setIsLoading(true);
-		setError("");
-		try {
-			await deleteAccount();
-			logoutAndRedirect("/signin");
-		} catch (err: any) {
-			setError(err.response?.data?.error || "Failed to delete account");
-		} finally {
-			setIsLoading(false);
-			setShowDeleteConfirm(false);
-		}
-	};
 
 	useEffect(() => {
 		if (user && !user.isGoogleLinked) {
@@ -350,33 +334,6 @@ const UserDashboard: React.FC = () => {
 						<button onClick={() => setShowWarning(false)}>Close</button>
 					</DialogFooter>
 			</Dialog>
-
-			<Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Confirm Account Deletion</DialogTitle>
-						<DialogDescription>
-							Are you sure you want to delete your account? This action is
-							irreversible and will delete all your forms and data.
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<button
-							onClick={() => setShowDeleteConfirm(false)}
-							className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600"
-						>
-							Cancel
-						</button>
-						<button
-							onClick={handleDeleteAccount}
-							className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-							disabled={isLoading}
-						>
-							{isLoading ? "Deleting..." : "Delete Account"}
-						</button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
                         <main className="flex-1 p-4 md:p-6 lg:p-8 pb-32">
                                 <div className="max-w-4xl mx-auto">
                                         {/* Response Display Area - only show if not displaying a form */}
@@ -423,14 +380,6 @@ const UserDashboard: React.FC = () => {
                                                                                         it to your Google account
                                                                                 </li>
                                                                         </ol>
-                                                                        <div className="mt-8 text-center">
-                                                                                <button
-                                                                                        onClick={() => setShowDeleteConfirm(true)}
-                                                                                        className="text-red-400 hover:text-red-300 text-sm"
-                                                                                >
-                                                                                        Delete Account
-                                                                                </button>
-                                                                        </div>
                                                                 </div>
                                                         )}
                                                 </div>
