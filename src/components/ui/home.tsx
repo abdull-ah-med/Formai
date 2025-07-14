@@ -54,18 +54,18 @@ const Home = () => {
                         <section className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
                                 {/* Background Elements */}
                                 <div className="absolute inset-0 overflow-hidden">
-                                        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
-                                        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-white/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                                        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
+                                        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-white/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
                                 </div>
 
                                 <div className="relative z-10 max-w-7xl mx-auto w-full">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                                                 {/* Left Side - Tagline */}
                                                 <div className="text-left">
-                                                        <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight leading-none">
-                                                                google forms.
+                                                        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-none">
+                                                                forms.
                                                                 <br />
-                                                                <span className="bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">
+                                                                <span className="bg-gradient-to-r from-white/40 to-white text-transparent bg-clip-text">
                                                                         reimagined.
                                                                 </span>
                                                         </h1>
@@ -82,7 +82,7 @@ const Home = () => {
                                                         <div className="flex flex-wrap gap-4">
                                                                 <Button
                                                                         size="lg"
-                                                                        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold"
+                                                                        className="bg-gradient-to-r from-white/80 to-white hover:from-white/90 hover:to-white text-black px-8 py-3 text-lg font-semibold"
                                                                         onClick={() => navigate("/signup")}
                                                                 >
                                                                         Get Started Free
@@ -91,7 +91,7 @@ const Home = () => {
                                                                 <Button
                                                                         size="lg"
                                                                         variant="outline"
-                                                                        className="border-white text-white hover:bg-white/10 px-8 py-3 text-lg font-semibold"
+                                                                        className="bg-gradient-to-r from-white/80 to-white hover:from-white/90 hover:to-white text-black px-8 py-3 text-lg font-semibold"
                                                                         onClick={() => navigate("/signin")}
                                                                 >
                                                                         Sign In
@@ -150,8 +150,8 @@ const Home = () => {
 
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                                 <div className="text-center">
-                                                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
-                                                                <span className="text-2xl font-bold text-white">1</span>
+                                                        <div className="bg-gradient-to-r from-white/30 to-white/80 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                                                                <span className="text-2xl font-bold text-black">1</span>
                                                         </div>
                                                         <h3 className="text-xl font-semibold text-white mb-3">
                                                                 Describe Your Vision
@@ -163,8 +163,8 @@ const Home = () => {
                                                         </p>
                                                 </div>
                                                 <div className="text-center">
-                                                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
-                                                                <span className="text-2xl font-bold text-white">2</span>
+                                                        <div className="bg-gradient-to-r from-white/30 to-white/80 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                                                                <span className="text-2xl font-bold text-black">2</span>
                                                         </div>
                                                         <h3 className="text-xl font-semibold text-white mb-3">
                                                                 AI Magic Happens
@@ -176,8 +176,8 @@ const Home = () => {
                                                         </p>
                                                 </div>
                                                 <div className="text-center">
-                                                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
-                                                                <span className="text-2xl font-bold text-white">3</span>
+                                                        <div className="bg-gradient-to-r from-white/30 to-white/80 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                                                                <span className="text-2xl font-bold text-black">3</span>
                                                         </div>
                                                         <h3 className="text-xl font-semibold text-white mb-3">
                                                                 Instant Delivery
@@ -205,7 +205,7 @@ const Home = () => {
                                         <div className="flex flex-wrap justify-center gap-4">
                                                 <Button
                                                         size="lg"
-                                                        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold"
+                                                        className="bg-gradient-to-r from-white/80 to-white hover:from-white/90 hover:to-white text-black px-8 py-3 text-lg font-semibold"
                                                         onClick={() => navigate("/signup")}
                                                 >
                                                         Get Started Free
