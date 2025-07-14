@@ -34,14 +34,44 @@ interface DialogDescriptionProps {
 
 export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
         useEffect(() => {
+                const originalStyle = window.getComputedStyle(document.body).overflow;
+                const originalPaddingRight = window.getComputedStyle(document.body).paddingRight;
+
                 if (open) {
+                        // Store the current scroll position
+                        const scrollY = window.scrollY;
+
+                        // Add padding right to prevent layout shift when scrollbar disappears
+                        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                        document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+                        // Disable scrolling
                         document.body.style.overflow = "hidden";
+
+                        // Keep the body at the same scroll position
+                        document.body.style.position = "fixed";
+                        document.body.style.top = `-${scrollY}px`;
+                        document.body.style.width = "100%";
                 } else {
-                        document.body.style.overflow = "unset";
+                        // Re-enable scrolling
+                        document.body.style.overflow = originalStyle;
+                        document.body.style.paddingRight = originalPaddingRight;
+
+                        // Restore scroll position
+                        const scrollY = document.body.style.top;
+                        document.body.style.position = "";
+                        document.body.style.top = "";
+                        document.body.style.width = "";
+                        window.scrollTo(0, parseInt(scrollY || "0") * -1);
                 }
 
                 return () => {
-                        document.body.style.overflow = "unset";
+                        // Cleanup in case component unmounts while dialog is open
+                        document.body.style.overflow = originalStyle;
+                        document.body.style.paddingRight = originalPaddingRight;
+                        document.body.style.position = "";
+                        document.body.style.top = "";
+                        document.body.style.width = "";
                 };
         }, [open]);
 
@@ -51,6 +81,8 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
                 <div
                         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
                         onClick={() => onOpenChange(false)}
+                        aria-modal="true"
+                        role="dialog"
                 >
                         {children}
                 </div>
