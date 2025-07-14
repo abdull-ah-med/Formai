@@ -438,7 +438,7 @@ const UserDashboard: React.FC = () => {
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
                                                 className="relative"
                                         >
-                                                <div className="relative flex items-center bg-black/50 rounded-xl border border-white/20">
+                                                <div className="relative flex items-center bg-black/50 rounded-xl border border-white">
                                                         <textarea
                                                                 value={formSchema ? revisionPrompt : prompt}
                                                                 onChange={(e) =>
