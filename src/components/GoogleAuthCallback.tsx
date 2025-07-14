@@ -13,7 +13,6 @@ const GoogleAuthCallback: React.FC = () => {
 
         useEffect(() => {
                 const handleCallback = async () => {
-                        // Prevent re-running if the process has already started
                         if (!isProcessing || codeProcessed.current) return;
 
                         const params = new URLSearchParams(location.search);
@@ -21,7 +20,6 @@ const GoogleAuthCallback: React.FC = () => {
                         const error = params.get("error");
 
                         if (error) {
-                                console.error("Google OAuth error:", error);
                                 setError("Google authentication was denied or cancelled.");
                                 setIsProcessing(false);
                                 return;
@@ -32,12 +30,8 @@ const GoogleAuthCallback: React.FC = () => {
                                 setIsProcessing(false);
                                 return;
                         }
-
-                        // Mark the code as being processed to prevent duplicate requests
                         codeProcessed.current = true;
-
                         try {
-                                console.log("Sending code to backend for verification...");
                                 const res = await api.get<{
                                         token: string;
                                         success: boolean;
@@ -58,27 +52,20 @@ const GoogleAuthCallback: React.FC = () => {
                                         setIsProcessing(false);
                                         return;
                                 }
-
-                                console.log("Successfully received token, logging in...");
                                 await login(res.data.token);
-
-                                // Check if there was a pending callback from form creation
                                 const pendingCallback = localStorage.getItem("pendingGoogleAuthCallback");
                                 if (pendingCallback) {
                                         localStorage.removeItem("pendingGoogleAuthCallback");
-                                        // Return to the form creation page
                                         navigate("/dashboard", { replace: true });
                                 } else {
                                         navigate("/dashboard", { replace: true });
                                 }
                         } catch (error: any) {
-                                console.error("Google OAuth callback failed:", error);
                                 setError(
                                         error.response?.data?.message ||
                                                 "Failed to connect your Google account. Please try again."
                                 );
                                 setIsProcessing(false);
-                                // Reset the flag so the user can try again
                                 codeProcessed.current = false;
                         }
                 };

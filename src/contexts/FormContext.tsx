@@ -44,9 +44,7 @@ export const FormProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                                 setFormSchema(JSON.parse(savedSchema));
                                 setFormId(savedId);
                         }
-                } catch (error) {
-                        console.error("Error loading form data from localStorage:", error);
-                }
+                } catch (error) {}
         }, []);
 
         // Clear form data when user changes

@@ -14,27 +14,19 @@ api.interceptors.request.use(
                 if (token && config.headers) {
                         config.headers.Authorization = `Bearer ${token}`;
                 }
-                console.log(`Making ${config.method?.toUpperCase()} request to: ${config.baseURL}${config.url}`);
                 return config;
         },
         (error) => {
-                console.error("Request error:", error);
                 return Promise.reject(error);
         }
 );
 api.interceptors.response.use(
         (res) => res,
         (err) => {
-                console.error("Response error:", err.message);
-                if (err.response) {
-                        console.error("Status:", err.response.status);
-                        console.error("Data:", err.response.data);
-                }
                 return Promise.reject(err);
         }
 );
 
-// Form API methods
 export const generateForm = async (prompt: string) => {
         const response = await api.post("/form/generate-form", { prompt });
         return response.data;
@@ -55,7 +47,6 @@ export const getFormHistory = async () => {
                 const response = await api.get("/form/forms/history");
                 return response.data;
         } catch (error) {
-                console.error("Error fetching form history:", error);
                 throw error;
         }
 };

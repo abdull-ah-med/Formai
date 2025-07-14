@@ -1,7 +1,8 @@
 // src/utils/auth.ts
 import api from "../api";
 import { CurrentUser } from "@formai/types";
-import { CurrentUser } from "@formai/types";
+
+export type { CurrentUser };
 
 export function setAuthToken(token: string | null) {
         if (token) {
@@ -16,17 +17,13 @@ export function getAuthToken(): string | null {
 }
 
 export async function logout() {
-        setAuthToken(null); // Clear the token from localStorage
-
-        // Clear form-related localStorage items
+        setAuthToken(null);
         localStorage.removeItem("formSchema");
         localStorage.removeItem("formId");
 
         try {
-                await api.post("/auth/logout"); // clears HttpOnly cookie on server
-        } catch (error) {
-                console.error("Logout API call failed:", error);
-        }
+                await api.post("/auth/logout");
+        } catch (error) {}
 }
 
 export async function logoutAndRedirect(redirectTo: string | null = "/signin") {
@@ -34,8 +31,6 @@ export async function logoutAndRedirect(redirectTo: string | null = "/signin") {
                 await logout();
 
                 localStorage.removeItem("nonPersistentAuth");
-
-                // Clear any additional form data or user-specific data
                 localStorage.removeItem("formSchema");
                 localStorage.removeItem("formId");
                 localStorage.removeItem("pendingGoogleAuthCallback");
