@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { cn } from "../../lib/utils";
+import { createPortal } from "react-dom";
 
 interface DialogProps {
         open: boolean;
@@ -77,9 +78,9 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
 
         if (!open) return null;
 
-        return (
+        const dialogContent = (
                 <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
+                        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
                         onClick={() => onOpenChange(false)}
                         aria-modal="true"
                         role="dialog"
@@ -87,6 +88,9 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
                         {children}
                 </div>
         );
+
+        // Use createPortal to render the dialog at the document root level
+        return createPortal(dialogContent, document.body);
 };
 
 export const DialogContent: React.FC<DialogContentProps> = ({ children, className }) => {
@@ -111,7 +115,9 @@ export const DialogContent: React.FC<DialogContentProps> = ({ children, classNam
                         onClick={(e) => e.stopPropagation()}
                         className={cn(
                                 "bg-white/15 backdrop-blur-md rounded-xl p-6 w-full max-w-md shadow-xl animate-in slide-in-from-bottom-5 duration-200",
-                                "border border-white/10 max-h-[85vh] overflow-y-auto",
+                                "border border-white/10 max-h-[80vh] overflow-y-auto",
+                                "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2",
+                                "m-auto max-w-[calc(100vw-2rem)]",
                                 className
                         )}
                 >
