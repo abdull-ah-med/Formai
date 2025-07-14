@@ -82,7 +82,7 @@ const Home = () => {
                                                         <div className="flex flex-wrap gap-4">
                                                                 <Button
                                                                         size="lg"
-                                                                        className="bg-gradient-to-r from-white/80 to-white text-black px-8 py-3 text-lg font-semibold border border-transparent hover:bg-black hover:text-white hover:border-white"
+                                                                        className="bg-gradient-to-r from-white/80 to-white hover:from-white/90 hover:to-white text-black px-8 py-3 text-lg font-semibold"
                                                                         onClick={() => navigate("/signup")}
                                                                 >
                                                                         Get Started Free
@@ -205,7 +205,7 @@ const Home = () => {
                                         <div className="flex flex-wrap justify-center gap-4">
                                                 <Button
                                                         size="lg"
-                                                        className="bg-gradient-to-r from-white/80 to-white text-black px-8 py-3 text-lg font-semibold border border-transparent hover:bg-black hover:text-white hover:border-white"
+                                                        className="bg-gradient-to-r from-white/80 to-white hover:from-white/90 hover:to-white text-black px-8 py-3 text-lg font-semibold"
                                                         onClick={() => navigate("/signup")}
                                                 >
                                                         Get Started Free
@@ -214,7 +214,7 @@ const Home = () => {
                                                 <Button
                                                         size="lg"
                                                         variant="outline"
-                                                        className="bg-gradient-to-r from-white/80 to-white text-black px-8 py-3 text-lg font-semibold hover:bg-black hover:text-white hover:border-white"
+                                                        className="border-white text-white px-8 py-3 text-lg font-semibold hover:bg-black hover:text-white hover:border-white"
                                                         onClick={() => navigate("/signin")}
                                                 >
                                                         Sign In
