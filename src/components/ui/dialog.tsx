@@ -49,7 +49,7 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
 
         return (
                 <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
                         onClick={() => onOpenChange(false)}
                 >
                         {children}
@@ -78,8 +78,8 @@ export const DialogContent: React.FC<DialogContentProps> = ({ children, classNam
                         ref={contentRef}
                         onClick={(e) => e.stopPropagation()}
                         className={cn(
-                                "bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 w-full max-w-md shadow-2xl animate-in slide-in-from-bottom-10 duration-300",
-                                "ring-1 ring-white/10 shadow-[0_0_30px_rgba(120,120,255,0.15)]",
+                                "bg-white/15 backdrop-blur-md rounded-xl p-6 w-full max-w-md shadow-xl animate-in slide-in-from-bottom-5 duration-200",
+                                "border border-white/10 max-h-[85vh] overflow-y-auto",
                                 className
                         )}
                 >
@@ -97,9 +97,9 @@ export const DialogFooter: React.FC<DialogFooterProps> = ({ children, className 
 };
 
 export const DialogTitle: React.FC<DialogTitleProps> = ({ children, className }) => {
-        return <h3 className={cn("text-2xl font-semibold text-white", className)}>{children}</h3>;
+        return <h3 className={cn("text-xl font-medium text-white", className)}>{children}</h3>;
 };
 
 export const DialogDescription: React.FC<DialogDescriptionProps> = ({ children, className }) => {
-        return <p className={cn("text-gray-300 mt-3 leading-relaxed", className)}>{children}</p>;
+        return <p className={cn("text-gray-300 mt-2 leading-relaxed", className)}>{children}</p>;
 };
