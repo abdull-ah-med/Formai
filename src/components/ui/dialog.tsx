@@ -33,6 +33,18 @@ interface DialogDescriptionProps {
 }
 
 export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
+        useEffect(() => {
+                if (open) {
+                        document.body.style.overflow = "hidden";
+                } else {
+                        document.body.style.overflow = "unset";
+                }
+
+                return () => {
+                        document.body.style.overflow = "unset";
+                };
+        }, [open]);
+
         if (!open) return null;
 
         return (
