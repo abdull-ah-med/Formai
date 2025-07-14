@@ -33,18 +33,18 @@ const Home = () => {
         const features = [
                 {
                         icon: <Sparkles className="w-6 h-6 text-white" />,
-                        title: "AI-Powered Generation",
-                        description: "Create forms instantly with natural language prompts",
+                        title: "Revolutionary AI Form Creation",
+                        description: "Create sophisticated Google Forms in seconds with a simple text prompt",
                 },
                 {
                         icon: <CheckCircle className="w-6 h-6 text-white" />,
-                        title: "Seamless Integration",
-                        description: "Connect with Google Forms and other popular platforms",
+                        title: "Seamless Google Integration",
+                        description: "Forms appear instantly in your Google account with zero manual setup",
                 },
                 {
                         icon: <CheckCircle className="w-6 h-6 text-white" />,
-                        title: "Smart Customization",
-                        description: "AI automatically adapts forms to your specific needs",
+                        title: "Advanced Question Intelligence",
+                        description: "Our AI crafts perfect questions, conditional logic, and response validation",
                 },
         ];
 
@@ -63,28 +63,40 @@ const Home = () => {
                                                 {/* Left Side - Tagline */}
                                                 <div className="text-left">
                                                         <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight leading-none">
-                                                                forms.
+                                                                google forms.
                                                                 <br />
-                                                                redefined.
+                                                                <span className="bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">
+                                                                        reimagined.
+                                                                </span>
                                                         </h1>
                                                 </div>
 
                                                 {/* Right Side - Content */}
                                                 <div className="text-left">
                                                         <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
-                                                                Create professional forms instantly with AI. Simply
-                                                                describe what you need, and watch as intelligent forms
-                                                                are generated and integrated with your favorite
-                                                                platforms.
+                                                                Harness the power of AI to create stunning Google Forms
+                                                                in seconds. Just describe what you need, and watch as
+                                                                our advanced AI instantly crafts the perfect form
+                                                                directly in your Google account.
                                                         </p>
-                                                        <Button
-                                                                size="lg"
-                                                                className="bg-white text-black hover:bg-gray-200 px-8 py-3 text-lg font-semibold"
-                                                                onClick={() => navigate("/signup")}
-                                                        >
-                                                                Sign Up
-                                                                <ArrowRight className="ml-2 w-5 h-5" />
-                                                        </Button>
+                                                        <div className="flex flex-wrap gap-4">
+                                                                <Button
+                                                                        size="lg"
+                                                                        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold"
+                                                                        onClick={() => navigate("/signup")}
+                                                                >
+                                                                        Get Started Free
+                                                                        <ArrowRight className="ml-2 w-5 h-5" />
+                                                                </Button>
+                                                                <Button
+                                                                        size="lg"
+                                                                        variant="outline"
+                                                                        className="border-white text-white hover:bg-white/10 px-8 py-3 text-lg font-semibold"
+                                                                        onClick={() => navigate("/signin")}
+                                                                >
+                                                                        Sign In
+                                                                </Button>
+                                                        </div>
                                                 </div>
                                         </div>
                                 </div>
@@ -95,12 +107,12 @@ const Home = () => {
                                 <div className="max-w-7xl mx-auto">
                                         <div className="text-center mb-16">
                                                 <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                                                        AI-Powered Form Creation
+                                                        The Future of Form Creation
                                                 </h2>
                                                 <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                                                        Transform how you create forms with intelligent AI that
-                                                        understands your needs and generates professional forms in
-                                                        seconds.
+                                                        Say goodbye to tedious form building forever. Our AI understands
+                                                        exactly what you need and creates professional Google Forms in
+                                                        mere seconds.
                                                 </p>
                                         </div>
 
@@ -108,7 +120,7 @@ const Home = () => {
                                                 {features.map((feature, index) => (
                                                         <div
                                                                 key={index}
-                                                                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 transition-all duration-300"
+                                                                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-1"
                                                         >
                                                                 <div className="mb-4">{feature.icon}</div>
                                                                 <h3 className="text-xl font-semibold text-white mb-3">
@@ -128,49 +140,52 @@ const Home = () => {
                                 <div className="max-w-7xl mx-auto">
                                         <div className="text-center mb-16">
                                                 <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                                                        How It Works
+                                                        Effortless Creation Process
                                                 </h2>
                                                 <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                                                        Creating forms has never been easier. Just describe, generate,
-                                                        and deploy.
+                                                        From idea to finished form in seconds. Our streamlined process
+                                                        eliminates all the complexity of traditional form building.
                                                 </p>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                                 <div className="text-center">
-                                                        <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                                                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
                                                                 <span className="text-2xl font-bold text-white">1</span>
                                                         </div>
                                                         <h3 className="text-xl font-semibold text-white mb-3">
-                                                                Describe Your Form
+                                                                Describe Your Vision
                                                         </h3>
                                                         <p className="text-gray-300">
-                                                                Simply tell our AI what kind of form you need. Be as
-                                                                detailed or simple as you want.
+                                                                Type a natural language prompt describing exactly what
+                                                                you need. Our AI understands context, purpose, and
+                                                                specific requirements.
                                                         </p>
                                                 </div>
                                                 <div className="text-center">
-                                                        <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                                                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
                                                                 <span className="text-2xl font-bold text-white">2</span>
                                                         </div>
                                                         <h3 className="text-xl font-semibold text-white mb-3">
-                                                                AI Generates
+                                                                AI Magic Happens
                                                         </h3>
                                                         <p className="text-gray-300">
-                                                                Our intelligent AI creates a professional form tailored
-                                                                to your specifications.
+                                                                Our powerful AI analyzes your request and crafts the
+                                                                perfect Google Form with intelligent questions, logic,
+                                                                and formatting.
                                                         </p>
                                                 </div>
                                                 <div className="text-center">
-                                                        <div className="bg-white/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+                                                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
                                                                 <span className="text-2xl font-bold text-white">3</span>
                                                         </div>
                                                         <h3 className="text-xl font-semibold text-white mb-3">
-                                                                Deploy & Integrate
+                                                                Instant Delivery
                                                         </h3>
                                                         <p className="text-gray-300">
-                                                                Seamlessly integrate with Google Forms, Typeform, or
-                                                                export to your platform.
+                                                                Your professionally designed form appears instantly in
+                                                                your Google Forms account, ready to share and collect
+                                                                responses.
                                                         </p>
                                                 </div>
                                         </div>
@@ -181,20 +196,30 @@ const Home = () => {
                         <section className="py-20 px-4 sm:px-6 lg:px-8">
                                 <div className="max-w-4xl mx-auto text-center">
                                         <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                                                Ready to Revolutionize Form Creation?
+                                                Ready to Revolutionize Your Form Creation?
                                         </h2>
                                         <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                                                Be among the first to experience AI-powered form generation. Sign up for
-                                                early access.
+                                                Join thousands of users already creating amazing Google Forms with AI.
+                                                Get started for free today.
                                         </p>
-                                        <Button
-                                                size="lg"
-                                                className="bg-white text-black hover:bg-gray-200 px-8 py-3 text-lg font-semibold"
-                                                onClick={() => navigate("/signup")}
-                                        >
-                                                Sign Up
-                                                <ArrowRight className="ml-2 w-5 h-5" />
-                                        </Button>
+                                        <div className="flex flex-wrap justify-center gap-4">
+                                                <Button
+                                                        size="lg"
+                                                        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold"
+                                                        onClick={() => navigate("/signup")}
+                                                >
+                                                        Get Started Free
+                                                        <ArrowRight className="ml-2 w-5 h-5" />
+                                                </Button>
+                                                <Button
+                                                        size="lg"
+                                                        variant="outline"
+                                                        className="border-white text-white hover:bg-white/10 px-8 py-3 text-lg font-semibold"
+                                                        onClick={() => navigate("/signin")}
+                                                >
+                                                        Sign In
+                                                </Button>
+                                        </div>
                                 </div>
                         </section>
                 </div>
