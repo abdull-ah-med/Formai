@@ -45,11 +45,6 @@ export const reviseForm = async (formId: string, prompt: string) => {
         return response.data;
 };
 
-export const finalizeForm = async (formId: string) => {
-        const response = await api.post(`/form/finalize-form/${formId}`);
-        return response.data;
-};
-
 export const getFormHistory = async () => {
         try {
                 const response = await api.get("/form/forms/history");

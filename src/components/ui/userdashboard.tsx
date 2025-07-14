@@ -1,17 +1,14 @@
-import { BarChart, CheckSquare, Flag, Home, MessageSquare, Settings, Users, Send, Edit2 } from "lucide-react";
+import { Send, Edit2 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useForm } from "../../contexts/FormContext";
-import { generateForm, reviseForm, finalizeForm } from "../../api";
+import { generateForm, reviseForm } from "../../api";
 import {
         FormSchema,
-        FormSection,
         FormQuestion,
         GenerateFormResponse,
         ReviseFormResponse,
-        FinalizeFormResponse,
 } from "../../types/form";
-import { useNavigate } from "react-router-dom";
 import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
 import { Loader } from "./loader";
@@ -19,14 +16,11 @@ import { Loader } from "./loader";
 const UserDashboard: React.FC = () => {
         const { user } = useAuth();
         const { formSchema, formId, setFormData, clearFormData } = useForm();
-        const navigate = useNavigate();
         const [prompt, setPrompt] = useState("");
         const [response, setResponse] = useState("");
         const [isLoading, setIsLoading] = useState(false);
         const [error, setError] = useState("");
-        const [showRevisionForm, setShowRevisionForm] = useState(false);
         const [revisionPrompt, setRevisionPrompt] = useState("");
-        const [revisionsRemaining, setRevisionsRemaining] = useState(3);
         const [isInputFocused, setIsInputFocused] = useState(false);
 
         useEffect(() => {
@@ -108,30 +102,6 @@ const UserDashboard: React.FC = () => {
                 }
         };
 
-        const handleRevise = async (revisionPrompt: string) => {
-                if (!formId) return;
-
-                // Sanitize user input
-                const sanitizedPrompt = DOMPurify.sanitize(revisionPrompt);
-
-                setIsLoading(true);
-                setError("");
-
-                try {
-                        const response = (await reviseForm(formId, sanitizedPrompt)) as ReviseFormResponse;
-
-                        if (response.success) {
-                                setFormData(response.data.schema, formId);
-                        } else {
-                                setError(response.error || "Failed to revise form");
-                        }
-                } catch (err: any) {
-                        setError(err.response?.data?.error || "An error occurred while revising the form");
-                } finally {
-                        setIsLoading(false);
-                }
-        };
-
         const handleFormSuccess = (googleFormUrl: string) => {
                 // Reset form state
                 setResponse("");
@@ -163,11 +133,7 @@ const UserDashboard: React.FC = () => {
                                 const typedResponse = response as ReviseFormResponse;
                                 if (typedResponse.success) {
                                         setFormData(typedResponse.data.schema, formId);
-                                        if (typedResponse.data.revisionsRemaining !== null) {
-                                                setRevisionsRemaining(typedResponse.data.revisionsRemaining);
-                                        }
                                         setRevisionPrompt("");
-                                        setShowRevisionForm(false);
                                 } else {
                                         setError(typedResponse.error || "Failed to revise form");
                                 }
