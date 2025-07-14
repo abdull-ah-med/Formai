@@ -435,27 +435,34 @@ const UserDashboard: React.FC = () => {
                         <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-black to-black/90 backdrop-blur-lg border-t border-white/10 p-4 shadow-lg">
                                 <style>
                                         {`
-                                                @keyframes rotate-gradient {
-                                                        0% {
-                                                                transform: rotate(0deg);
-                                                        }
-                                                        100% {
-                                                                transform: rotate(360deg);
-                                                        }
+                                                @keyframes aurora-spin {
+                                                    from {
+                                                        transform: rotate(0deg);
+                                                    }
+                                                    to {
+                                                        transform: rotate(360deg);
+                                                    }
                                                 }
-                                                .animated-border::before {
-                                                        content: "";
-                                                        position: absolute;
-                                                        inset: 0;
-                                                        border-radius: inherit;
-                                                        background: conic-gradient(from 180deg at 50% 50%, #d8b4fe, #818cf8, #d8b4fe);
-                                                        animation: rotate-gradient 2s linear infinite;
-                                                        z-index: 0;
-                                                        opacity: 1;
-                                                        transition: opacity 0.3s ease-in-out;
+                                                .aurora-border::before {
+                                                    content: "";
+                                                    position: absolute;
+                                                    top: 50%;
+                                                    left: 50%;
+                                                    width: 250%;
+                                                    height: 250%;
+                                                    background: conic-gradient(
+                                                        transparent,
+                                                        rgba(216, 180, 254, 0.7),
+                                                        rgba(129, 140, 248, 0.7),
+                                                        transparent 35%
+                                                    );
+                                                    transform: translate(-50%, -50%);
+                                                    animation: aurora-spin 6s linear infinite;
+                                                    z-index: 0; /* Behind the main content */
                                                 }
-                                                .animated-border.focused::before {
-                                                        opacity: 0;
+                                                .aurora-border.focused::before {
+                                                    opacity: 0;
+                                                    transition: opacity 0.4s ease-out;
                                                 }
                                         `}
                                 </style>
@@ -465,13 +472,13 @@ const UserDashboard: React.FC = () => {
                                                 className="relative"
                                         >
                                                 <div
-                                                        className={`relative rounded-xl overflow-hidden animated-border transition-[box-shadow,border-color] duration-300 ${
+                                                        className={`relative rounded-xl overflow-hidden aurora-border transition-[box-shadow,border-color] duration-300 ${
                                                                 isInputFocused
                                                                         ? "focused border border-indigo-400 shadow-[0_0_15px_rgba(129,140,248,0.4)]"
-                                                                        : "p-[1px]"
+                                                                        : "p-[2px]"
                                                         }`}
                                                 >
-                                                        <div className="bg-black rounded-xl relative z-10">
+                                                        <div className="bg-black rounded-[10px] relative z-10">
                                                                 <textarea
                                                                         value={formSchema ? revisionPrompt : prompt}
                                                                         onChange={(e) =>
