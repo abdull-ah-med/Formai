@@ -22,10 +22,7 @@ const Cookies = () => {
                                                         Cookie Policy
                                                 </h1>
                                                 <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                                                        Learn how we use cookies
-                                                        to enhance your
-                                                        experience on our
-                                                        platform.
+                                                        Learn how we use cookies on our platform.
                                                 </p>
                                         </div>
 
@@ -34,47 +31,15 @@ const Cookies = () => {
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
                                                                         <Info className="w-6 h-6 mr-3 text-blue-400" />
-                                                                        What Are
-                                                                        Cookies?
+                                                                        What Are Cookies?
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                Cookies
-                                                                                are
-                                                                                small
-                                                                                text
-                                                                                files
-                                                                                that
-                                                                                are
-                                                                                placed
-                                                                                on
-                                                                                your
-                                                                                device
-                                                                                when
-                                                                                you
-                                                                                visit
-                                                                                our
-                                                                                website.
-                                                                                They
-                                                                                help
-                                                                                us
-                                                                                provide
-                                                                                you
-                                                                                with
-                                                                                a
-                                                                                better
-                                                                                experience
-                                                                                by
-                                                                                remembering
-                                                                                your
-                                                                                preferences
-                                                                                and
-                                                                                analyzing
-                                                                                how
-                                                                                you
-                                                                                use
-                                                                                our
-                                                                                site.
+                                                                                Cookies are small text files that are
+                                                                                placed on your device when you visit our
+                                                                                website. They help us maintain secure
+                                                                                user sessions and authenticate users on
+                                                                                our platform.
                                                                         </p>
                                                                 </div>
                                                         </section>
@@ -82,70 +47,44 @@ const Cookies = () => {
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
                                                                         <Settings className="w-6 h-6 mr-3 text-green-400" />
-                                                                        How We
-                                                                        Use
-                                                                        Cookies
+                                                                        How We Use Cookies
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                We
-                                                                                use
-                                                                                cookies
-                                                                                for
-                                                                                the
-                                                                                following
+                                                                                We use cookies for the following
                                                                                 purposes:
                                                                         </p>
                                                                         <ul className="list-disc list-inside space-y-2 ml-4">
                                                                                 <li>
                                                                                         <strong>
-                                                                                                Essential
+                                                                                                Essential Authentication
                                                                                                 Cookies:
                                                                                         </strong>{" "}
-                                                                                        Required
-                                                                                        for
-                                                                                        the
-                                                                                        website
-                                                                                        to
-                                                                                        function
-                                                                                        properly
+                                                                                        These cookies are strictly
+                                                                                        necessary for our website to
+                                                                                        function properly and securely.
+                                                                                        They are used solely to
+                                                                                        authenticate you and maintain
+                                                                                        your session while using our
+                                                                                        services.
+                                                                                </li>
+                                                                        </ul>
+                                                                        <p>
+                                                                                We do
+                                                                                <strong>not</strong> use cookies for:
+                                                                        </p>
+                                                                        <ul className="list-disc list-inside space-y-2 ml-4">
+                                                                                <li>
+                                                                                        Analytics or tracking user
+                                                                                        behavior
                                                                                 </li>
                                                                                 <li>
-                                                                                        <strong>
-                                                                                                Analytics
-                                                                                                Cookies:
-                                                                                        </strong>{" "}
-                                                                                        Help
-                                                                                        us
-                                                                                        understand
-                                                                                        how
-                                                                                        visitors
-                                                                                        interact
-                                                                                        with
-                                                                                        our
-                                                                                        site
+                                                                                        Marketing or advertising
+                                                                                        purposes
                                                                                 </li>
                                                                                 <li>
-                                                                                        <strong>
-                                                                                                Preference
-                                                                                                Cookies:
-                                                                                        </strong>{" "}
-                                                                                        Remember
-                                                                                        your
-                                                                                        settings
-                                                                                        and
-                                                                                        preferences
-                                                                                </li>
-                                                                                <li>
-                                                                                        <strong>
-                                                                                                Marketing
-                                                                                                Cookies:
-                                                                                        </strong>{" "}
-                                                                                        Used
-                                                                                        to
-                                                                                        deliver
-                                                                                        relevant
-                                                                                        advertisements
+                                                                                        Sharing information with third
+                                                                                        parties
                                                                                 </li>
                                                                         </ul>
                                                                 </div>
@@ -154,91 +93,39 @@ const Cookies = () => {
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
                                                                         <Shield className="w-6 h-6 mr-3 text-purple-400" />
-                                                                        Types of
-                                                                        Cookies
-                                                                        We Use
+                                                                        Types of Cookies We Use
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <div className="space-y-4">
                                                                                 <div>
                                                                                         <h3 className="text-lg font-semibold text-white mb-2">
-                                                                                                Session
-                                                                                                Cookies
+                                                                                                Session Cookies
                                                                                         </h3>
                                                                                         <p>
-                                                                                                These
-                                                                                                cookies
-                                                                                                are
-                                                                                                temporary
-                                                                                                and
-                                                                                                are
-                                                                                                deleted
-                                                                                                when
-                                                                                                you
-                                                                                                close
-                                                                                                your
-                                                                                                browser.
-                                                                                                They
-                                                                                                help
-                                                                                                maintain
-                                                                                                your
-                                                                                                session
-                                                                                                while
-                                                                                                you
-                                                                                                navigate
-                                                                                                our
+                                                                                                These cookies are
+                                                                                                temporary and are
+                                                                                                deleted when you close
+                                                                                                your browser. They help
+                                                                                                maintain your
+                                                                                                authentication session
+                                                                                                while you navigate our
                                                                                                 website.
                                                                                         </p>
                                                                                 </div>
                                                                                 <div>
                                                                                         <h3 className="text-lg font-semibold text-white mb-2">
-                                                                                                Persistent
-                                                                                                Cookies
+                                                                                                Persistent Cookies
                                                                                         </h3>
                                                                                         <p>
-                                                                                                These
-                                                                                                cookies
-                                                                                                remain
-                                                                                                on
-                                                                                                your
-                                                                                                device
-                                                                                                for
-                                                                                                a
-                                                                                                set
-                                                                                                period
-                                                                                                and
-                                                                                                help
-                                                                                                us
-                                                                                                remember
-                                                                                                your
-                                                                                                preferences
-                                                                                                for
-                                                                                                future
-                                                                                                visits.
-                                                                                        </p>
-                                                                                </div>
-                                                                                <div>
-                                                                                        <h3 className="text-lg font-semibold text-white mb-2">
-                                                                                                Third-Party
-                                                                                                Cookies
-                                                                                        </h3>
-                                                                                        <p>
-                                                                                                These
-                                                                                                cookies
-                                                                                                are
-                                                                                                set
-                                                                                                by
-                                                                                                third-party
-                                                                                                services
-                                                                                                we
-                                                                                                use,
-                                                                                                such
-                                                                                                as
-                                                                                                analytics
-                                                                                                providers
-                                                                                                and
-                                                                                                advertising
-                                                                                                networks.
+                                                                                                These cookies remain on
+                                                                                                your device for a set
+                                                                                                period and help us
+                                                                                                remember your login
+                                                                                                status for future
+                                                                                                visits. These are only
+                                                                                                used when you choose
+                                                                                                "remember me" during
+                                                                                                login.
                                                                                         </p>
                                                                                 </div>
                                                                         </div>
@@ -247,64 +134,50 @@ const Cookies = () => {
 
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4">
-                                                                        Managing
-                                                                        Your
-                                                                        Cookie
-                                                                        Preferences
+                                                                        Managing Your Cookie Preferences
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                You
-                                                                                can
-                                                                                control
-                                                                                and
-                                                                                manage
-                                                                                cookies
-                                                                                in
-                                                                                several
-                                                                                ways:
+                                                                                You can control and manage cookies in
+                                                                                your browser:
                                                                         </p>
                                                                         <ul className="list-disc list-inside space-y-2 ml-4">
                                                                                 <li>
-                                                                                        Browser
-                                                                                        settings:
-                                                                                        Most
-                                                                                        browsers
-                                                                                        allow
-                                                                                        you
-                                                                                        to
-                                                                                        block
-                                                                                        or
-                                                                                        delete
+                                                                                        Browser settings: Most browsers
+                                                                                        allow you to block or delete
                                                                                         cookies
                                                                                 </li>
+                                                                        </ul>
+                                                                        <p>
+                                                                                Please note that blocking essential
+                                                                                cookies may affect your ability to log
+                                                                                in and use our services.
+                                                                        </p>
+                                                                </div>
+                                                        </section>
+
+                                                        <section>
+                                                                <h2 className="text-2xl font-bold text-white mb-4">
+                                                                        Cookie Security
+                                                                </h2>
+                                                                <div className="text-gray-300 space-y-4">
+                                                                        <p>
+                                                                                Our authentication cookies are secured
+                                                                                using industry best practices:
+                                                                        </p>
+                                                                        <ul className="list-disc list-inside space-y-2 ml-4">
                                                                                 <li>
-                                                                                        Cookie
-                                                                                        consent:
-                                                                                        We
-                                                                                        provide
-                                                                                        options
-                                                                                        to
-                                                                                        accept
-                                                                                        or
-                                                                                        decline
-                                                                                        non-essential
-                                                                                        cookies
+                                                                                        HttpOnly: Prevents client-side
+                                                                                        scripts from accessing cookie
+                                                                                        data
                                                                                 </li>
                                                                                 <li>
-                                                                                        Third-party
-                                                                                        opt-outs:
-                                                                                        You
-                                                                                        can
-                                                                                        opt
-                                                                                        out
-                                                                                        of
-                                                                                        third-party
-                                                                                        cookies
-                                                                                        through
-                                                                                        their
-                                                                                        respective
-                                                                                        websites
+                                                                                        Secure: Only transmitted over
+                                                                                        HTTPS connections
+                                                                                </li>
+                                                                                <li>
+                                                                                        SameSite: Protects against
+                                                                                        cross-site request forgery
                                                                                 </li>
                                                                         </ul>
                                                                 </div>
@@ -312,132 +185,32 @@ const Cookies = () => {
 
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4">
-                                                                        Cookie
-                                                                        Consent
+                                                                        Updates to This Policy
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                When
-                                                                                you
-                                                                                first
-                                                                                visit
-                                                                                our
-                                                                                website,
-                                                                                you'll
-                                                                                see
-                                                                                a
-                                                                                cookie
-                                                                                consent
-                                                                                banner
-                                                                                that
-                                                                                allows
-                                                                                you
-                                                                                to
-                                                                                choose
-                                                                                which
-                                                                                types
-                                                                                of
-                                                                                cookies
-                                                                                you
-                                                                                want
-                                                                                to
-                                                                                accept.
-                                                                                You
-                                                                                can
-                                                                                change
-                                                                                your
-                                                                                preferences
-                                                                                at
-                                                                                any
-                                                                                time
-                                                                                through
-                                                                                our
-                                                                                cookie
-                                                                                settings.
+                                                                                We may update this Cookie Policy from
+                                                                                time to time to reflect changes in our
+                                                                                practices or for other operational,
+                                                                                legal, or regulatory reasons. We will
+                                                                                notify you of any material changes by
+                                                                                posting the new policy on this page.
                                                                         </p>
                                                                 </div>
                                                         </section>
 
                                                         <section>
                                                                 <h2 className="text-2xl font-bold text-white mb-4">
-                                                                        Updates
-                                                                        to This
-                                                                        Policy
+                                                                        Contact Us
                                                                 </h2>
                                                                 <div className="text-gray-300 space-y-4">
                                                                         <p>
-                                                                                We
-                                                                                may
-                                                                                update
-                                                                                this
-                                                                                Cookie
-                                                                                Policy
-                                                                                from
-                                                                                time
-                                                                                to
-                                                                                time
-                                                                                to
-                                                                                reflect
-                                                                                changes
-                                                                                in
-                                                                                our
-                                                                                practices
-                                                                                or
-                                                                                for
-                                                                                other
-                                                                                operational,
-                                                                                legal,
-                                                                                or
-                                                                                regulatory
-                                                                                reasons.
-                                                                                We
-                                                                                will
-                                                                                notify
-                                                                                you
-                                                                                of
-                                                                                any
-                                                                                material
-                                                                                changes
-                                                                                by
-                                                                                posting
-                                                                                the
-                                                                                new
-                                                                                policy
-                                                                                on
-                                                                                this
-                                                                                page.
-                                                                        </p>
-                                                                </div>
-                                                        </section>
-
-                                                        <section>
-                                                                <h2 className="text-2xl font-bold text-white mb-4">
-                                                                        Contact
-                                                                        Us
-                                                                </h2>
-                                                                <div className="text-gray-300 space-y-4">
-                                                                        <p>
-                                                                                If
-                                                                                you
-                                                                                have
-                                                                                any
-                                                                                questions
-                                                                                about
-                                                                                our
-                                                                                use
-                                                                                of
-                                                                                cookies,
-                                                                                please
-                                                                                contact
-                                                                                us
-                                                                                at
+                                                                                If you have any questions about our use
+                                                                                of cookies, please contact us at
                                                                                 reachformaihere@gmail.com
                                                                         </p>
                                                                         <p className="mt-4 text-sm text-gray-400">
-                                                                                Last
-                                                                                Updated:
-                                                                                December
-                                                                                2024
+                                                                                Last Updated: December 2024
                                                                         </p>
                                                                 </div>
                                                         </section>
