@@ -204,7 +204,7 @@ const Navbar = () => {
                                                 </div>
 
                                                 {/* Beta Notice - Overlay */}
-                                                <div className="absolute left-1/2 -translate-x-1/2 bottom-0 mb-[-25px] z-50 pointer-events-none select-none hidden md:block">
+                                                <div className="absolute left-1/2 -translate-x-1/2 bottom-0 mb-[-23px] z-50 pointer-events-none select-none hidden md:block">
                                                         <span className="text-xs text-white/70 bg-black/70 px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">
                                                                 beta version: some features may not work
                                                         </span>
