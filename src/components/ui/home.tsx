@@ -60,7 +60,7 @@ const Home = () => {
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                                                 {/* Left Side - Tagline */}
                                                 <div className="text-left">
-                                                        <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight leading-[1.1]">
+                                                        <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight leading-[1.4]">
                                                                 <span className="text-white">forms.</span>
                                                                 <br />
                                                                 <span className="bg-gradient-to-r from-white via-gray-300 to-white/20 bg-clip-text text-transparent">
