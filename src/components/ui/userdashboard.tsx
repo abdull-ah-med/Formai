@@ -433,19 +433,43 @@ const UserDashboard: React.FC = () => {
                                 </div>
                         </main>
                         <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-black to-black/90 backdrop-blur-lg border-t border-white/10 p-4 shadow-lg">
+                                <style>
+                                        {`
+                                                @keyframes rotate-gradient {
+                                                        0% {
+                                                                transform: rotate(0deg);
+                                                        }
+                                                        100% {
+                                                                transform: rotate(360deg);
+                                                        }
+                                                }
+                                                .animated-border::before {
+                                                        content: "";
+                                                        position: absolute;
+                                                        inset: -1px;
+                                                        border-radius: inherit;
+                                                        background: conic-gradient(from 180deg at 50% 50%, white, black, white);
+                                                        animation: rotate-gradient 4s linear infinite;
+                                                        z-index: 0;
+                                                        opacity: 1;
+                                                        transition: opacity 0.3s ease-in-out;
+                                                }
+                                                .animated-border.focused::before {
+                                                        opacity: 0;
+                                                }
+                                        `}
+                                </style>
                                 <div className="max-w-4xl mx-auto">
                                         <form
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
                                                 className="relative"
                                         >
                                                 <div
-                                                        className={`relative rounded-xl overflow-hidden ${
-                                                                isInputFocused
-                                                                        ? "border border-white"
-                                                                        : "bg-gradient-to-r from-white to-black p-[1px]"
+                                                        className={`relative rounded-xl overflow-hidden animated-border transition-all duration-300 ${
+                                                                isInputFocused ? "focused border border-white" : ""
                                                         }`}
                                                 >
-                                                        <div className="bg-black rounded-xl relative">
+                                                        <div className="bg-black rounded-xl relative z-10">
                                                                 <textarea
                                                                         value={formSchema ? revisionPrompt : prompt}
                                                                         onChange={(e) =>
