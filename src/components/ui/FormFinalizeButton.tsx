@@ -93,35 +93,31 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
 
                         {error && <p className="text-red-500 mt-2">{error}</p>}
 
-                        <Dialog open={showPermissionDialog} onOpenChange={setShowPermissionDialog}>
-                                <DialogContent>
-                                        <DialogHeader>
-                                                <DialogTitle className="text-2xl text-center font-bold mb-2">
-                                                        Google Permission Required
-                                                </DialogTitle>
-                                                <DialogDescription className="text-center text-gray-400">
-                                                        {permissionError}
-                                                </DialogDescription>
-                                        </DialogHeader>
-                                        <div className="flex flex-col gap-3 mt-4">
-                                                <Button
-                                                        onClick={handleConnectGoogle}
-                                                        className="bg-blue-600 hover:bg-blue-700 w-full transition-colors duration-300 shadow-lg"
-                                                        size="lg"
-                                                >
-                                                        Connect Google Account
-                                                </Button>
-                                                <Button
-                                                        variant="ghost"
-                                                        onClick={() => setShowPermissionDialog(false)}
-                                                        className="w-full hover:bg-white/10"
-                                                        size="sm"
-                                                >
-                                                        Cancel
-                                                </Button>
+                        {showPermissionDialog && (
+                                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
+                                        <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-xl p-6 w-full max-w-sm text-center shadow-2xl">
+                                                <h3 className="text-2xl font-bold mb-2">Google Permission Required</h3>
+                                                <p className="text-gray-300 mb-6">{permissionError}</p>
+                                                <div className="flex flex-col gap-3">
+                                                        <Button
+                                                                onClick={handleConnectGoogle}
+                                                                className="bg-blue-600 hover:bg-blue-700 w-full transition-colors duration-300 shadow-lg"
+                                                                size="lg"
+                                                        >
+                                                                Connect Google Account
+                                                        </Button>
+                                                        <Button
+                                                                variant="ghost"
+                                                                onClick={() => setShowPermissionDialog(false)}
+                                                                className="w-full hover:bg-white/10"
+                                                                size="sm"
+                                                        >
+                                                                Cancel
+                                                        </Button>
+                                                </div>
                                         </div>
-                                </DialogContent>
-                        </Dialog>
+                                </div>
+                        )}
                 </>
         );
 };
