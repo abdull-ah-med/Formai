@@ -60,4 +60,9 @@ export const getFormHistory = async () => {
         }
 };
 
+export const deleteAccount = async () => {
+        const response = await api.delete("/account");
+        return response.data;
+};
+
 export default api;
