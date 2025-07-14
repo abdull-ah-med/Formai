@@ -446,7 +446,7 @@ const UserDashboard: React.FC = () => {
                                                 .animated-border::before {
                                                         content: "";
                                                         position: absolute;
-                                                        inset: -1px;
+                                                        inset: 0;
                                                         border-radius: inherit;
                                                         background: conic-gradient(from 180deg at 50% 50%, white, black, white);
                                                         animation: rotate-gradient 4s linear infinite;
@@ -466,7 +466,9 @@ const UserDashboard: React.FC = () => {
                                         >
                                                 <div
                                                         className={`relative rounded-xl overflow-hidden animated-border transition-all duration-300 ${
-                                                                isInputFocused ? "focused border border-white" : ""
+                                                                isInputFocused
+                                                                        ? "focused border border-white"
+                                                                        : "p-[1px]"
                                                         }`}
                                                 >
                                                         <div className="bg-black rounded-xl relative z-10">
