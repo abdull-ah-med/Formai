@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "./button";
 import { useNavigate } from "react-router-dom";
 import { getGoogleOAuthURL } from "../../auth/googleOAuth";
@@ -27,6 +27,19 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
         const [showPermissionDialog, setShowPermissionDialog] = useState(false);
         const [permissionError, setPermissionError] = useState<string>("");
         const navigate = useNavigate();
+
+        // Prevent scrolling when dialog is open
+        useEffect(() => {
+                if (showPermissionDialog) {
+                        document.body.style.overflow = "hidden";
+                } else {
+                        document.body.style.overflow = "";
+                }
+
+                return () => {
+                        document.body.style.overflow = "";
+                };
+        }, [showPermissionDialog]);
 
         const handleFinalize = async () => {
                 setIsLoading(true);
@@ -93,7 +106,10 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                         {error && <p className="text-red-500 mt-2">{error}</p>}
 
                         {showPermissionDialog && (
-                                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
+                                <div
+                                        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]"
+                                        style={{ position: "fixed" }}
+                                >
                                         <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-xl p-6 w-full max-w-sm text-center shadow-2xl">
                                                 <h3 className="text-2xl font-bold mb-2">Google Permission Required</h3>
                                                 <p className="text-gray-300 mb-6">{permissionError}</p>
