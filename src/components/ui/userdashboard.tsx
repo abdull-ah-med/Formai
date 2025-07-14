@@ -3,20 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useForm } from "../../contexts/FormContext";
 import { generateForm, reviseForm } from "../../api";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogFooter,
-	DialogTitle,
-	DialogDescription,
-} from "./dialog";
-import {
-        FormSchema,
-        FormQuestion,
-        GenerateFormResponse,
-        ReviseFormResponse,
-} from "../../types/form";
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "./dialog";
+import { FormSchema, FormQuestion, GenerateFormResponse, ReviseFormResponse } from "../../types/form";
 import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
 import { Loader } from "./loader";
@@ -30,13 +18,13 @@ const UserDashboard: React.FC = () => {
         const [error, setError] = useState("");
         const [revisionPrompt, setRevisionPrompt] = useState("");
         const [isInputFocused, setIsInputFocused] = useState(false);
-	const [showWarning, setShowWarning] = useState(false);
+        const [showWarning, setShowWarning] = useState(false);
 
-	useEffect(() => {
-		if (user && !user.isGoogleLinked) {
-			setShowWarning(true);
-		}
-	}, [user]);
+        useEffect(() => {
+                if (user && !user.isGoogleLinked) {
+                        setShowWarning(true);
+                }
+        }, [user]);
 
         useEffect(() => {
                 if (formSchema && formId) {
@@ -321,19 +309,20 @@ const UserDashboard: React.FC = () => {
 
         return (
                 <div className="min-h-screen bg-black text-white flex flex-col pt-16">
-			<Dialog open={showWarning} onOpenChange={setShowWarning}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Google Account Not Linked</DialogTitle>
-						<DialogDescription>
-							Your Google account is not linked. You will not be able to create
-							Google Forms until you link your account.
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<button onClick={() => setShowWarning(false)}>Close</button>
-					</DialogFooter>
-			</Dialog>
+                        <Dialog open={showWarning} onOpenChange={setShowWarning}>
+                                <DialogContent>
+                                        <DialogHeader>
+                                                <DialogTitle>Google Account Not Linked</DialogTitle>
+                                                <DialogDescription>
+                                                        Your Google account is not linked. You will not be able to
+                                                        create Google Forms until you link your account.
+                                                </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                                <button onClick={() => setShowWarning(false)}>Close</button>
+                                        </DialogFooter>
+                                </DialogContent>
+                        </Dialog>
                         <main className="flex-1 p-4 md:p-6 lg:p-8 pb-32">
                                 <div className="max-w-4xl mx-auto">
                                         {/* Response Display Area - only show if not displaying a form */}
@@ -427,15 +416,12 @@ const UserDashboard: React.FC = () => {
                                 </div>
                         </main>
                         <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-black to-black/90 backdrop-blur-lg border-t border-white/10 p-4 shadow-lg">
-                                
                                 <div className="max-w-4xl mx-auto">
                                         <form
                                                 onSubmit={formSchema ? handleRevisionSubmit : handleSubmit}
                                                 className="relative"
                                         >
-                                                <div
-                                                        className="relative rounded-xl overflow-hidden border border-white p-[1px]"
-                                                >
+                                                <div className="relative rounded-xl overflow-hidden border border-white p-[1px]">
                                                         <div className="bg-black rounded-[10px] relative z-10">
                                                                 <textarea
                                                                         value={formSchema ? revisionPrompt : prompt}

@@ -116,8 +116,8 @@ export const DialogContent: React.FC<DialogContentProps> = ({ children, classNam
                         className={cn(
                                 "bg-white/15 backdrop-blur-md rounded-xl p-6 w-full max-w-md shadow-xl animate-in slide-in-from-bottom-5 duration-200",
                                 "border border-white/10 max-h-[80vh] overflow-y-auto",
-                                "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2",
-                                "m-auto max-w-[calc(100vw-2rem)]",
+                                "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2",
+                                "mx-auto max-w-[calc(100vw-2rem)]",
                                 className
                         )}
                 >
