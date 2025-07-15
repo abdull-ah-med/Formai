@@ -81,24 +81,32 @@ const Footer = () => {
                                                 <div className="space-y-3 text-center md:text-left">
                                                         <h3 className="text-white font-semibold mb-4">Legal</h3>
                                                         <div className="space-y-2">
-                                                                <Link
-                                                                        to="/privacy"
+                                                                <a
+                                                                        href="/privacy"
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
                                                                         className="block text-gray-400 hover:text-white transition-colors"
                                                                 >
                                                                         Privacy Policy
-                                                                </Link>
-                                                                <Link
-                                                                        to="/terms"
+                                                                </a>
+
+                                                                <a
+                                                                        href="/terms"
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
                                                                         className="block text-gray-400 hover:text-white transition-colors"
                                                                 >
                                                                         Terms of Service
-                                                                </Link>
-                                                                <Link
-                                                                        to="/cookies"
+                                                                </a>
+
+                                                                <a
+                                                                        href="/cookies"
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
                                                                         className="block text-gray-400 hover:text-white transition-colors"
                                                                 >
                                                                         Cookie Policy
-                                                                </Link>
+                                                                </a>
                                                         </div>
                                                 </div>
 
