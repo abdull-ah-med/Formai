@@ -1,7 +1,10 @@
 import { Shield, Eye, Lock, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDocumentTitle } from "../../utils/useDocumentTitle";
 
 const Privacy = () => {
+        useDocumentTitle("Privacy Policy");
+
         return (
                 <div className="min-h-screen bg-black text-white">
                         <section className="relative py-20 px-4 sm:px-6 lg:px-8">

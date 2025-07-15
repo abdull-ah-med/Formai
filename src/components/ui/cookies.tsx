@@ -1,7 +1,10 @@
 import { Cookie, Settings, Info, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDocumentTitle } from "../../utils/useDocumentTitle";
 
 const Cookies = () => {
+        useDocumentTitle("Cookie Policy");
+
         return (
                 <div className="min-h-screen bg-black text-white">
                         <section className="relative py-20 px-4 sm:px-6 lg:px-8">

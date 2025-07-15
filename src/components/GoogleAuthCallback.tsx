@@ -2,11 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../contexts/AuthContext";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
 
 const GoogleAuthCallback: React.FC = () => {
         const navigate = useNavigate();
         const location = useLocation();
         const { login } = useAuth();
+        useDocumentTitle("Google Authentication");
         const [error, setError] = useState<string | null>(null);
         const [isProcessing, setIsProcessing] = useState(true);
         const codeProcessed = useRef(false);

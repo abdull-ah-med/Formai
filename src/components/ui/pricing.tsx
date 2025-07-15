@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDocumentTitle } from "../../utils/useDocumentTitle";
 
 const getTiers = (annual: boolean) => [
         {
@@ -64,6 +65,7 @@ const getTiers = (annual: boolean) => [
 ];
 
 const Pricing: React.FC = () => {
+        useDocumentTitle("Pricing");
         const [annual, setAnnual] = useState(false);
         const tiers = getTiers(annual);
         const scrollRef = useRef<HTMLDivElement>(null);
@@ -158,22 +160,20 @@ const Pricing: React.FC = () => {
                                                 Monthly
                                         </span>
                                         <button
-                                                className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none ${
-                                                        annual
+                                                className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none ${annual
                                                                 ? "bg-white/30"
                                                                 : "bg-white/60"
-                                                }`}
+                                                        }`}
                                                 onClick={() =>
                                                         setAnnual((a) => !a)
                                                 }
                                                 aria-label="Toggle annual pricing"
                                         >
                                                 <span
-                                                        className={`absolute left-1 top-1 w-6 h-6 rounded-full bg-white shadow transition-transform duration-300 ${
-                                                                annual
+                                                        className={`absolute left-1 top-1 w-6 h-6 rounded-full bg-white shadow transition-transform duration-300 ${annual
                                                                         ? "translate-x-6"
                                                                         : "translate-x-0"
-                                                        }`}
+                                                                }`}
                                                 />
                                         </button>
                                         <span
@@ -227,11 +227,10 @@ const Pricing: React.FC = () => {
                                 {tiers.map((tier, idx) => (
                                         <div
                                                 key={tier.name}
-                                                className={`relative flex-shrink-0 w-80 md:w-auto bg-white/5 border border-white/10 rounded-2xl shadow-lg p-8 flex flex-col items-center transition-transform duration-300 mx-2 ${
-                                                        tier.highlight
+                                                className={`relative flex-shrink-0 w-80 md:w-auto bg-white/5 border border-white/10 rounded-2xl shadow-lg p-8 flex flex-col items-center transition-transform duration-300 mx-2 ${tier.highlight
                                                                 ? "border-2 border-white shadow-white/30"
                                                                 : ""
-                                                } md:hover:scale-105 md:transition-transform snap-center md:snap-none`}
+                                                        } md:hover:scale-105 md:transition-transform snap-center md:snap-none`}
                                                 style={{
                                                         display: "flex",
                                                         flexDirection: "column",
@@ -240,12 +239,11 @@ const Pricing: React.FC = () => {
                                                 {/* Badge: Only one at a time */}
                                                 {tier.badge && (
                                                         <span
-                                                                className={`absolute -top-4 left-1/2 -translate-x-1/2 z-20 ${
-                                                                        tier.badge ===
-                                                                        "Best Deal"
+                                                                className={`absolute -top-4 left-1/2 -translate-x-1/2 z-20 ${tier.badge ===
+                                                                                "Best Deal"
                                                                                 ? "bg-green-600"
                                                                                 : "bg-blue-600"
-                                                                } text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg`}
+                                                                        } text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg`}
                                                         >
                                                                 {tier.badge}
                                                         </span>
@@ -294,7 +292,7 @@ const Pricing: React.FC = () => {
                                                 <div className="flex-grow" />
                                                 <div className="w-full flex flex-col items-center">
                                                         {tier.name ===
-                                                        "Free" ? (
+                                                                "Free" ? (
                                                                 <Link
                                                                         to="/signup"
                                                                         className="w-full"
@@ -309,7 +307,7 @@ const Pricing: React.FC = () => {
                                                                         </Button>
                                                                 </Link>
                                                         ) : tier.name ===
-                                                          "Premium" ? (
+                                                                "Premium" ? (
                                                                 <Link
                                                                         to="/signin"
                                                                         className="w-full"
@@ -335,19 +333,19 @@ const Pricing: React.FC = () => {
                                                         )}
                                                         {tier.name !==
                                                                 "Free" && (
-                                                                <Link
-                                                                        to="/signup"
-                                                                        className="w-full mt-3"
-                                                                >
-                                                                        <Button
-                                                                                size="lg"
-                                                                                className="bg-black text-white hover:bg-white hover:text-black hover:border-black border-2 border-white px-8 py-3 text-lg font-semibold transition-all duration-300 w-full"
+                                                                        <Link
+                                                                                to="/signup"
+                                                                                className="w-full mt-3"
                                                                         >
-                                                                                Sign
-                                                                                Up
-                                                                        </Button>
-                                                                </Link>
-                                                        )}
+                                                                                <Button
+                                                                                        size="lg"
+                                                                                        className="bg-black text-white hover:bg-white hover:text-black hover:border-black border-2 border-white px-8 py-3 text-lg font-semibold transition-all duration-300 w-full"
+                                                                                >
+                                                                                        Sign
+                                                                                        Up
+                                                                                </Button>
+                                                                        </Link>
+                                                                )}
                                                         {tier.showMoneyBack && (
                                                                 <div className="mt-4 text-sm text-white/70 text-center w-full">
                                                                         7-day
@@ -360,15 +358,15 @@ const Pricing: React.FC = () => {
                                                         )}
                                                         {tier.name ===
                                                                 "Free" && (
-                                                                <div
-                                                                        className="mt-4 text-sm invisible select-none"
-                                                                        style={{
-                                                                                height: "40px",
-                                                                        }}
-                                                                >
-                                                                        placeholder
-                                                                </div>
-                                                        )}
+                                                                        <div
+                                                                                className="mt-4 text-sm invisible select-none"
+                                                                                style={{
+                                                                                        height: "40px",
+                                                                                }}
+                                                                        >
+                                                                                placeholder
+                                                                        </div>
+                                                                )}
                                                 </div>
                                         </div>
                                 ))}

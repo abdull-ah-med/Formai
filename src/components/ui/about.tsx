@@ -1,9 +1,11 @@
 import { Users, Target, Zap, Shield, Globe, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./button";
+import { useDocumentTitle } from "../../utils/useDocumentTitle";
 
 const About = () => {
         const navigate = useNavigate();
+        useDocumentTitle("About Us");
 
         const values = [
                 {

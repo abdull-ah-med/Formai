@@ -8,8 +8,10 @@ import { FormSchema, FormQuestion, GenerateFormResponse, ReviseFormResponse, For
 import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
 import { Loader } from "./loader";
+import { useDocumentTitle } from "../../utils/useDocumentTitle";
 
 const UserDashboard: React.FC = () => {
+        useDocumentTitle("Dashboard");
         const { user } = useAuth();
         const { formSchema, formId, setFormData, clearFormData } = useForm();
         const [prompt, setPrompt] = useState("");

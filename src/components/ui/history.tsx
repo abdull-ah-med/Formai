@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getFormHistory } from "../../api";
 import { useForm } from "../../contexts/FormContext";
 import { Loader } from "./loader";
+import { useDocumentTitle } from "../../utils/useDocumentTitle";
 
 interface FormHistoryItem {
         id: string;
@@ -19,6 +20,7 @@ interface HistoryResponse {
 }
 
 const History: React.FC = () => {
+        useDocumentTitle("Form History");
         const [history, setHistory] = useState<FormHistoryItem[]>([]);
         const [isLoading, setIsLoading] = useState(true);
         const [error, setError] = useState("");

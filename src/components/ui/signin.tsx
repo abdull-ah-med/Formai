@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useAuth } from "../../contexts/AuthContext";
 import { Loader } from "./loader";
+import { useDocumentTitle } from "../../utils/useDocumentTitle";
 
 // Ensure Vite env types are available
 /// <reference types="vite/client" />
@@ -19,6 +20,7 @@ interface LoginResponse {
 }
 
 const Signin = () => {
+        useDocumentTitle("Sign In");
         const siteKey = (import.meta as any).env.VITE_RECAPTCHA_SITE_KEY as string;
         const initialValues = {
                 email: "",
@@ -94,11 +96,10 @@ const Signin = () => {
                                                                         type="email"
                                                                         id="email"
                                                                         name="email"
-                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${
-                                                                                errors.email && touched.email
+                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${errors.email && touched.email
                                                                                         ? "border-red-500"
                                                                                         : "border-white/10"
-                                                                        } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
+                                                                                } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
                                                                         placeholder="jane@example.com"
                                                                 />
                                                                 <ErrorMessage
@@ -118,11 +119,10 @@ const Signin = () => {
                                                                         type="password"
                                                                         id="password"
                                                                         name="password"
-                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${
-                                                                                errors.password && touched.password
+                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${errors.password && touched.password
                                                                                         ? "border-red-500"
                                                                                         : "border-white/10"
-                                                                        } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
+                                                                                } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
                                                                         placeholder="••••••••"
                                                                         autoComplete="current-password"
                                                                 />

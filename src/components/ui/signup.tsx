@@ -7,10 +7,12 @@ import api from "../../api";
 import GoogleSignInButton from "./GoogleSignInButton";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useAuth } from "../../contexts/AuthContext";
+import { useDocumentTitle } from "../../utils/useDocumentTitle";
 /// <reference types="vite/client" />
 
 const Signup = () => {
         const navigate = useNavigate();
+        useDocumentTitle("Sign Up");
         const siteKey = (import.meta as any).env.VITE_RECAPTCHA_SITE_KEY as string;
         const [apiError, setApiError] = useState<string | null>(null);
         const { isAuthenticated, loading } = useAuth();
@@ -94,11 +96,10 @@ const Signup = () => {
                                                                         type="text"
                                                                         id="fullName"
                                                                         name="fullName"
-                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${
-                                                                                errors.fullName && touched.fullName
+                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${errors.fullName && touched.fullName
                                                                                         ? "border-red-500"
                                                                                         : "border-white/10"
-                                                                        } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
+                                                                                } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
                                                                         placeholder="Jane Doe"
                                                                 />
                                                                 <ErrorMessage
@@ -120,11 +121,10 @@ const Signup = () => {
                                                                         type="email"
                                                                         id="email"
                                                                         name="email"
-                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${
-                                                                                errors.email && touched.email
+                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${errors.email && touched.email
                                                                                         ? "border-red-500"
                                                                                         : "border-white/10"
-                                                                        } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
+                                                                                } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
                                                                         placeholder="jane@example.com"
                                                                 />
                                                                 <ErrorMessage
@@ -146,11 +146,10 @@ const Signup = () => {
                                                                         type="password"
                                                                         id="password"
                                                                         name="password"
-                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${
-                                                                                errors.password && touched.password
+                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${errors.password && touched.password
                                                                                         ? "border-red-500"
                                                                                         : "border-white/10"
-                                                                        } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
+                                                                                } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
                                                                         placeholder="••••••••"
                                                                         autoComplete="new-password"
                                                                 />
@@ -173,12 +172,11 @@ const Signup = () => {
                                                                         type="password"
                                                                         id="confirmPassword"
                                                                         name="confirmPassword"
-                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${
-                                                                                errors.confirmPassword &&
-                                                                                touched.confirmPassword
+                                                                        className={`mt-1 block w-full px-3 py-2 bg-white/5 border ${errors.confirmPassword &&
+                                                                                        touched.confirmPassword
                                                                                         ? "border-red-500"
                                                                                         : "border-white/10"
-                                                                        } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
+                                                                                } rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50`}
                                                                         placeholder="••••••••"
                                                                         autoComplete="new-password"
                                                                 />

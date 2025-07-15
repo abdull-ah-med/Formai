@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { logoutAndRedirect } from "@/auth/authHelper";
+import { useDocumentTitle } from "@/utils/useDocumentTitle";
 
 const Home = () => {
         const navigate = useNavigate();
         const { isAuthenticated, loading } = useAuth();
+        useDocumentTitle("AI-Powered Form Creation");
+
         useEffect(() => {
                 if (loading) {
                         return; // Wait until authentication status is resolved
