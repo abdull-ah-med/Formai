@@ -65,6 +65,11 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                                 "Your Google authorization has expired. Please reconnect your Google account."
                                         );
                                         setShowPermissionDialog(true);
+                                } else if (response.error === "GOOGLE_PERMISSION_DENIED") {
+                                        setPermissionError(
+                                                "You don't have permission to create Google Forms. Please reconnect your Google account with the required permissions."
+                                        );
+                                        setShowPermissionDialog(true);
                                 } else {
                                         setError(response.message || response.error || "Failed to finalize form");
                                 }
@@ -77,6 +82,11 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                         } else if (errData?.error === "GOOGLE_TOKEN_EXPIRED") {
                                 setPermissionError(
                                         "Your Google authorization has expired. Please reconnect your Google account."
+                                );
+                                setShowPermissionDialog(true);
+                        } else if (errData?.error === "GOOGLE_PERMISSION_DENIED") {
+                                setPermissionError(
+                                        "You don't have permission to create Google Forms. Please reconnect your Google account with the required permissions."
                                 );
                                 setShowPermissionDialog(true);
                         } else {

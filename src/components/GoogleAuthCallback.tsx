@@ -53,17 +53,23 @@ const GoogleAuthCallback: React.FC = () => {
                                         return;
                                 }
                                 await login(res.data.token);
-                                const pendingCallback = localStorage.getItem("pendingGoogleAuthCallback");
-                                if (pendingCallback) {
-                                        localStorage.removeItem("pendingGoogleAuthCallback");
-                                        navigate("/dashboard", { replace: true });
+                                const redirectPath = localStorage.getItem("redirectAfterAuth");
+                                if (redirectPath) {
+                                        localStorage.removeItem("redirectAfterAuth");
+                                        navigate(redirectPath, { replace: true });
                                 } else {
-                                        navigate("/dashboard", { replace: true });
+                                        const pendingCallback = localStorage.getItem("pendingGoogleAuthCallback");
+                                        if (pendingCallback) {
+                                                localStorage.removeItem("pendingGoogleAuthCallback");
+                                                navigate("/dashboard", { replace: true });
+                                        } else {
+                                                navigate("/dashboard", { replace: true });
+                                        }
                                 }
                         } catch (error: any) {
                                 setError(
                                         error.response?.data?.message ||
-                                                "Failed to connect your Google account. Please try again."
+                                        "Failed to connect your Google account. Please try again."
                                 );
                                 setIsProcessing(false);
                                 codeProcessed.current = false;
