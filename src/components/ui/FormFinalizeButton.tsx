@@ -47,9 +47,11 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                 setPermissionError("");
 
                 try {
+                        console.log("Attempting to finalize form...");
                         const response = (await finalizeForm(formId)) as FormFinalizeResponse;
 
                         if (response.success && response.data) {
+                                console.log("Form finalized successfully!");
                                 const googleFormUrl = response.data.googleFormUrl;
                                 if (onSuccess) {
                                         onSuccess(googleFormUrl);
@@ -57,6 +59,7 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                         window.open(googleFormUrl, "_blank");
                                 }
                         } else {
+                                console.warn("Form finalization failed:", response.error);
                                 if (response.error === "CONNECT_GOOGLE") {
                                         setPermissionError("Please connect your Google account to create forms.");
                                         setShowPermissionDialog(true);
@@ -75,7 +78,10 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                 }
                         }
                 } catch (err: any) {
+                        console.error("Error finalizing form:", err);
                         const errData = err.response?.data;
+                        console.error("Error response data:", errData);
+
                         if (errData?.error === "CONNECT_GOOGLE") {
                                 setPermissionError("Please connect your Google account to create forms.");
                                 setShowPermissionDialog(true);
@@ -90,7 +96,7 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                 );
                                 setShowPermissionDialog(true);
                         } else {
-                                setError(errData?.message || err.message || "An error occurred");
+                                setError(errData?.message || err.message || "An error occurred creating your form. Please try reconnecting your Google account.");
                         }
                 } finally {
                         setIsLoading(false);
@@ -99,10 +105,12 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
 
         const handleConnectGoogle = () => {
                 localStorage.setItem("redirectAfterAuth", window.location.pathname);
+                // Force the OAuth consent screen to appear again by adding a timestamp
+                // This ensures we get a fresh token with appropriate permissions
                 const timestamp = new Date().getTime();
                 const googleOAuthURL = getGoogleOAuthURL() + `&prompt_time=${timestamp}`;
 
-                console.log("Redirecting to Google OAuth consent screen");
+                console.log("Redirecting to Google OAuth consent screen for Google Forms permissions");
                 window.location.href = googleOAuthURL;
         };
 
