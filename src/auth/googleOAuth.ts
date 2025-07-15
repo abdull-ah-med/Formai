@@ -12,6 +12,7 @@ export function getGoogleOAuthURL() {
                 response_type: "code",
                 scope: "openid email profile https://www.googleapis.com/auth/forms",
                 access_type: "offline",
+                prompt: "consent",
                 include_granted_scopes: "true",
         });
 

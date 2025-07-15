@@ -99,7 +99,10 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
 
         const handleConnectGoogle = () => {
                 localStorage.setItem("redirectAfterAuth", window.location.pathname);
-                const googleOAuthURL = getGoogleOAuthURL();
+                const timestamp = new Date().getTime();
+                const googleOAuthURL = getGoogleOAuthURL() + `&prompt_time=${timestamp}`;
+
+                console.log("Redirecting to Google OAuth consent screen");
                 window.location.href = googleOAuthURL;
         };
 

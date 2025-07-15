@@ -4,6 +4,7 @@ import api, { deleteAccount } from "../../api";
 import GoogleSignInButton from "./GoogleSignInButton";
 import { logoutAndRedirect } from "../../auth/authHelper";
 import { useDocumentTitle } from "../../utils/useDocumentTitle";
+import { getGoogleOAuthURL } from "../../auth/googleOAuth";
 
 import {
         Dialog,
@@ -276,31 +277,26 @@ const AccountSettings: React.FC = () => {
                                                         className={googleLinked ? "opacity-60 cursor-not-allowed" : ""}
                                                 />
                                                 {googleLinked && (
-                                                        <p className="text-gray-400 text-sm">
-                                                                Your account is already linked with Google.
-                                                        </p>
-                                                )}
-                                                {googleLinked && hasPassword && (
-                                                        <div className="pt-4 border-t border-white/10">
-                                                                <Button
-                                                                        variant="destructive"
-                                                                        onClick={handleDelinkGoogle}
-                                                                        disabled={delinkStatus.loading}
-                                                                        className="text-sm"
-                                                                >
-                                                                        {delinkStatus.loading
-                                                                                ? "Delinking..."
-                                                                                : "Delink Google Account"}
-                                                                </Button>
-                                                                <p className="text-xs text-gray-400 mt-2">
-                                                                        You can delink because you have a password set.
+                                                        <>
+                                                                <p className="text-gray-400 text-sm mb-3">
+                                                                        Your account is already linked with Google.
                                                                 </p>
-                                                                {delinkStatus.error && (
-                                                                        <p className="text-red-500 text-sm mt-2">
-                                                                                {delinkStatus.error}
-                                                                        </p>
-                                                                )}
-                                                        </div>
+                                                                <Button
+                                                                        onClick={() => {
+                                                                                localStorage.setItem("redirectAfterAuth", "/account-settings");
+                                                                                const timestamp = new Date().getTime();
+                                                                                const googleOAuthURL = getGoogleOAuthURL() + `&prompt_time=${timestamp}`;
+                                                                                window.location.href = googleOAuthURL;
+                                                                        }}
+                                                                        variant="outline"
+                                                                        className="w-full"
+                                                                >
+                                                                        Reconnect Google Account
+                                                                </Button>
+                                                                <p className="text-gray-400 text-sm mt-2">
+                                                                        Use this if you're experiencing permission issues with Google Forms.
+                                                                </p>
+                                                        </>
                                                 )}
                                         </div>
                                 </div>
