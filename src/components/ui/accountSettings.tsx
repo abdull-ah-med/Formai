@@ -288,8 +288,7 @@ const AccountSettings: React.FC = () => {
                                                                                 const googleOAuthURL = getGoogleOAuthURL() + `&prompt_time=${timestamp}`;
                                                                                 window.location.href = googleOAuthURL;
                                                                         }}
-                                                                        variant="outline"
-                                                                        className="w-full"
+                                                                        className="w-full bg-white text-black border-0 hover:bg-black hover:text-white hover:border hover:border-white transition-all duration-300"
                                                                 >
                                                                         Reconnect Google Account
                                                                 </Button>
