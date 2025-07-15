@@ -4,6 +4,13 @@ declare module "@/auth/authHelper";
 // Form field option type
 type FormOption = string | { text?: string; label?: string };
 
+// Condition interface for conditional logic
+export interface FormCondition {
+        fieldId: string;
+        equals?: string;
+        notEquals?: string;
+}
+
 // Form field interface
 interface FormField {
         label: string;
@@ -18,6 +25,7 @@ export interface FormSection {
         title: string;
         description?: string;
         fields: FormField[];
+        conditions?: FormCondition[];
 }
 
 // Question interface for history form schemas
@@ -28,6 +36,11 @@ export interface FormQuestion {
         options?: {
                 id: string;
                 text: string;
+        }[];
+        conditions?: {
+                dependsOn: string; // id of the question this depends on
+                operator: string;  // equals or notEquals
+                value: string;     // value to compare
         }[];
 }
 

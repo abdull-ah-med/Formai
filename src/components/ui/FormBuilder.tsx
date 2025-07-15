@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FormSchema, FormSection } from "../../types/form";
+import { FormSchema, FormSection, FormCondition } from "../../types/form";
 import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
 
@@ -131,38 +131,61 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 if (schema.sections && schema.sections.length > 0) {
                         return (
                                 <>
-                                        {schema.sections.map((section, sectionIndex) => (
-                                                <div key={sectionIndex} className="mb-8 border-b pb-6">
-                                                        <h3 className="text-xl font-semibold mb-3">
-                                                                {DOMPurify.sanitize(section.title)}
-                                                        </h3>
-                                                        {section.description && (
-                                                                <p className="text-gray-600 mb-4">
-                                                                        {DOMPurify.sanitize(section.description)}
-                                                                </p>
-                                                        )}
-                                                        <div className="space-y-4">
-                                                                {section.fields.map((field, fieldIndex) => (
-                                                                        <div
-                                                                                key={fieldIndex}
-                                                                                className="p-4 bg-white border rounded-md"
-                                                                        >
-                                                                                <label className="block text-lg font-medium mb-2">
-                                                                                        {DOMPurify.sanitize(
-                                                                                                field.label
-                                                                                        )}
-                                                                                        {field.required && (
-                                                                                                <span className="text-red-500 ml-1">
-                                                                                                        *
-                                                                                                </span>
-                                                                                        )}
-                                                                                </label>
-                                                                                {renderField(field, fieldIndex)}
+                                        {schema.sections.map((section, sectionIndex) => {
+                                                // Check if this section has conditions
+                                                const hasConditions = section.conditions && section.conditions.length > 0;
+
+                                                return (
+                                                        <div key={sectionIndex} className="mb-8 border-b pb-6">
+                                                                <h3 className="text-xl font-semibold mb-3">
+                                                                        {DOMPurify.sanitize(section.title)}
+                                                                </h3>
+                                                                {section.description && (
+                                                                        <p className="text-gray-600 mb-4">
+                                                                                {DOMPurify.sanitize(section.description)}
+                                                                        </p>
+                                                                )}
+
+                                                                {/* Display condition information if this section is conditional */}
+                                                                {hasConditions && section.conditions && (
+                                                                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 text-sm">
+                                                                                <p className="text-blue-700 flex items-center font-medium">
+                                                                                        <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                                <path d="M12 16V12M12 8H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                                                        </svg>
+                                                                                        Conditional Section
+                                                                                </p>
+                                                                                {section.conditions.map((condition: FormCondition, i: number) => (
+                                                                                        <p key={i} className="text-gray-700 ml-6 mt-1">
+                                                                                                Shows when: "{condition.fieldId}" {condition.equals ? "is" : "is not"} "{condition.equals || condition.notEquals}"
+                                                                                        </p>
+                                                                                ))}
                                                                         </div>
-                                                                ))}
+                                                                )}
+
+                                                                <div className="space-y-4">
+                                                                        {section.fields.map((field, fieldIndex) => (
+                                                                                <div
+                                                                                        key={fieldIndex}
+                                                                                        className="p-4 bg-white border rounded-md"
+                                                                                >
+                                                                                        <label className="block text-lg font-medium mb-2">
+                                                                                                {DOMPurify.sanitize(
+                                                                                                        field.label
+                                                                                                )}
+                                                                                                {field.required && (
+                                                                                                        <span className="text-red-500 ml-1">
+                                                                                                                *
+                                                                                                        </span>
+                                                                                                )}
+                                                                                        </label>
+                                                                                        {renderField(field, fieldIndex)}
+                                                                                </div>
+                                                                        ))}
+                                                                </div>
                                                         </div>
-                                                </div>
-                                        ))}
+                                                );
+                                        })}
                                 </>
                         );
                 } else {

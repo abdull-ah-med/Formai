@@ -4,7 +4,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useForm } from "../../contexts/FormContext";
 import { generateForm, reviseForm } from "../../api";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "./dialog";
-import { FormSchema, FormQuestion, GenerateFormResponse, ReviseFormResponse } from "../../types/form";
+import { FormSchema, FormQuestion, GenerateFormResponse, ReviseFormResponse, FormSection, FormCondition } from "../../types/form";
 import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
 import { Loader } from "./loader";
@@ -94,9 +94,8 @@ const UserDashboard: React.FC = () => {
                         } else {
                                 setError(err.response?.data?.error || "An error occurred while generating the form");
                                 setResponse(
-                                        `Error: ${
-                                                err.response?.data?.error ||
-                                                "An error occurred while generating the form"
+                                        `Error: ${err.response?.data?.error ||
+                                        "An error occurred while generating the form"
                                         }`
                                 );
                         }
@@ -238,6 +237,9 @@ const UserDashboard: React.FC = () => {
                                                         section.title === formSchema.title &&
                                                         section.description === formSchema.description;
 
+                                                // Check if this section has conditions
+                                                const hasConditions = section.conditions && section.conditions.length > 0;
+
                                                 return (
                                                         <div key={sectionIndex}>
                                                                 {!isDefaultSection && (
@@ -253,6 +255,23 @@ const UserDashboard: React.FC = () => {
                                                                                                         section.description
                                                                                                 )}
                                                                                         </p>
+                                                                                )}
+
+                                                                                {/* Display condition information if this section is conditional */}
+                                                                                {hasConditions && section.conditions && (
+                                                                                        <div className="bg-blue-900/20 border border-blue-500/30 rounded-md p-2 mb-4 text-sm">
+                                                                                                <p className="text-blue-300 flex items-center">
+                                                                                                        <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                                                <path d="M12 16V12M12 8H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                                                                        </svg>
+                                                                                                        Conditional Section
+                                                                                                </p>
+                                                                                                {section.conditions.map((condition: FormCondition, i: number) => (
+                                                                                                        <p key={i} className="text-gray-300 ml-6">
+                                                                                                                Shows when: "{condition.fieldId}" {condition.equals ? "is" : "is not"} "{condition.equals || condition.notEquals}"
+                                                                                                        </p>
+                                                                                                ))}
+                                                                                        </div>
                                                                                 )}
                                                                         </div>
                                                                 )}
@@ -428,8 +447,8 @@ const UserDashboard: React.FC = () => {
                                                                         onChange={(e) =>
                                                                                 formSchema
                                                                                         ? setRevisionPrompt(
-                                                                                                  e.target.value
-                                                                                          )
+                                                                                                e.target.value
+                                                                                        )
                                                                                         : setPrompt(e.target.value)
                                                                         }
                                                                         placeholder={
