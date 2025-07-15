@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { FormSchema, FormSection, FormCondition } from "../../types/form";
+import { FormSchema, FormSection, FormCondition, FormField } from "../../types/form";
 import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
+import { getValidationRequirements, hasValidationRequirements } from "../../utils/formValidation";
 
 interface FormBuilderProps {
         schema: FormSchema;
@@ -35,24 +36,75 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 setShowRevisionForm(false);
         };
 
+        const renderValidationRequirements = (field: FormField) => {
+                if (!hasValidationRequirements(field)) return null;
+
+                const requirements = getValidationRequirements(field);
+                return (
+                        <div className="mt-1 text-sm text-blue-600">
+                                <span className="font-medium">Validation:</span> {requirements}
+                        </div>
+                );
+        };
+
         const renderField = (field: any, index: number) => {
                 switch (field.type) {
                         case "text":
-                                return <input type="text" className="w-full p-2 border rounded" disabled />;
+                                return (
+                                        <>
+                                                <input type="text" className="w-full p-2 border rounded" disabled />
+                                                {renderValidationRequirements(field)}
+                                        </>
+                                );
                         case "textarea":
-                                return <textarea className="w-full p-2 border rounded" rows={3} disabled></textarea>;
+                                return (
+                                        <>
+                                                <textarea className="w-full p-2 border rounded" rows={3} disabled></textarea>
+                                                {renderValidationRequirements(field)}
+                                        </>
+                                );
                         case "email":
-                                return <input type="email" className="w-full p-2 border rounded" disabled />;
+                                return (
+                                        <>
+                                                <input type="email" className="w-full p-2 border rounded" disabled />
+                                                {renderValidationRequirements(field)}
+                                        </>
+                                );
                         case "number":
-                                return <input type="number" className="w-full p-2 border rounded" disabled />;
+                                return (
+                                        <>
+                                                <input type="number" className="w-full p-2 border rounded" disabled />
+                                                {renderValidationRequirements(field)}
+                                        </>
+                                );
                         case "tel":
-                                return <input type="tel" className="w-full p-2 border rounded" disabled />;
+                                return (
+                                        <>
+                                                <input type="tel" className="w-full p-2 border rounded" disabled />
+                                                {renderValidationRequirements(field)}
+                                        </>
+                                );
                         case "date":
-                                return <input type="date" className="w-full p-2 border rounded" disabled />;
+                                return (
+                                        <>
+                                                <input type="date" className="w-full p-2 border rounded" disabled />
+                                                {renderValidationRequirements(field)}
+                                        </>
+                                );
                         case "time":
-                                return <input type="time" className="w-full p-2 border rounded" disabled />;
+                                return (
+                                        <>
+                                                <input type="time" className="w-full p-2 border rounded" disabled />
+                                                {renderValidationRequirements(field)}
+                                        </>
+                                );
                         case "url":
-                                return <input type="url" className="w-full p-2 border rounded" disabled />;
+                                return (
+                                        <>
+                                                <input type="url" className="w-full p-2 border rounded" disabled />
+                                                {renderValidationRequirements(field)}
+                                        </>
+                                );
                         case "checkbox":
                                 return (
                                         <div className="flex items-center">
@@ -126,86 +178,115 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
         const sanitizedTitle = DOMPurify.sanitize(schema.title);
         const sanitizedDescription = DOMPurify.sanitize(schema.description);
 
-        // Render form sections or fallback to fields if no sections
-        const renderFormContent = () => {
+        // Add a notice about validation requirements if any exist
+        const hasValidationRules = () => {
                 if (schema.sections && schema.sections.length > 0) {
-                        return (
-                                <>
-                                        {schema.sections.map((section, sectionIndex) => {
-                                                // Check if this section has conditions
-                                                const hasConditions = section.conditions && section.conditions.length > 0;
-
-                                                return (
-                                                        <div key={sectionIndex} className="mb-8 border-b pb-6">
-                                                                <h3 className="text-xl font-semibold mb-3">
-                                                                        {DOMPurify.sanitize(section.title)}
-                                                                </h3>
-                                                                {section.description && (
-                                                                        <p className="text-gray-600 mb-4">
-                                                                                {DOMPurify.sanitize(section.description)}
-                                                                        </p>
-                                                                )}
-
-                                                                {/* Display condition information if this section is conditional */}
-                                                                {hasConditions && section.conditions && (
-                                                                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 text-sm">
-                                                                                <p className="text-blue-700 flex items-center font-medium">
-                                                                                        <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                                <path d="M12 16V12M12 8H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                                                        </svg>
-                                                                                        Conditional Section
-                                                                                </p>
-                                                                                {section.conditions.map((condition: FormCondition, i: number) => (
-                                                                                        <p key={i} className="text-gray-700 ml-6 mt-1">
-                                                                                                Shows when: "{condition.fieldId}" {condition.equals ? "is" : "is not"} "{condition.equals || condition.notEquals}"
-                                                                                        </p>
-                                                                                ))}
-                                                                        </div>
-                                                                )}
-
-                                                                <div className="space-y-4">
-                                                                        {section.fields.map((field, fieldIndex) => (
-                                                                                <div
-                                                                                        key={fieldIndex}
-                                                                                        className="p-4 bg-white border rounded-md"
-                                                                                >
-                                                                                        <label className="block text-lg font-medium mb-2">
-                                                                                                {DOMPurify.sanitize(
-                                                                                                        field.label
-                                                                                                )}
-                                                                                                {field.required && (
-                                                                                                        <span className="text-red-500 ml-1">
-                                                                                                                *
-                                                                                                        </span>
-                                                                                                )}
-                                                                                        </label>
-                                                                                        {renderField(field, fieldIndex)}
-                                                                                </div>
-                                                                        ))}
-                                                                </div>
-                                                        </div>
-                                                );
-                                        })}
-                                </>
-                        );
-                } else {
-                        // Fallback to the old fields array for backward compatibility
-                        return (
-                                <>
-                                        {schema.fields?.map((field, index) => (
-                                                <div key={index} className="mb-6 p-4 bg-white border rounded-md">
-                                                        <label className="block text-lg font-medium mb-2">
-                                                                {DOMPurify.sanitize(field.label)}
-                                                                {field.required && (
-                                                                        <span className="text-red-500 ml-1">*</span>
-                                                                )}
-                                                        </label>
-                                                        {renderField(field, index)}
-                                                </div>
-                                        ))}
-                                </>
+                        return schema.sections.some(section =>
+                                section.fields.some(field => hasValidationRequirements(field))
                         );
                 }
+                return schema.fields?.some(field => hasValidationRequirements(field)) || false;
+        };
+
+        // Render form sections or fallback to fields if no sections
+        const renderFormContent = () => {
+                // Show validation notice at the top of the form
+                const showValidationNotice = hasValidationRules();
+
+                return (
+                        <>
+                                {showValidationNotice && (
+                                        <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+                                                <h3 className="font-medium text-blue-700 flex items-center">
+                                                        <svg className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                                        </svg>
+                                                        Form Validation
+                                                </h3>
+                                                <p className="mt-1 text-sm text-gray-700">
+                                                        This form contains fields with validation requirements.
+                                                        Fields with validation rules are highlighted with blue validation details.
+                                                        These requirements will be preserved in the generated Google Form.
+                                                </p>
+                                        </div>
+                                )}
+
+                                {schema.sections && schema.sections.length > 0 ? (
+                                        <>
+                                                {schema.sections.map((section, sectionIndex) => {
+                                                        // Check if this section has conditions
+                                                        const hasConditions = section.conditions && section.conditions.length > 0;
+
+                                                        return (
+                                                                <div key={sectionIndex} className="mb-8 border-b pb-6">
+                                                                        <h3 className="text-xl font-semibold mb-3">
+                                                                                {DOMPurify.sanitize(section.title)}
+                                                                        </h3>
+                                                                        {section.description && (
+                                                                                <p className="text-gray-600 mb-4">
+                                                                                        {DOMPurify.sanitize(section.description)}
+                                                                                </p>
+                                                                        )}
+
+                                                                        {/* Display condition information if this section is conditional */}
+                                                                        {hasConditions && section.conditions && (
+                                                                                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 text-sm">
+                                                                                        <p className="text-blue-700 flex items-center font-medium">
+                                                                                                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                                        <path d="M12 16V12M12 8H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                                                                </svg>
+                                                                                                Conditional Section
+                                                                                        </p>
+                                                                                        {section.conditions.map((condition: FormCondition, i: number) => (
+                                                                                                <p key={i} className="text-gray-700 ml-6 mt-1">
+                                                                                                        Shows when: "{condition.fieldId}" {condition.equals ? "is" : "is not"} "{condition.equals || condition.notEquals}"
+                                                                                                </p>
+                                                                                        ))}
+                                                                                </div>
+                                                                        )}
+
+                                                                        <div className="space-y-4">
+                                                                                {section.fields.map((field, fieldIndex) => (
+                                                                                        <div
+                                                                                                key={fieldIndex}
+                                                                                                className="p-4 bg-white border rounded-md"
+                                                                                        >
+                                                                                                <label className="block text-lg font-medium mb-2">
+                                                                                                        {DOMPurify.sanitize(
+                                                                                                                field.label
+                                                                                                        )}
+                                                                                                        {field.required && (
+                                                                                                                <span className="text-red-500 ml-1">
+                                                                                                                        *
+                                                                                                                </span>
+                                                                                                        )}
+                                                                                                </label>
+                                                                                                {renderField(field, fieldIndex)}
+                                                                                        </div>
+                                                                                ))}
+                                                                        </div>
+                                                                </div>
+                                                        );
+                                                })}
+                                        </>
+                                ) : (
+                                        // Fallback to the old fields array for backward compatibility
+                                        <>
+                                                {schema.fields?.map((field, index) => (
+                                                        <div key={index} className="mb-6 p-4 bg-white border rounded-md">
+                                                                <label className="block text-lg font-medium mb-2">
+                                                                        {DOMPurify.sanitize(field.label)}
+                                                                        {field.required && (
+                                                                                <span className="text-red-500 ml-1">*</span>
+                                                                        )}
+                                                                </label>
+                                                                {renderField(field, index)}
+                                                        </div>
+                                                ))}
+                                        </>
+                                )}
+                        </>
+                );
         };
 
         return (

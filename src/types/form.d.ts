@@ -12,12 +12,17 @@ export interface FormCondition {
 }
 
 // Form field interface
-interface FormField {
+export interface FormField {
         label: string;
         type: string;
         required?: boolean;
         scale?: number;
         options?: FormOption[];
+        // Validation properties
+        minLength?: number;
+        maxLength?: number;
+        min?: number;
+        max?: number;
 }
 
 // Form section interface
