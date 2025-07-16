@@ -38,8 +38,15 @@ const UserDashboard: React.FC = () => {
 	const autoResize = () => {
 		const textarea = textareaRef.current;
 		if (textarea) {
+			const MAX_HEIGHT = 192; // 12rem ~ 192px
 			textarea.style.height = "auto";
-			textarea.style.height = `${textarea.scrollHeight}px`;
+			if (textarea.scrollHeight > MAX_HEIGHT) {
+				textarea.style.height = `${MAX_HEIGHT}px`;
+				textarea.style.overflowY = "auto";
+			} else {
+				textarea.style.height = `${textarea.scrollHeight}px`;
+				textarea.style.overflowY = "hidden";
+			}
 		}
 	};
 
@@ -600,7 +607,7 @@ const UserDashboard: React.FC = () => {
 									}
 									ref={textareaRef}
 									onInput={autoResize}
-									className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none resize-none scrollbar-hide rounded-xl w-full min-h-[3rem]"
+									className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none resize-none scrollbar-hide rounded-xl w-full min-h-[3rem] max-h-48"
 								/>
 								<button
 									type="submit"
