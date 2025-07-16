@@ -1,5 +1,5 @@
 import { Send, Edit2 } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useForm } from "../../contexts/FormContext";
 import { generateForm, reviseForm } from "../../api";
@@ -30,6 +30,23 @@ const UserDashboard: React.FC = () => {
 	const [revisionPrompt, setRevisionPrompt] = useState("");
 	const [isInputFocused, setIsInputFocused] = useState(false);
 	const [showWarning, setShowWarning] = useState(false);
+
+	// Reference for the textarea to auto-resize as the user types
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+	// Automatically grow/shrink the textarea based on its content
+	const autoResize = () => {
+		const textarea = textareaRef.current;
+		if (textarea) {
+			textarea.style.height = "auto";
+			textarea.style.height = `${textarea.scrollHeight}px`;
+		}
+	};
+
+	// Re-run resize whenever the prompt changes or when we switch between initial/revision modes
+	useEffect(() => {
+		autoResize();
+	}, [prompt, revisionPrompt, formSchema]);
 
 	useEffect(() => {
 		if (user && !user.isGoogleLinked) {
@@ -581,7 +598,9 @@ const UserDashboard: React.FC = () => {
 											? "Describe changes you want to make to the form..."
 											: "Describe the form you want to create..."
 									}
-									className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none h-12 resize-none scrollbar-hide rounded-xl w-full"
+									ref={textareaRef}
+									onInput={autoResize}
+									className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none resize-none scrollbar-hide rounded-xl w-full min-h-[3rem]"
 								/>
 								<button
 									type="submit"
