@@ -1,7 +1,14 @@
 import axios from "axios";
+
+// Standard timeout for most requests
+const DEFAULT_TIMEOUT = 30000; // 30 seconds
+
+// Extended timeout for form generation/revision operations that use Claude API
+const FORM_GENERATION_TIMEOUT = 180000; // 3 minutes
+
 const api = axios.create({
         baseURL: (import.meta as unknown as { env: Record<string, string> }).env?.VITE_API_BASE_URL || "/api",
-        timeout: 30000,
+        timeout: DEFAULT_TIMEOUT,
         withCredentials: true,
         headers: {
                 "Content-Type": "application/json",
@@ -28,12 +35,18 @@ api.interceptors.response.use(
 );
 
 export const generateForm = async (prompt: string) => {
-        const response = await api.post("/form/generate-form", { prompt });
+        // Use the longer timeout for Claude API calls
+        const response = await api.post("/form/generate-form", { prompt }, { 
+                timeout: FORM_GENERATION_TIMEOUT 
+        });
         return response.data;
 };
 
 export const reviseForm = async (formId: string, prompt: string) => {
-        const response = await api.post(`/form/revise-form/${formId}`, { prompt });
+        // Use the longer timeout for Claude API calls
+        const response = await api.post(`/form/revise-form/${formId}`, { prompt }, { 
+                timeout: FORM_GENERATION_TIMEOUT 
+        });
         return response.data;
 };
 

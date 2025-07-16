@@ -22,7 +22,6 @@ const GoogleAuthCallback: React.FC = () => {
                         const error = params.get("error");
 
                         if (error) {
-                                console.error("Google OAuth error:", error);
                                 setError("Google authentication was denied or cancelled.");
                                 setIsProcessing(false);
                                 return;
@@ -35,7 +34,6 @@ const GoogleAuthCallback: React.FC = () => {
                         }
                         codeProcessed.current = true;
                         try {
-                                console.log("Exchanging code for token...");
                                 const res = await api.get<{
                                         token: string;
                                         success: boolean;
@@ -48,7 +46,6 @@ const GoogleAuthCallback: React.FC = () => {
                                 });
 
                                 if (!res.data.success) {
-                                        console.error("Authentication failed:", res.data);
                                         setError(res.data.message || "Authentication failed");
                                         setIsProcessing(false);
                                         return;
@@ -60,19 +57,8 @@ const GoogleAuthCallback: React.FC = () => {
                                         return;
                                 }
 
-                                // Check if we have the required scopes and refresh token
-                                if (!res.data.hasFormsScope) {
-                                        console.warn("Missing Forms scope permission");
-                                }
-
-                                if (!res.data.hasRefreshToken) {
-                                        console.warn("No refresh token received from Google");
-                                }
-
                                 await login(res.data.token);
                                 const redirectPath = localStorage.getItem("redirectAfterAuth");
-
-                                console.log("Authentication successful, redirecting to:", redirectPath || "/dashboard");
 
                                 if (redirectPath) {
                                         localStorage.removeItem("redirectAfterAuth");
@@ -87,7 +73,7 @@ const GoogleAuthCallback: React.FC = () => {
                                         }
                                 }
                         } catch (error: any) {
-                                console.error("Google authentication error:", error);
+
                                 setError(
                                         error.response?.data?.message ||
                                         "Failed to connect your Google account. Please try again."

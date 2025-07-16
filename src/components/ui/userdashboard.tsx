@@ -17,6 +17,8 @@ const UserDashboard: React.FC = () => {
         const [prompt, setPrompt] = useState("");
         const [response, setResponse] = useState("");
         const [isLoading, setIsLoading] = useState(false);
+        const [loadingProgress, setLoadingProgress] = useState(0);
+        const [loadingMessage, setLoadingMessage] = useState("");
         const [error, setError] = useState("");
         const [revisionPrompt, setRevisionPrompt] = useState("");
         const [isInputFocused, setIsInputFocused] = useState(false);
@@ -80,8 +82,16 @@ const UserDashboard: React.FC = () => {
                 setError("");
                 setResponse(`Creating a form for: "${sanitizedPrompt}"`);
 
+                // Start progress simulation for the long-running Claude call
+                const stopProgress = simulateProgress();
+
                 try {
                         const response = (await generateForm(sanitizedPrompt)) as GenerateFormResponse;
+
+                        // Set progress to 100% when API returns
+                        setLoadingProgress(100);
+                        setLoadingMessage("Form complete!");
+
                         if (response.success) {
                                 setFormData(response.data.schema, response.data.formId);
                                 setResponse(""); // Clear response when form is displayed
@@ -93,6 +103,9 @@ const UserDashboard: React.FC = () => {
                         if (err.response?.status === 429) {
                                 setError("Daily form generation limit reached. Try again tomorrow.");
                                 setResponse("Error: Daily form generation limit reached. Try again tomorrow.");
+                        } else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+                                setError("The request timed out. This form may be too complex or our servers are busy.");
+                                setResponse("Error: The request timed out. This form may be too complex or our servers are busy.");
                         } else {
                                 setError(err.response?.data?.error || "An error occurred while generating the form");
                                 setResponse(
@@ -102,6 +115,8 @@ const UserDashboard: React.FC = () => {
                                 );
                         }
                 } finally {
+                        // Stop progress simulation
+                        stopProgress();
                         setIsLoading(false);
                 }
         };
@@ -132,8 +147,16 @@ const UserDashboard: React.FC = () => {
                 setIsLoading(true);
                 setError("");
 
+                // Start progress simulation for the long-running Claude call
+                const stopProgress = simulateProgress();
+                setLoadingMessage("Revising your form...");
+
                 reviseForm(formId, sanitizedPrompt)
                         .then((response: any) => {
+                                // Set progress to 100% when API returns
+                                setLoadingProgress(100);
+                                setLoadingMessage("Revision complete!");
+
                                 const typedResponse = response as ReviseFormResponse;
                                 if (typedResponse.success) {
                                         setFormData(typedResponse.data.schema, formId);
@@ -143,9 +166,15 @@ const UserDashboard: React.FC = () => {
                                 }
                         })
                         .catch((err: any) => {
-                                setError(err.response?.data?.error || "An error occurred while revising the form");
+                                if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+                                        setError("The revision request timed out. Try a simpler request or try again later.");
+                                } else {
+                                        setError(err.response?.data?.error || "An error occurred while revising the form");
+                                }
                         })
                         .finally(() => {
+                                // Stop progress simulation
+                                stopProgress();
                                 setIsLoading(false);
                         });
         };
@@ -328,6 +357,38 @@ const UserDashboard: React.FC = () => {
                 }
         };
 
+        // Add a function to simulate progress for long operations
+        const simulateProgress = () => {
+                // Reset progress
+                setLoadingProgress(0);
+                setLoadingMessage("Creating your form...");
+
+                // Start progress simulation
+                let progress = 0;
+                const interval = setInterval(() => {
+                        progress += Math.random() * 5;
+
+                        if (progress < 40) {
+                                setLoadingMessage("Generating form structure...");
+                                setLoadingProgress(Math.min(progress, 40));
+                        } else if (progress < 70) {
+                                setLoadingMessage("Building form fields...");
+                                setLoadingProgress(Math.min(progress, 70));
+                        } else if (progress < 95) {
+                                setLoadingMessage("Adding validation and logic...");
+                                setLoadingProgress(Math.min(progress, 95));
+                        }
+
+                        // Cap at 95% - the final 5% happens when API actually returns
+                        if (progress >= 95) {
+                                setLoadingProgress(95);
+                                clearInterval(interval);
+                        }
+                }, 800);
+
+                return () => clearInterval(interval);
+        };
+
         return (
                 <div className="min-h-screen bg-black text-white flex flex-col pt-16">
                         <Dialog open={showWarning} onOpenChange={setShowWarning}>
@@ -350,7 +411,19 @@ const UserDashboard: React.FC = () => {
                                         {!formSchema && (
                                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 min-h-[200px] mb-6 shadow-lg">
                                                         {isLoading ? (
-                                                                <div className="flex items-center justify-center h-full">
+                                                                <div className="flex flex-col items-center justify-center h-full py-8">
+                                                                        <div className="w-full max-w-sm mb-4">
+                                                                                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                                                                                        <div
+                                                                                                className="h-full bg-blue-500 transition-all duration-300"
+                                                                                                style={{ width: `${loadingProgress}%` }}
+                                                                                        ></div>
+                                                                                </div>
+                                                                                <div className="mt-2 text-center">
+                                                                                        <p className="text-gray-300">{loadingMessage}</p>
+                                                                                        <p className="text-xs text-gray-500 mt-1">This may take up to 3 minutes</p>
+                                                                                </div>
+                                                                        </div>
                                                                         <Loader variant="spinner" size="lg" />
                                                                 </div>
                                                         ) : response ? (
@@ -469,7 +542,10 @@ const UserDashboard: React.FC = () => {
                                                                         }
                                                                 >
                                                                         {isLoading ? (
-                                                                                <Loader variant="spinner" size="sm" />
+                                                                                <div className="flex items-center space-x-1">
+                                                                                        <Loader variant="spinner" size="sm" />
+                                                                                        <span className="text-xs">{Math.round(loadingProgress)}%</span>
+                                                                                </div>
                                                                         ) : formSchema ? (
                                                                                 <Edit2 className="h-5 w-5" />
                                                                         ) : (
