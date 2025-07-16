@@ -45,18 +45,7 @@ const Loader = React.forwardRef<HTMLDivElement, LoaderProps>(
                 return (
                         <div ref={ref} className={cn("flex items-center justify-center", className)} {...props}>
                                 {variant === "spinner" && (
-                                        <div
-                                                className={cn(
-                                                        "animate-spin rounded-full border-2 border-opacity-25",
-                                                        sizeClasses[size].spinner
-                                                )}
-                                                style={{
-                                                        borderTopColor: `currentColor`,
-                                                        borderRightColor: "transparent",
-                                                        borderBottomColor: "transparent",
-                                                        borderLeftColor: "transparent",
-                                                }}
-                                        ></div>
+                                        
                                 )}
 
                                 {variant === "dots" && (
