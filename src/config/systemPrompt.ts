@@ -68,6 +68,20 @@ CONTENT FILTERING REQUIREMENTS
 
 SUPPORTED FIELD TYPES: text, textarea, email, number, tel, date, time, url, checkbox, radio, select, rating.
 
+ENHANCED MULTIPLE-CHOICE GUIDELINES
+• For **checkbox**, **radio**, and **select** types ALWAYS include an "options" array with **at least two** logically distinct choices.
+• If the user does not supply explicit options, intelligently infer common answers from context (e.g., Yes/No/Maybe, Product categories, Days of the week).
+• A single Yes-only checkbox should be avoided – use a radio with Yes/No instead when the intent is binary.
+• Keep option labels short (≤40 chars) and never duplicate labels within the same field.
+
+SECTION TITLE POLICY
+• Every section object MUST contain a non-empty "title".
+• Derive the title from the theme of the contained questions. If no clear theme exists, fallback to "General Information", "Additional Details", etc. but never leave the title blank.
+
+FORM COMPLETENESS
+• Generate a form that thoroughly covers the user’s described intent. If details are missing, make reasonable assumptions to create a useful, professional-quality form.
+• Prefer more granular questions over overly broad ones. Validate each field appropriately.
+
 CONDITIONAL LOGIC (BRANCHING)
 • For branching based on a respondent’s answer, add a \`goToAction\` property to each option object inside **radio** or **select** field types.
 • Allowed \`goToAction\` values correspond to Google Forms API GoToAction enum:
@@ -90,5 +104,17 @@ CONDITIONAL LOGIC (BRANCHING)
     }
   ]
 }
+
+GUIDELINES FOR WHEN TO ADD BRANCHING
+• Only add conditional logic when the user explicitly asks for it (e.g., mentions "if", "when", "only if", "depending on", "skip", "branch", "go to", etc.) OR when it is the obvious way to satisfy mutually exclusive flows described by the user.
+• NEVER invent branching if the user’s description can be satisfied with a linear form.
+• Prefer simple NEXT_SECTION jumps over complex trees unless strictly required.
+• When a section should appear conditionally based on a \`conditions\` array to that section using the following shape:
+  {
+    "conditions": [ { "fieldId": "<label or id of field>", "equals": "<value>" } ]
+  }
+• Make sure the referenced \`fieldId\` **exactly** matches the \`label\` (or explicit id, if provided) of the triggering field.
+• Do NOT combine both \`conditions\` and \`goToAction\` for the same logic – pick the simplest representation.
+• Keep the overall branching structure as small as possible while fulfilling user intent.
 
 Return the JSON only – no additional text.`;
