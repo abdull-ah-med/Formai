@@ -54,23 +54,27 @@ function mapField(field: any, index: number): forms_v1.Schema$Request {
 			break;
 		case "radio":
 		case "select": {
-			const options = (field.options as any[]).map((opt) => {
+			const rawOptions = (field.options as any[]).map((opt) => {
 				if (typeof opt === "string") return { value: opt } as forms_v1.Schema$Option;
-				const option: forms_v1.Schema$Option = { value: opt.label || opt.text || "" };
-				if (opt.goTo === "NEXT_SECTION" || opt.goTo === "SUBMIT_FORM")
-					option.goToAction = opt.goTo;
-				else option.goToSectionId = opt.goTo;
-				return option;
+				const base: forms_v1.Schema$Option = { value: opt.label || opt.text || "" };
+				if (opt.goTo === "NEXT_SECTION" || opt.goTo === "SUBMIT_FORM") {
+					base.goToAction = opt.goTo; // built-in actions are safe immediately
+				}
+				// For non built-in goTo targets we defer setting navigation until we know the
+				// actual section itemId.
+				return base;
 			});
-			// ensure navigability invariant
-			const anyNav = options.some((o) => "goToAction" in o || "goToSectionId" in o);
-			const patched = anyNav
-				? options.map((o) =>
+			const hasPlannedNav = (field.options as any[]).some(
+				(o) => typeof o !== "string" && o.goTo !== undefined
+			);
+			const patched = hasPlannedNav
+				? rawOptions.map((o) =>
 						"goToAction" in o || "goToSectionId" in o
 							? o
 							: { ...o, goToAction: "NEXT_SECTION" }
 				  )
-				: options;
+				: rawOptions;
+
 			q.choiceQuestion = {
 				type: field.type === "radio" ? "RADIO" : "DROP_DOWN",
 				options: patched,
