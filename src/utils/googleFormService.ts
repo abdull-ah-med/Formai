@@ -251,8 +251,14 @@ function validateBranchingNavigation(schema: FormSchema) {
 		}
 	});
 
+	console.debug("[branch-check] navInfos", navInfos);
+	console.debug(
+		"[branch-check] section conditions",
+		(schema.sections || []).map((s) => ({ title: s.title, conditions: (s as any).conditions }))
+	);
+
 	if (errors.length) {
-		console.error("Branching validation failed:", errors);
+		console.error("[branch-check] UNSATISFIED", errors);
 		throw new Error("Branching validation error: " + errors.join(" | "));
 	}
 
