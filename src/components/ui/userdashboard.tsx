@@ -38,7 +38,7 @@ const UserDashboard: React.FC = () => {
 	const autoResize = () => {
 		const textarea = textareaRef.current;
 		if (textarea) {
-			const MAX_HEIGHT = 192; // 12rem ~ 192px
+			const MAX_HEIGHT = 128; // 8rem ~ 128px
 			textarea.style.height = "auto";
 			if (textarea.scrollHeight > MAX_HEIGHT) {
 				textarea.style.height = `${MAX_HEIGHT}px`;
@@ -66,38 +66,31 @@ const UserDashboard: React.FC = () => {
 			let processedSchema = { ...formSchema };
 
 			// Handle case when form is loaded from history without proper sections
-			if (!processedSchema.sections || !processedSchema.sections.length) {
-				// Create sections from fields if they exist
-				if (processedSchema.fields && processedSchema.fields.length) {
+			if (!processedSchema.sections || processedSchema.sections.length === 0) {
+				let fields: any[] = [];
+
+				if (processedSchema.fields && processedSchema.fields.length > 0) {
+					fields = processedSchema.fields;
+				} else if (processedSchema.questions && Array.isArray(processedSchema.questions)) {
+					fields = processedSchema.questions.map((question: FormQuestion) => ({
+						label: question.label,
+						type: question.type === "dropdown" ? "select" : "text",
+						required: false,
+						options: question.options?.map((opt) => opt.text),
+					}));
+				}
+
+				if (fields.length > 0) {
 					processedSchema.sections = [
 						{
 							title: processedSchema.title,
 							description: processedSchema.description,
-							fields: processedSchema.fields,
+							fields: fields,
 						},
 					];
+					// We've modified the schema, so we should update it in the context
+					setFormData(processedSchema, formId);
 				}
-				// Convert questions to fields format if they exist
-				else if (processedSchema.questions && Array.isArray(processedSchema.questions)) {
-					processedSchema.fields = processedSchema.questions.map(
-						(question: FormQuestion) => ({
-							label: question.label,
-							type: question.type === "dropdown" ? "select" : "text",
-							required: false,
-							options: question.options?.map((opt) => opt.text),
-						})
-					);
-
-					processedSchema.sections = [
-						{
-							title: processedSchema.title,
-							description: processedSchema.description,
-							fields: processedSchema.fields,
-						},
-					];
-				}
-
-				setFormData(processedSchema, formId);
 			}
 		}
 	}, [formSchema, formId, setFormData]);
@@ -622,7 +615,7 @@ const UserDashboard: React.FC = () => {
 									}
 									ref={textareaRef}
 									onInput={autoResize}
-									className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none resize-none scrollbar-hide rounded-xl w-full min-h-[3rem] max-h-48"
+									className="flex-grow bg-transparent p-4 pr-14 text-white placeholder-gray-400 focus:outline-none resize-none rounded-xl w-full min-h-[2.5rem] max-h-32"
 								/>
 								<button
 									type="submit"

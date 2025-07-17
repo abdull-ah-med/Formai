@@ -6,33 +6,35 @@ import SmoothScroll from "./components/ui/smooth-scroll";
 import AppRoutes from "./routes";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import SessionManager from "./components/SessionManager";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { FormProvider } from "./contexts/FormContext";
 
-function App() {
-        useEffect(() => {
-                // Global authentication check on app initialization
-                // Removed legacy token migration and validation logic
-        }, []);
+function AppContent() {
+	const { isAuthenticated } = useAuth();
+	return (
+		<div className={`min-h-screen ${!isAuthenticated ? "bg-dark-gradient" : "bg-black"}`}>
+			<SessionManager />
+			<Navbar />
+			<AppRoutes />
+			<Footer />
+		</div>
+	);
+}
 
-        return (
-                <ErrorBoundary>
-                        <Router>
-                                <AuthProvider>
-                                        <FormProvider>
-                                                <SmoothScroll>
-                                                        <div className="min-h-screen bg-black text-white">
-                                                                <SessionManager />
-                                                                <Navbar />
-                                                                <AppRoutes />
-                                                                <Footer />
-                                                        </div>
-                                                </SmoothScroll>
-                                        </FormProvider>
-                                </AuthProvider>
-                        </Router>
-                </ErrorBoundary>
-        );
+function App() {
+	return (
+		<ErrorBoundary>
+			<Router>
+				<AuthProvider>
+					<FormProvider>
+						<SmoothScroll>
+							<AppContent />
+						</SmoothScroll>
+					</FormProvider>
+				</AuthProvider>
+			</Router>
+		</ErrorBoundary>
+	);
 }
 
 export default App;

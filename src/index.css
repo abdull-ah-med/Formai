@@ -117,6 +117,10 @@
 	}
 }
 
+.bg-dark-gradient {
+	background: radial-gradient(ellipse at top, #1c1c1c, #000000);
+}
+
 /* Custom scrollbar styling */
 *::-webkit-scrollbar {
 	width: 8px;
