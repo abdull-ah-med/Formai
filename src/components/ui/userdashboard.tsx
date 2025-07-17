@@ -30,6 +30,7 @@ const UserDashboard: React.FC = () => {
 	const [revisionPrompt, setRevisionPrompt] = useState("");
 	const [isInputFocused, setIsInputFocused] = useState(false);
 	const [showWarning, setShowWarning] = useState(false);
+	const [showLengthWarning, setShowLengthWarning] = useState(false);
 
 	// Reference for the textarea to auto-resize as the user types
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -48,6 +49,19 @@ const UserDashboard: React.FC = () => {
 				textarea.style.overflowY = "hidden";
 			}
 		}
+	};
+
+	const PROMPT_CHAR_LIMIT = 4000; // Approx. 1000 tokens @ 4 chars/token
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		const value = e.target.value;
+		if (formSchema) {
+			setRevisionPrompt(value);
+		} else {
+			setPrompt(value);
+		}
+
+		setShowLengthWarning(value.length > PROMPT_CHAR_LIMIT);
 	};
 
 	// Re-run resize whenever the prompt changes or when we switch between initial/revision modes
@@ -601,13 +615,7 @@ const UserDashboard: React.FC = () => {
 							<div className="bg-black rounded-[10px] relative z-10">
 								<textarea
 									value={formSchema ? revisionPrompt : prompt}
-									onChange={(e) =>
-										formSchema
-											? setRevisionPrompt(
-													e.target.value
-											  )
-											: setPrompt(e.target.value)
-									}
+									onChange={handleInputChange}
 									placeholder={
 										formSchema
 											? "Describe changes you want to make to the form..."
@@ -639,6 +647,13 @@ const UserDashboard: React.FC = () => {
 								</button>
 							</div>
 						</div>
+						{showLengthWarning && (
+							<p className="text-xs text-center text-yellow-400 mt-2 px-4">
+								{formSchema
+									? "That's a detailed revision! Our AI will do its best, but with long requests, some nuances might get lost in translation."
+									: "Whoa, that's a long prompt! Our AI is smart, but it might get a bit flustered by this much text. Some details could be overlooked."}
+							</p>
+						)}
 						{!formSchema && (
 							<p className="text-xs text-center text-gray-500 mt-2">
 								Formai may produce inaccurate information about forms,
