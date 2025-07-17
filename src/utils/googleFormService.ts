@@ -265,6 +265,14 @@ function validateBranchingNavigation(schema: FormSchema) {
 	console.info("[branching-validator] All conditional sections have corresponding navigation.");
 }
 
+// Helper to slugify section titles into safe IDs
+function slugify(text: string): string {
+	return text
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-|-$/g, "");
+}
+
 export async function createGoogleForm(
 	schema: FormSchema,
 	oauth2Client: OAuth2Client
@@ -321,36 +329,28 @@ export async function createGoogleForm(
 		if (schema.sections && schema.sections.length > 0) {
 			let currentIndex = 0;
 
-			// Add each section and its fields
+			// Add each section and its fields, creating SectionHeaderItem for section >0
 			schema.sections.forEach((section, sectionIndex) => {
-				// Add section title and description as a text item
-				requests.push({
-					createItem: {
-						item: {
-							title: section.title,
-							description: section.description || "",
-							textItem: {},
+				if (sectionIndex > 0) {
+					const sectionId = slugify(section.title) || `section-${sectionIndex + 1}`;
+					requests.push({
+						createItem: {
+							item: {
+								itemId: sectionId,
+								title: section.title,
+								description: section.description || "",
+								// @ts-ignore - SectionHeaderItem may not be in typings but is supported by API
+								sectionHeaderItem: {},
+							} as any,
+							location: { index: currentIndex++ },
 						},
-						location: { index: currentIndex++ },
-					},
-				});
+					});
+				}
 
 				// Add fields for this section
 				section.fields.forEach((field) => {
 					requests.push(mapFieldToGoogleFormsRequest(field, currentIndex++));
 				});
-
-				// Add page break after each section except the last one
-				if (sectionIndex < schema.sections!.length - 1) {
-					requests.push({
-						createItem: {
-							item: {
-								pageBreakItem: {},
-							},
-							location: { index: currentIndex++ },
-						},
-					});
-				}
 			});
 		} else if (schema.fields) {
 			// Fallback to the old fields array for backward compatibility
