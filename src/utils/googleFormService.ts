@@ -270,6 +270,94 @@ function slugify(text: string): string {
 	return /^[a-z]/.test(cleaned) ? cleaned : `s_${cleaned}`;
 }
 
+// After the initial form structure is created we need to attach navigation rules that
+// jump to specific sections. This must be done in a second batchUpdate because the
+// target section itemIds are unknown until Google assigns them.
+async function applyConditionalNavigation(
+	formsClient: ReturnType<typeof google.forms>,
+	formId: string,
+	schema: FormSchema
+) {
+	// Fetch the freshly-created form to discover real itemIds
+	const formResp = await formsClient.forms.get({ formId });
+	const items = formResp.data.items || [];
+
+	// Build look-up tables
+	const sectionTitleToId = new Map<string, string>();
+	const questionLabelToId = new Map<string, string>();
+
+	items.forEach((it) => {
+		if (!it.itemId) return;
+		if (it.pageBreakItem) {
+			sectionTitleToId.set(it.title || "", it.itemId);
+		} else if (it.questionItem) {
+			questionLabelToId.set(it.title || "", it.itemId);
+		}
+	});
+
+	const navRequests: forms_v1.Schema$Request[] = [];
+
+	const processField = (field: FormField) => {
+		if (!(field.type === "radio" || field.type === "select")) return;
+		if (!field.options || !field.options.length) return;
+		// Do any options reference a section title?
+		const needsNav = field.options.some((opt) => typeof opt !== "string" && (opt as any).goToSectionId);
+		if (!needsNav) return;
+
+		const questionItemId = questionLabelToId.get(field.label);
+		if (!questionItemId) return; // Cannot locate question
+
+		// Re-build options array with concrete goToSectionId values
+		const updatedOptions: forms_v1.Schema$Option[] = field.options.map((opt) => {
+			if (typeof opt === "string") {
+				return { value: opt } as forms_v1.Schema$Option;
+			}
+
+			const optionObj: forms_v1.Schema$Option = {
+				value: opt.label || opt.text || "",
+			};
+			if (opt.goToAction) optionObj.goToAction = opt.goToAction;
+			if ((opt as any).goToSectionId) {
+				const targetTitle = (opt as any).goToSectionId;
+				const targetId = sectionTitleToId.get(targetTitle);
+				if (targetId) {
+					optionObj.goToSectionId = targetId;
+				}
+			}
+			return optionObj;
+		});
+
+		navRequests.push({
+			updateItem: {
+				item: {
+					itemId: questionItemId,
+					questionItem: {
+						question: {
+							choiceQuestion: {
+								options: updatedOptions,
+							},
+						},
+					},
+				} as any,
+				updateMask: "questionItem.question.choiceQuestion.options",
+			},
+		});
+	};
+
+	if (schema.sections && schema.sections.length) {
+		schema.sections.forEach((sec) => sec.fields.forEach(processField));
+	} else if (schema.fields) {
+		schema.fields.forEach(processField);
+	}
+
+	if (navRequests.length) {
+		await formsClient.forms.batchUpdate({
+			formId,
+			requestBody: { requests: navRequests },
+		});
+	}
+}
+
 export async function createGoogleForm(
 	schema: FormSchema,
 	oauth2Client: OAuth2Client
@@ -319,26 +407,21 @@ export async function createGoogleForm(
 			},
 		];
 
-		// Handle sections if they exist, otherwise use fields
 		if (schema.sections && schema.sections.length > 0) {
 			let currentIndex = 0;
 
-			// Add each section and its fields, creating SectionHeaderItem for section >0
-			schema.sections.forEach((section, sectionIndex) => {
-				if (sectionIndex > 0) {
-					const sectionId = slugify(section.title) || `section-${sectionIndex + 1}`;
-					requests.push({
-						createItem: {
-							item: {
-								// New section header (page break). Let API assign itemId to avoid Invalid ID errors.
-								title: section.title,
-								description: section.description || "",
-								pageBreakItem: {},
-							} as any,
-							location: { index: currentIndex++ },
-						},
-					});
-				}
+			// Add each section and its fields, always creating a SectionHeaderItem first
+			schema.sections.forEach((section) => {
+				requests.push({
+					createItem: {
+						item: {
+							title: section.title,
+							description: section.description || "",
+							pageBreakItem: {},
+						} as any,
+						location: { index: currentIndex++ },
+					},
+				});
 
 				// Add fields for this section
 				section.fields.forEach((field) => {
@@ -362,7 +445,10 @@ export async function createGoogleForm(
 			});
 		}
 
-		// 4. Get the form details to return the responder URI
+		// 4. Apply conditional navigation
+		await applyConditionalNavigation(forms, formId, schema);
+
+		// 5. Get the form details to return the responder URI
 		const form = await forms.forms.get({ formId });
 		const responderUri = form.data.responderUri || "";
 

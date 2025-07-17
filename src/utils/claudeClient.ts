@@ -25,6 +25,11 @@ export interface FormField {
 				 * Only respected for RADIO or DROP_DOWN questions.
 				 */
 				goToAction?: "NEXT_SECTION" | "RESTART_FORM" | "SUBMIT_FORM";
+				/**
+				 * Title of the section to jump to. The service will map this title to the
+				 * real section itemId after the form is created.
+				 */
+				goToSectionId?: string;
 		  }
 	>;
 }
