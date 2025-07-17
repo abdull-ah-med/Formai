@@ -285,9 +285,24 @@ const UserDashboard: React.FC = () => {
 					);
 				case "checkbox":
 					return (
-						<div className="mt-2 flex items-center">
-							<div className="w-4 h-4 border border-white/30 mr-2"></div>
-							<span className="text-gray-300 text-sm">Yes</span>
+						<div className="mt-2 space-y-2">
+							{(field.options && field.options.length
+								? field.options
+								: ["Yes", "No"]
+							).map((option: any, i: number) => {
+								const optionText =
+									typeof option === "string"
+										? option
+										: option.text || option.label;
+								return (
+									<div key={i} className="flex items-center">
+										<div className="w-4 h-4 border border-white/30 mr-2"></div>
+										<span className="text-gray-300 text-sm">
+											{optionText}
+										</span>
+									</div>
+								);
+							})}
 						</div>
 					);
 				default:
