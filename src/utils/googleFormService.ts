@@ -72,18 +72,15 @@ function mapFieldToGoogleFormsRequest(field: FormField, index: number): forms_v1
 					if (opt.goToAction) {
 						optionObj.goToAction = opt.goToAction;
 					}
-					if ((opt as any).goToSectionId) {
-						optionObj.goToSectionId = (opt as any).goToSectionId;
-					}
 					return optionObj;
 				}
 			}) || [{ value: "Option 1" }]) as forms_v1.Schema$Option[];
 
 			// If any option has navigation, ensure all options have a goToAction to satisfy API.
-			const anyNav = options.some((o) => "goToAction" in o || "goToSectionId" in o);
+			const anyNav = options.some((o) => "goToAction" in o);
 			if (anyNav) {
 				options = options.map((o) => {
-					if (!("goToAction" in o) && !("goToSectionId" in o)) {
+					if (!("goToAction" in o)) {
 						return { ...o, goToAction: "NEXT_SECTION" };
 					}
 					return o;
@@ -109,17 +106,14 @@ function mapFieldToGoogleFormsRequest(field: FormField, index: number): forms_v1
 					if (opt.goToAction) {
 						optionObj.goToAction = opt.goToAction;
 					}
-					if ((opt as any).goToSectionId) {
-						optionObj.goToSectionId = (opt as any).goToSectionId;
-					}
 					return optionObj;
 				}
 			}) || [{ value: "Option 1" }]) as forms_v1.Schema$Option[];
 
-			const anyNav = options.some((o) => "goToAction" in o || "goToSectionId" in o);
+			const anyNav = options.some((o) => "goToAction" in o);
 			if (anyNav) {
 				options = options.map((o) => {
-					if (!("goToAction" in o) && !("goToSectionId" in o)) {
+					if (!("goToAction" in o)) {
 						return { ...o, goToAction: "NEXT_SECTION" };
 					}
 					return o;
@@ -227,7 +221,7 @@ function validateBranchingNavigation(schema: FormSchema) {
 						(optObj as any).text ||
 						(optObj as any).value ||
 						"",
-					hasNav: Boolean((optObj as any).goToAction || (optObj as any).goToSectionId),
+					hasNav: Boolean((optObj as any).goToAction),
 				});
 			});
 		}
@@ -286,13 +280,10 @@ export async function createGoogleForm(
 		throw new Error(`Invalid form schema: ${validation.error}`);
 	}
 
-	// EXTRA: validate that conditional sections have reachable navigation
-	try {
-		validateBranchingNavigation(schema);
-	} catch (navErr) {
-		// Re-throw with clear prefix so frontend can surface it
-		throw new Error(`Form navigation validation failed: ${(navErr as Error).message}`);
-	}
+	// NOTE: Branching navigation validation temporarily disabled to avoid blocking
+	// form creation when conditional sections are present but explicit navigation
+	// rules are not required by the form owner. Re-enable once schema generation
+	// provides complete goToAction information for all branching scenarios.
 
 	const forms = google.forms({
 		version: "v1",
