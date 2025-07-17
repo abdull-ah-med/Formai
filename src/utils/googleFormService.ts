@@ -1,6 +1,14 @@
 import { google, forms_v1 } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
-import { FormSchema, FormField, FormSection } from "./claudeClient";
+import { FormSchema, FormField } from "./claudeClient";
+
+// Local type override to include optional conditions array (used for dashboard metadata)
+interface SectionWithConditions {
+	title: string;
+	description?: string;
+	fields: FormField[];
+	conditions?: Array<{ fieldId: string; equals?: string; notEquals?: string }>;
+}
 
 function mapFieldToGoogleFormsRequest(field: FormField, index: number): forms_v1.Schema$Request {
 	const request: forms_v1.Schema$Request = {
@@ -194,6 +202,65 @@ function validateFormSchema(schema: FormSchema): { valid: boolean; error?: strin
 	}
 }
 
+// DEBUG helper – checks that conditional sections are reachable via goTo navigation
+function validateBranchingNavigation(schema: FormSchema) {
+	if (!schema.sections) return; // nothing to do
+
+	const errors: string[] = [];
+
+	// Build a quick lookup of questions and their option navigation
+	type NavInfo = { fieldLabel: string; optionValue: string; hasNav: boolean };
+	const navInfos: NavInfo[] = [];
+
+	const collectFromField = (field: FormField) => {
+		if (field.type === "radio" || field.type === "select") {
+			(field.options || []).forEach((opt) => {
+				const optObj = typeof opt === "string" ? { value: opt } : opt;
+				navInfos.push({
+					fieldLabel: field.label,
+					optionValue:
+						(optObj as any).label ||
+						(optObj as any).text ||
+						(optObj as any).value ||
+						"",
+					hasNav: Boolean((optObj as any).goToAction || (optObj as any).goToSectionId),
+				});
+			});
+		}
+	};
+
+	// gather all fields
+	if (schema.sections) {
+		(schema.sections as SectionWithConditions[]).forEach((section) =>
+			section.fields.forEach(collectFromField)
+		);
+	}
+	if (schema.fields) {
+		schema.fields.forEach(collectFromField);
+	}
+
+	// Validate each conditional section
+	(schema.sections as SectionWithConditions[]).forEach((section) => {
+		if (section.conditions && section.conditions.length) {
+			(section.conditions as any[]).forEach((cond) => {
+				const related = navInfos.filter((n) => n.fieldLabel === cond.fieldId);
+				if (!related.length || !related.some((r) => r.hasNav)) {
+					errors.push(
+						`Section "${section.title}" claims condition on field "${cond.fieldId}" but no option navigation found.`
+					);
+				}
+			});
+		}
+	});
+
+	if (errors.length) {
+		console.error("Branching validation failed:", errors);
+		throw new Error("Branching validation error: " + errors.join(" | "));
+	}
+
+	console.info("[branching-validator] All conditional sections have corresponding navigation.");
+}
+
 export async function createGoogleForm(
 	schema: FormSchema,
 	oauth2Client: OAuth2Client
@@ -202,6 +269,14 @@ export async function createGoogleForm(
 	const validation = validateFormSchema(schema);
 	if (!validation.valid) {
 		throw new Error(`Invalid form schema: ${validation.error}`);
+	}
+
+	// EXTRA: validate that conditional sections have reachable navigation
+	try {
+		validateBranchingNavigation(schema);
+	} catch (navErr) {
+		// Re-throw with clear prefix so frontend can surface it
+		throw new Error(`Form navigation validation failed: ${(navErr as Error).message}`);
 	}
 
 	const forms = google.forms({
