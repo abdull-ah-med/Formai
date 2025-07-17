@@ -17,19 +17,14 @@ export interface FormField {
 	options?: Array<
 		| string
 		| {
-				text?: string;
 				label?: string;
+				text?: string;
 				/**
-				 * Follow Google Forms API GoToAction enum. Supported values:
-				 * "NEXT_SECTION", "RESTART_FORM", "SUBMIT_FORM".
-				 * Only respected for RADIO or DROP_DOWN questions.
+				 * Navigation directive – REQUIRED for every option of radio/select.
+				 * "NEXT_SECTION" | "SUBMIT_FORM" for built-in actions, or the exact
+				 * Section.title to jump to for branching.
 				 */
-				goToAction?: "NEXT_SECTION" | "RESTART_FORM" | "SUBMIT_FORM";
-				/**
-				 * Title of the section to jump to. The service will map this title to the
-				 * real section itemId after the form is created.
-				 */
-				goToSectionId?: string;
+				goTo: "NEXT_SECTION" | "SUBMIT_FORM" | string;
 		  }
 	>;
 }

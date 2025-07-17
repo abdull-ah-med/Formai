@@ -1,6 +1,7 @@
 import { google, forms_v1 } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 import { FormSchema, FormField } from "./claudeClient";
+import { validateFormSchemaStrict } from "../schemas/formSchema";
 
 // Local type override to include optional conditions array (used for dashboard metadata)
 interface SectionWithConditions {
@@ -69,18 +70,26 @@ function mapFieldToGoogleFormsRequest(field: FormField, index: number): forms_v1
 					const optionObj: forms_v1.Schema$Option = {
 						value: opt.label || opt.text || "",
 					} as forms_v1.Schema$Option;
-					if (opt.goToAction) {
-						optionObj.goToAction = opt.goToAction;
+					const goTarget =
+						(opt as any).goTo ??
+						(opt as any).goToAction ??
+						(opt as any).goToSectionId;
+					if (goTarget) {
+						if (goTarget === "NEXT_SECTION" || goTarget === "SUBMIT_FORM") {
+							optionObj.goToAction = goTarget;
+						} else {
+							optionObj.goToSectionId = goTarget;
+						}
 					}
 					return optionObj;
 				}
 			}) || [{ value: "Option 1" }]) as forms_v1.Schema$Option[];
 
 			// If any option has navigation, ensure all options have a goToAction to satisfy API.
-			const anyNav = options.some((o) => "goToAction" in o);
+			const anyNav = options.some((o) => "goToAction" in o || "goToSectionId" in o);
 			if (anyNav) {
 				options = options.map((o) => {
-					if (!("goToAction" in o)) {
+					if (!("goToAction" in o) && !("goToSectionId" in o)) {
 						return { ...o, goToAction: "NEXT_SECTION" };
 					}
 					return o;
@@ -103,17 +112,16 @@ function mapFieldToGoogleFormsRequest(field: FormField, index: number): forms_v1
 					const optionObj: forms_v1.Schema$Option = {
 						value: opt.label || opt.text || "",
 					};
-					if (opt.goToAction) {
-						optionObj.goToAction = opt.goToAction;
-					}
+					const legacyAction = (opt as any).goToAction;
+					if (legacyAction) optionObj.goToAction = legacyAction;
 					return optionObj;
 				}
 			}) || [{ value: "Option 1" }]) as forms_v1.Schema$Option[];
 
-			const anyNav = options.some((o) => "goToAction" in o);
+			const anyNav = options.some((o) => "goToAction" in o || "goToSectionId" in o);
 			if (anyNav) {
 				options = options.map((o) => {
-					if (!("goToAction" in o)) {
+					if (!("goToAction" in o) && !("goToSectionId" in o)) {
 						return { ...o, goToAction: "NEXT_SECTION" };
 					}
 					return o;
@@ -143,61 +151,7 @@ function mapFieldToGoogleFormsRequest(field: FormField, index: number): forms_v1
 
 // Helper function to validate the form schema
 function validateFormSchema(schema: FormSchema): { valid: boolean; error?: string } {
-	try {
-		// Check for required top-level fields
-		if (!schema.title) {
-			return { valid: false, error: "Form schema is missing title" };
-		}
-		if (!schema.description) {
-			return { valid: false, error: "Form schema is missing description" };
-		}
-
-		// Check that either sections or fields exist
-		if (!schema.sections?.length && !schema.fields?.length) {
-			return { valid: false, error: "Form schema must have either sections or fields" };
-		}
-
-		// If using sections, validate each section
-		if (schema.sections?.length) {
-			for (const section of schema.sections) {
-				if (!section.title) {
-					return { valid: false, error: "Section is missing title" };
-				}
-				if (!section.fields || !Array.isArray(section.fields) || section.fields.length === 0) {
-					return { valid: false, error: `Section "${section.title}" has no fields` };
-				}
-
-				// Validate each field in the section
-				for (const field of section.fields) {
-					if (!field.label) {
-						return { valid: false, error: "Field is missing label" };
-					}
-					if (!field.type) {
-						return {
-							valid: false,
-							error: `Field "${field.label}" is missing type`,
-						};
-					}
-				}
-			}
-		}
-
-		// If using fields directly, validate each field
-		if (schema.fields?.length) {
-			for (const field of schema.fields) {
-				if (!field.label) {
-					return { valid: false, error: "Field is missing label" };
-				}
-				if (!field.type) {
-					return { valid: false, error: `Field "${field.label}" is missing type` };
-				}
-			}
-		}
-
-		return { valid: true };
-	} catch (error) {
-		return { valid: false, error: `Schema validation error: ${(error as Error).message}` };
-	}
+	return validateFormSchemaStrict(schema as unknown);
 }
 
 // DEBUG helper – checks that conditional sections are reachable via goTo navigation
@@ -221,7 +175,11 @@ function validateBranchingNavigation(schema: FormSchema) {
 						(optObj as any).text ||
 						(optObj as any).value ||
 						"",
-					hasNav: Boolean((optObj as any).goToAction || (optObj as any).goToSectionId),
+					hasNav: Boolean(
+						(optObj as any).goToAction ||
+							(optObj as any).goToSectionId ||
+							(optObj as any).goTo
+					),
 				});
 			});
 		}
@@ -279,6 +237,12 @@ function slugify(text: string): string {
 // Mutates schema in-place: for each conditional section, ensure the referenced question options include a goToSectionId to that section.
 function ensureNavigationForConditions(schema: FormSchema) {
 	if (!schema.sections) return;
+	const canon = (txt: string) =>
+		txt
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, "_")
+			.replace(/_+/g, "_")
+			.replace(/^_+|_+$/g, "");
 	// Build quick label→field look-up (only radio/select) across all sections so far
 	const labelToField = new Map<string, FormField>();
 	for (const section of schema.sections) {
@@ -288,22 +252,25 @@ function ensureNavigationForConditions(schema: FormSchema) {
 			}
 		}
 	}
+	// Build canonical lookup for tolerant matching
+	const canonToField = new Map<string, FormField>();
+	labelToField.forEach((f, lbl) => canonToField.set(canon(lbl), f));
 	// Iterate again to apply navigation based on conditions
 	for (const section of schema.sections as SectionWithConditions[]) {
 		if (!section.conditions?.length) continue;
 		for (const cond of section.conditions) {
 			const targetSectionTitle = section.title;
-			const field = labelToField.get(cond.fieldId);
+			const field = canonToField.get(canon(cond.fieldId));
 			if (!field || !field.options) continue;
 			// Find matching options (if equals specified) else add to first option
 			let modified = false;
-			field.options = field.options.map((opt, idx) => {
+			field.options = (field.options as any[]).map((opt: any, idx: number) => {
 				if (typeof opt === "string") return opt; // skip string style
 				const value = opt.label || opt.text || "";
 				const shouldAdd = cond.equals ? value === cond.equals : idx === 0;
 				if (shouldAdd) {
 					modified = true;
-					return { ...opt, goToSectionId: targetSectionTitle } as any;
+					return { ...opt, goTo: targetSectionTitle } as any;
 				}
 				return opt;
 			});
@@ -311,16 +278,12 @@ function ensureNavigationForConditions(schema: FormSchema) {
 			if (!modified && Array.isArray(field.options) && field.options.length) {
 				const first = field.options[0];
 				if (typeof first !== "string") {
-					field.options[0] = { ...first, goToSectionId: targetSectionTitle } as any;
+					field.options[0] = { ...first, goTo: targetSectionTitle } as any;
 				}
 			}
 		}
 	}
 }
-
-// After the initial form structure is created we need to attach navigation rules that
-// jump to specific sections. This must be done in a second batchUpdate because the
-// target section itemIds are unknown until Google assigns them.
 async function applyConditionalNavigation(
 	formsClient: ReturnType<typeof google.forms>,
 	formId: string,
@@ -355,7 +318,9 @@ async function applyConditionalNavigation(
 		if (!(field.type === "radio" || field.type === "select")) return;
 		if (!field.options || !field.options.length) return;
 		// Do any options reference a section title?
-		const needsNav = field.options.some((opt) => typeof opt !== "string" && (opt as any).goToSectionId);
+		const needsNav = field.options.some(
+			(opt) => typeof opt !== "string" && ((opt as any).goTo || (opt as any).goToSectionId)
+		);
 		if (!needsNav) return;
 
 		const questionItemId = questionLabelToId.get(field.label);
@@ -370,8 +335,15 @@ async function applyConditionalNavigation(
 			const optionObj: forms_v1.Schema$Option = {
 				value: opt.label || opt.text || "",
 			};
-			if (opt.goToAction) optionObj.goToAction = opt.goToAction;
-			if ((opt as any).goToSectionId) {
+			const legacyAction = (opt as any).goToAction;
+			if (legacyAction) optionObj.goToAction = legacyAction;
+			if ((opt as any).goTo) {
+				const targetTitle = (opt as any).goTo;
+				const targetId = sectionTitleToId.get(targetTitle);
+				if (targetId) {
+					optionObj.goToSectionId = targetId;
+				}
+			} else if ((opt as any).goToSectionId) {
 				const targetTitle = (opt as any).goToSectionId;
 				const targetId = sectionTitleToId.get(targetTitle);
 				if (targetId) {
