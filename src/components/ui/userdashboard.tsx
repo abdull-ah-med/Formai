@@ -140,20 +140,25 @@ const UserDashboard: React.FC = () => {
 		} catch (err: any) {
 			if (err.response?.status === 429) {
 				setError("Daily form generation limit reached. Try again tomorrow.");
-				setResponse("Error: Daily form generation limit reached. Try again tomorrow.");
+				setResponse(
+					"Whoa, you're a form-making machine! Our AI needs to recharge its creative juices (and maybe take a nap). Please come back tomorrow for a fresh batch of forms."
+				);
 			} else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
 				setError(
-					"The request timed out. This form may be too complex or our servers are busy."
+					"Looks like our AI is pondering the meaning of forms and took too long to respond. This can happen with very complex requests or when our servers are meditating. Please try a simpler request or try again later."
 				);
 				setResponse(
-					"Error: The request timed out. This form may be too complex or our servers are busy."
+					"Error: Looks like our AI is pondering the meaning of forms and took too long to respond. This can happen with very complex requests or when our servers are meditating. Please try a simpler request or try again later."
 				);
 			} else {
-				setError(err.response?.data?.error || "An error occurred while generating the form");
+				setError(
+					err.response?.data?.error ||
+						"Oops! Something went haywire. We've sent a distress signal to our team of caffeinated developers. Please try again in a bit."
+				);
 				setResponse(
 					`Error: ${
 						err.response?.data?.error ||
-						"An error occurred while generating the form"
+						"Oops! Something went haywire. We've sent a distress signal to our team of caffeinated developers. Please try again in a bit."
 					}`
 				);
 			}
@@ -211,11 +216,12 @@ const UserDashboard: React.FC = () => {
 			.catch((err: any) => {
 				if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
 					setError(
-						"The revision request timed out. Try a simpler request or try again later."
+						"Our AI got a little carried away revising and the request timed out. Try a simpler change, or give it another go in a moment."
 					);
 				} else {
 					setError(
-						err.response?.data?.error || "An error occurred while revising the form"
+						err.response?.data?.error ||
+							"A wild error appeared during revision! We're working on catching it. Please try your revision again."
 					);
 				}
 			})
