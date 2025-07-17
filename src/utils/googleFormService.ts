@@ -331,15 +331,23 @@ export async function createGoogleForm(
 		// Handle sections if they exist, otherwise use fields
 		if (schema.sections && schema.sections.length > 0) {
 			let currentIndex = 0;
+			const usedIds = new Set<string>();
 
-			// Add each section and its fields, creating SectionHeaderItem for section >0
+			// Add each section and its fields, creating PageBreakItem for section >0
 			schema.sections.forEach((section, sectionIndex) => {
 				if (sectionIndex > 0) {
-					const sectionId = slugify(section.title) || `section-${sectionIndex + 1}`;
+					let baseId = slugify(section.title) || `section_${sectionIndex + 1}`;
+					let uniqueId = baseId;
+					let counter = 1;
+					while (usedIds.has(uniqueId)) {
+						uniqueId = `${baseId}_${counter++}`;
+					}
+					usedIds.add(uniqueId);
+
 					requests.push({
 						createItem: {
 							item: {
-								// New section header (page break). Let API assign itemId to avoid Invalid ID errors.
+								itemId: uniqueId,
 								title: section.title,
 								description: section.description || "",
 								pageBreakItem: {},
