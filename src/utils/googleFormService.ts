@@ -282,6 +282,12 @@ async function applyConditionalNavigation(
 	const formResp = await formsClient.forms.get({ formId });
 	const items = formResp.data.items || [];
 
+	// Build index map for location requirement
+	const itemIdToIndex = new Map<string, number>();
+	items.forEach((it, idx) => {
+		if (it.itemId) itemIdToIndex.set(it.itemId, idx);
+	});
+
 	// Build look-up tables
 	const sectionTitleToId = new Map<string, string>();
 	const questionLabelToId = new Map<string, string>();
@@ -327,6 +333,9 @@ async function applyConditionalNavigation(
 			return optionObj;
 		});
 
+		const locationIndex = itemIdToIndex.get(questionItemId);
+		if (locationIndex === undefined) return;
+
 		navRequests.push({
 			updateItem: {
 				item: {
@@ -339,6 +348,7 @@ async function applyConditionalNavigation(
 						},
 					},
 				} as any,
+				location: { index: locationIndex },
 				updateMask: "questionItem.question.choiceQuestion.options",
 			},
 		});
