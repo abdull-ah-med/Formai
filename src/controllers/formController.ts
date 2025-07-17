@@ -7,6 +7,14 @@ import { OAuth2Client } from "google-auth-library";
 import { AuthTokenPayload } from "../middleware/verifyJWT";
 import { convertClaudeSchemaToUserSchema } from "../utils/formSchemaConverter";
 
+const isSameDay = (date1: Date, date2: Date) => {
+	return (
+		date1.getFullYear() === date2.getFullYear() &&
+		date1.getMonth() === date2.getMonth() &&
+		date1.getDate() === date2.getDate()
+	);
+};
+
 /**
  * Iterates over a raw schema from Claude and enriches it with a `conditions`
  * array on any section that is the target of a conditional `goTo` navigation.
@@ -63,6 +71,34 @@ export const generateForm = async (req: Request, res: Response) => {
 	}
 
 	try {
+		const user = await UserModel.findById(userId);
+		if (!user) {
+			return res.status(404).json({ success: false, error: "User not found." });
+		}
+
+		const today = new Date();
+		const creationData = user.dailyFormCreations || {
+			count: 0,
+			date: today,
+		};
+
+		if (isSameDay(creationData.date, today)) {
+			if (creationData.count >= 3) {
+				return res.status(429).json({
+					success: false,
+					error: "Whoa, you're a form-making machine! Our AI needs to recharge its creative juices (and maybe take a nap). Please come back tomorrow for a fresh batch of forms.",
+				});
+			}
+			creationData.count += 1;
+		} else {
+			// It's a new day, reset the counter
+			creationData.count = 1;
+			creationData.date = today;
+		}
+
+		user.dailyFormCreations = creationData;
+		await user.save();
+
 		const schemaFromClaude = await generateSchemaFromPrompt(prompt);
 
 		// Add conditional metadata for the front-end before saving/sending
