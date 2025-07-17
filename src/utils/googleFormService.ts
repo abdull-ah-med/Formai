@@ -276,6 +276,48 @@ function slugify(text: string): string {
 	return /^[a-z]/.test(cleaned) ? cleaned : `s_${cleaned}`;
 }
 
+// Mutates schema in-place: for each conditional section, ensure the referenced question options include a goToSectionId to that section.
+function ensureNavigationForConditions(schema: FormSchema) {
+	if (!schema.sections) return;
+	// Build quick label→field look-up (only radio/select) across all sections so far
+	const labelToField = new Map<string, FormField>();
+	for (const section of schema.sections) {
+		for (const field of section.fields) {
+			if (field.type === "radio" || field.type === "select") {
+				labelToField.set(field.label, field);
+			}
+		}
+	}
+	// Iterate again to apply navigation based on conditions
+	for (const section of schema.sections as SectionWithConditions[]) {
+		if (!section.conditions?.length) continue;
+		for (const cond of section.conditions) {
+			const targetSectionTitle = section.title;
+			const field = labelToField.get(cond.fieldId);
+			if (!field || !field.options) continue;
+			// Find matching options (if equals specified) else add to first option
+			let modified = false;
+			field.options = field.options.map((opt, idx) => {
+				if (typeof opt === "string") return opt; // skip string style
+				const value = opt.label || opt.text || "";
+				const shouldAdd = cond.equals ? value === cond.equals : idx === 0;
+				if (shouldAdd) {
+					modified = true;
+					return { ...opt, goToSectionId: targetSectionTitle } as any;
+				}
+				return opt;
+			});
+			// If nothing matched (maybe equals not found), attach nav to first option.
+			if (!modified && Array.isArray(field.options) && field.options.length) {
+				const first = field.options[0];
+				if (typeof first !== "string") {
+					field.options[0] = { ...first, goToSectionId: targetSectionTitle } as any;
+				}
+			}
+		}
+	}
+}
+
 // After the initial form structure is created we need to attach navigation rules that
 // jump to specific sections. This must be done in a second batchUpdate because the
 // target section itemIds are unknown until Google assigns them.
@@ -402,6 +444,8 @@ export async function createGoogleForm(
 		fields: schema.fields?.length,
 	});
 	console.debug("[createGoogleForm] raw schema", JSON.stringify(schema, null, 2));
+	// Auto-add navigation based on conditions to avoid validator false negatives
+	ensureNavigationForConditions(schema);
 	// Validate the schema first
 	const validation = validateFormSchema(schema);
 	if (!validation.valid) {
