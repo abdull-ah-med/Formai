@@ -314,7 +314,7 @@ async function applyConditionalNavigation(
 		if (!questionItemId) return; // Cannot locate question
 
 		// Re-build options array with concrete goToSectionId values
-		const updatedOptions: forms_v1.Schema$Option[] = field.options.map((opt) => {
+		let updatedOptions: forms_v1.Schema$Option[] = field.options.map((opt) => {
 			if (typeof opt === "string") {
 				return { value: opt } as forms_v1.Schema$Option;
 			}
@@ -332,6 +332,17 @@ async function applyConditionalNavigation(
 			}
 			return optionObj;
 		});
+
+		// Google API requirement: if any option has navigation, all must.
+		const navPresent = updatedOptions.some((o) => "goToAction" in o || "goToSectionId" in o);
+		if (navPresent) {
+			updatedOptions = updatedOptions.map((o) => {
+				if (!("goToAction" in o) && !("goToSectionId" in o)) {
+					return { ...o, goToAction: "NEXT_SECTION" } as forms_v1.Schema$Option;
+				}
+				return o;
+			});
+		}
 
 		const locationIndex = itemIdToIndex.get(questionItemId);
 		if (locationIndex === undefined) return;
