@@ -401,11 +401,7 @@ export async function createGoogleForm(
 	if (!validation.valid) {
 		throw new Error(`Invalid form schema: ${validation.error}`);
 	}
-
-	// NOTE: Branching navigation validation temporarily disabled to avoid blocking
-	// form creation when conditional sections are present but explicit navigation
-	// rules are not required by the form owner. Re-enable once schema generation
-	// provides complete goToAction information for all branching scenarios.
+	validateBranchingNavigation(schema);
 
 	const forms = google.forms({
 		version: "v1",
