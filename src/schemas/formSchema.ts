@@ -32,7 +32,7 @@ export const formFieldSchema = z.object({
 });
 
 export const sectionConditionSchema = z.object({
-	field: z.string().min(1),
+	fieldId: z.string().min(1),
 	equals: z.string().optional(),
 	notEquals: z.string().optional(),
 });

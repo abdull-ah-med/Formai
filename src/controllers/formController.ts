@@ -7,6 +7,53 @@ import { OAuth2Client } from "google-auth-library";
 import { AuthTokenPayload } from "../middleware/verifyJWT";
 import { convertClaudeSchemaToUserSchema } from "../utils/formSchemaConverter";
 
+/**
+ * Iterates over a raw schema from Claude and enriches it with a `conditions`
+ * array on any section that is the target of a conditional `goTo` navigation.
+ * This allows the front-end to display a "Conditional Section" banner.
+ * This does not affect the final Google Form, only the dashboard preview.
+ */
+function enrichSchemaWithConditions(schema: FormSchema): FormSchema {
+	if (!schema.sections) return schema;
+
+	// Create a deep copy to avoid mutating the original object
+	const newSchema = JSON.parse(JSON.stringify(schema));
+
+	const sectionTitleMap = new Map<string, any>();
+	newSchema.sections.forEach((section: any) => {
+		sectionTitleMap.set(section.title, section);
+	});
+
+	newSchema.sections.forEach((section: any) => {
+		section.fields.forEach((field: any) => {
+			if ((field.type === "radio" || field.type === "select") && field.options) {
+				field.options.forEach((option: any) => {
+					// Check for a goTo that targets a specific section by title
+					if (
+						typeof option !== "string" &&
+						option.goTo &&
+						!["NEXT_SECTION", "SUBMIT_FORM"].includes(option.goTo)
+					) {
+						const targetSection = sectionTitleMap.get(option.goTo);
+						if (targetSection) {
+							if (!targetSection.conditions) {
+								targetSection.conditions = [];
+							}
+							// Add the condition metadata for the front-end
+							targetSection.conditions.push({
+								fieldId: field.label,
+								equals: option.label || option.text,
+							});
+						}
+					}
+				});
+			}
+		});
+	});
+
+	return newSchema;
+}
+
 export const generateForm = async (req: Request, res: Response) => {
 	const { prompt } = req.body;
 	const userId = (req.user as AuthTokenPayload)?.sub;
@@ -16,7 +63,10 @@ export const generateForm = async (req: Request, res: Response) => {
 	}
 
 	try {
-		const schema = await generateSchemaFromPrompt(prompt);
+		const schemaFromClaude = await generateSchemaFromPrompt(prompt);
+
+		// Add conditional metadata for the front-end before saving/sending
+		const schema = enrichSchemaWithConditions(schemaFromClaude);
 
 		// Create a new form document
 		const newForm = new FormModel({
@@ -81,7 +131,10 @@ export const reviseForm = async (req: Request, res: Response) => {
 				: form.claudeResponse;
 
 		// Generate the revised schema
-		const revisedSchema = await reviseSchemaWithPrompt(latestSchema, prompt);
+		const revisedSchemaFromClaude = await reviseSchemaWithPrompt(latestSchema, prompt);
+
+		// Add conditional metadata for the front-end
+		const revisedSchema = enrichSchemaWithConditions(revisedSchemaFromClaude);
 
 		// Update the form with the new revision
 		form.revisions.push({
