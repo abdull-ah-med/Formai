@@ -339,10 +339,9 @@ export async function createGoogleForm(
 					requests.push({
 						createItem: {
 							item: {
-								itemId: sectionId,
+								// New section header (page break). Let API assign itemId to avoid Invalid ID errors.
 								title: section.title,
 								description: section.description || "",
-								// Using PageBreakItem to represent a new section header since SectionHeaderItem is not supported in the REST API
 								pageBreakItem: {},
 							} as any,
 							location: { index: currentIndex++ },
