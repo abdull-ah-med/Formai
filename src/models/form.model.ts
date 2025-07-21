@@ -1,36 +1,33 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { FormSchema } from "@formai/types";
 
 export interface IForm extends Document {
-        userId: mongoose.Types.ObjectId;
-        prompt: string;
-        claudeResponse: any; // JSON representation of the form structure
-        revisions: {
-                prompt: string;
-                claudeResponse: any;
-                timestamp: Date;
-        }[];
-        googleFormUrl?: string;
-        createdAt: Date;
-        updatedAt: Date;
-        revisionCount: number;
+	userId: mongoose.Types.ObjectId;
+	prompt: string;
+	history: FormSchema[];
+	revisionHistory: {
+		prompt: string;
+		revisedAt: Date;
+	}[];
+	googleFormUrl?: string;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 const FormSchema: Schema = new Schema(
-        {
-                userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-                prompt: { type: String, required: true },
-                claudeResponse: { type: Schema.Types.Mixed, required: true },
-                revisions: [
-                        {
-                                prompt: { type: String, required: true },
-                                claudeResponse: { type: Schema.Types.Mixed, required: true },
-                                timestamp: { type: Date, default: Date.now },
-                        },
-                ],
-                googleFormUrl: { type: String },
-                revisionCount: { type: Number, default: 0 },
-        },
-        { timestamps: true }
+	{
+		userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+		prompt: { type: String, required: true },
+		history: { type: [Schema.Types.Mixed], required: true },
+		revisionHistory: [
+			{
+				prompt: { type: String, required: true },
+				revisedAt: { type: Date, default: Date.now },
+			},
+		],
+		googleFormUrl: { type: String },
+	},
+	{ timestamps: true }
 );
 
 export default mongoose.model<IForm>("Form", FormSchema);
