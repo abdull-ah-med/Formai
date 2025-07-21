@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../../models/user.model";
 import { OAuth2Client } from "google-auth-library";
-import { IUser } from "@formai/types";
 
 const { JWT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, FRONTEND_URL } = process.env;
 
@@ -78,7 +77,7 @@ export const googleCallback = async (req: Request, res: Response) => {
 			});
 		}
 
-		let user: IUser | null;
+		let user;
 		try {
 			user = await User.findOne({ email: payload.email });
 		} catch (dbError: any) {
@@ -117,46 +116,29 @@ export const googleCallback = async (req: Request, res: Response) => {
 				});
 			}
 
+			// If no Google ID yet, link it
+			if (!user.googleId) user.googleId = payload.sub;
+
+			// Always update the Google tokens
+			user.googleTokens = {
+				accessToken: tokens.access_token!,
+				refreshToken:
+					tokens.refresh_token ||
+					(user.googleTokens ? user.googleTokens.refreshToken : undefined),
+				expiryDate: tokens.expiry_date || Date.now() + 3600 * 1000,
+			};
+
+			user.lastLogin = new Date();
 			try {
-				const updatedUser = await User.findOneAndUpdate(
-					{ email: payload.email },
-					{
-						$set: {
-							googleId: payload.sub,
-							lastLogin: new Date(),
-							googleTokens: {
-								accessToken: tokens.access_token!,
-								refreshToken:
-									tokens.refresh_token ||
-									(user.googleTokens
-										? user.googleTokens.refreshToken
-										: undefined),
-								expiryDate:
-									tokens.expiry_date || Date.now() + 3600 * 1000,
-							},
-						},
-						$unset: { password: 1 },
-					},
-					{ new: true }
-				);
-				user = updatedUser;
-			} catch (updateError: any) {
+				await user.save();
+			} catch (saveError: any) {
 				return res.status(500).json({
 					success: false,
 					error: "User update failed",
-					message: updateError.message || "Failed to link Google account.",
+					message: saveError.message || "Failed to update user account",
 				});
 			}
 		}
-
-		if (!user) {
-			return res.status(404).json({
-				success: false,
-				error: "User not found",
-				message: "Could not find or update user after authentication.",
-			});
-		}
-
 		let token;
 		try {
 			token = jwt.sign({ sub: user._id, email: user.email, role: user.role }, JWT_SECRET, {

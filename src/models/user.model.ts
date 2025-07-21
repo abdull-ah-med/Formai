@@ -1,6 +1,5 @@
 import { Schema, model, Document, connect, connections, Types, Model } from "mongoose";
 import crypto from "crypto";
-import { IUser, FormSchema, Question, Option } from "@formai/types";
 
 const ALGORITHM = "aes-256-cbc";
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "default_encryption_key_32_chars_"; // 32 chars
@@ -30,6 +29,73 @@ const decrypt = (text: string) => {
 		return text; // Return original text if decryption fails
 	}
 };
+
+// Form schema interfaces as per prompt
+interface Option {
+	id: string;
+	text: string;
+}
+interface Question {
+	id: string;
+	type: "short_answer" | "dropdown";
+	label: string;
+	options?: Option[];
+}
+export interface FormSchema {
+	title: string;
+	description: string;
+	questions: Question[];
+}
+
+// User Interface
+export interface IUser extends Document {
+	fullName: string;
+	email: string;
+	password?: string;
+	chatHistory: { prompt: string; response: string; timestamp: Date }[];
+	formsCreated: Types.ObjectId[];
+	lastLogin?: Date;
+	role: "user" | "admin";
+	subscription?: {
+		tier: "free" | "premium" | "enterprise";
+		stripeCustomerId?: string;
+		stripeSubscriptionId?: string;
+		priceId?: string; // Stripe Price ID for the recurring plan
+		status?:
+			| "active"
+			| "trialing"
+			| "past_due"
+			| "canceled"
+			| "unpaid"
+			| "incomplete"
+			| "incomplete_expired";
+		currentPeriodEnd?: Date; // End of the current billing period
+		paymentMethod?: {
+			brand?: string; // e.g. visa, mastercard (non-sensitive)
+			last4?: string; // Last 4 digits of the card (non-sensitive)
+			expMonth?: number;
+			expYear?: number;
+		};
+	};
+	createdAt: Date;
+	updatedAt: Date;
+	googleId?: string;
+	googleTokens?: {
+		accessToken: string;
+		refreshToken?: string;
+		expiryDate: number;
+	};
+	formsHistory: {
+		schema: FormSchema;
+		formId: string;
+		responderUri?: string;
+		finalizedAt: Date;
+	}[];
+	dailyFormCreations?: {
+		count: number;
+		date: Date;
+	};
+}
 
 const formQuestionOptionSchema = new Schema<Option>(
 	{
@@ -63,7 +129,7 @@ const formSchema = new Schema<FormSchema>(
 );
 
 // Schema
-const userSchema = new Schema<IUser & Document>(
+const userSchema = new Schema<IUser>(
 	{
 		fullName: { type: String, required: true },
 		email: {
@@ -74,7 +140,7 @@ const userSchema = new Schema<IUser & Document>(
 		},
 		password: {
 			type: String,
-			required: function (this: IUser): boolean {
+			required: function () {
 				return !this.googleId;
 			},
 		},
@@ -153,13 +219,13 @@ const userSchema = new Schema<IUser & Document>(
 );
 
 // Model - Create and export the User model
-let UserModel: Model<IUser & Document>;
+let UserModel: Model<IUser>;
 
 // Check if the model is already defined (for hot reloading)
 if (connections[0]?.readyState && connections[0].models.User) {
-	UserModel = connections[0].models.User as Model<IUser & Document>;
+	UserModel = connections[0].models.User as Model<IUser>;
 } else {
-	UserModel = model<IUser & Document>("User", userSchema);
+	UserModel = model<IUser>("User", userSchema);
 }
 
 // DB connect helper (reused across requests)
