@@ -16,6 +16,7 @@ import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
 import { Loader } from "./loader";
 import { useDocumentTitle } from "../../utils/useDocumentTitle";
+import { handleGoogleLogin } from "../../auth/googleOAuth";
 
 const UserDashboard: React.FC = () => {
 	useDocumentTitle("Dashboard");
@@ -496,14 +497,24 @@ const UserDashboard: React.FC = () => {
 			<Dialog open={showWarning} onOpenChange={setShowWarning}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Google Account Not Linked</DialogTitle>
+						<DialogTitle>Link Your Google Account</DialogTitle>
 						<DialogDescription>
-							Your Google account is not linked. You will not be able to
-							create Google Forms until you link your account.
+							To create and manage Google Forms, you need to link your Google
+							account. This allows Formai to securely access Google Forms on
+							your behalf.
 						</DialogDescription>
 					</DialogHeader>
-					<DialogFooter>
-						<button onClick={() => setShowWarning(false)}>Close</button>
+					<DialogFooter className="flex-col sm:flex-row sm:justify-end gap-2 mt-4">
+						<button
+							onClick={() => setShowWarning(false)}
+							className="px-4 py-2 bg-transparent border border-white/20 text-white rounded-md font-semibold hover:bg-white/10 transition-colors">
+							Close
+						</button>
+						<button
+							onClick={handleGoogleLogin}
+							className="px-4 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors">
+							Link Google Account
+						</button>
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
