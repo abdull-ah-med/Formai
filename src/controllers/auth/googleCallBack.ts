@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../../models/user.model";
 import { OAuth2Client } from "google-auth-library";
+import { IUser } from "@formai/types";
 
 const { JWT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, FRONTEND_URL } = process.env;
 
@@ -77,7 +78,7 @@ export const googleCallback = async (req: Request, res: Response) => {
 			});
 		}
 
-		let user;
+		let user: IUser | null;
 		try {
 			user = await User.findOne({ email: payload.email });
 		} catch (dbError: any) {
