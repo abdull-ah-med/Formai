@@ -70,7 +70,12 @@ const Signin = () => {
 
                         navigate("/dashboard", { replace: true });
                 } catch (err: any) {
-                        setFieldError("email", err.response?.data?.message || "Login failed");
+                        const backendMsg = err.response?.data?.message;
+                        if (backendMsg === "This account is linked with Google. Please sign in with Google.") {
+                                setError(backendMsg);
+                        } else {
+                                setFieldError("email", backendMsg || "Login failed");
+                        }
                         setIsLoading(false);
                 }
         };
@@ -84,6 +89,11 @@ const Signin = () => {
                                                         <h1 className="text-3xl font-bold text-white">Sign In</h1>
                                                         <p className="mt-2 text-gray-300">Access your Formai account</p>
                                                 </div>
+                                                {error && (
+                                                        <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-center">
+                                                                {error}
+                                                        </div>
+                                                )}
                                                 <Form className="space-y-6">
                                                         <div>
                                                                 <label

@@ -58,6 +58,11 @@ const GoogleAuthCallback: React.FC = () => {
 				}
 
 				await login(res.data.token);
+				// Explicitly reload user state after Google linking
+				if (typeof window !== 'undefined') {
+					const { reloadUser } = require('../contexts/AuthContext');
+					if (reloadUser) await reloadUser();
+				}
 				const redirectPath = localStorage.getItem("redirectAfterAuth");
 
 				if (redirectPath) {
