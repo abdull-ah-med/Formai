@@ -87,6 +87,22 @@ export const googleCallback = async (req: Request, res: Response) => {
 			});
 		}
 
+		// Prevent a Google account from being linked to multiple user accounts
+		const existingGoogleUser = await User.findOne({ googleId: payload.sub });
+		if (
+			existingGoogleUser &&
+			(
+				!user ||
+				String(existingGoogleUser._id) !== String(user._id)
+			)
+		) {
+			return res.status(400).json({
+				success: false,
+				error: "Google account already linked",
+				message: "This Google account is already linked to another user.",
+			});
+		}
+
 		if (!user) {
 			try {
 				user = await User.create({
