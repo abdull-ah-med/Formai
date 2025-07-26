@@ -79,9 +79,21 @@ export const googleCallback = async (req: Request, res: Response) => {
 		// If user is logged in (has JWT), link to their account
 		// If not logged in, find by email or create new user
 		let user;
-		if (req.user?.sub) {
-			// Authenticated user wants to link Google - use their account
-			user = await User.findById(req.user.sub);
+		
+		// Check if there's a userId in the state parameter (for account linking)
+		let userIdFromState = null;
+		if (state) {
+			try {
+				const stateData = JSON.parse(state);
+				userIdFromState = stateData.userId;
+			} catch (e) {
+				// Invalid state parameter, ignore
+			}
+		}
+		
+		if (userIdFromState) {
+			// User wants to link Google to their existing account
+			user = await User.findById(userIdFromState);
 		} else {
 			// Not logged in - find by email or create new
 			user = await User.findOne({ email: payload.email });
