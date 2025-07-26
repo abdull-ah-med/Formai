@@ -3,6 +3,7 @@ import { Button } from "./button";
 import { useNavigate } from "react-router-dom";
 import { getGoogleOAuthURL } from "../../auth/googleOAuth";
 import { finalizeForm } from "../../api";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface FormFinalizeButtonProps {
         formId: string;
@@ -27,6 +28,7 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
         const [showPermissionDialog, setShowPermissionDialog] = useState(false);
         const [permissionError, setPermissionError] = useState<string>("");
         const navigate = useNavigate();
+        const { user } = useAuth();
 
         // Prevent scrolling when dialog is open
         useEffect(() => {
@@ -103,7 +105,7 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                 // Force the OAuth consent screen to appear again by adding a timestamp
                 // This ensures we get a fresh token with appropriate permissions
                 const timestamp = new Date().getTime();
-                const googleOAuthURL = getGoogleOAuthURL() + `&prompt_time=${timestamp}`;
+                const googleOAuthURL = getGoogleOAuthURL(user?.id) + `&prompt_time=${timestamp}`;
 
                 window.location.href = googleOAuthURL;
         };

@@ -49,6 +49,7 @@ const AccountSettings: React.FC = () => {
 
         const [fullName, setFullName] = useState("");
         const [email, setEmail] = useState("");
+        const [userId, setUserId] = useState<string>("");
         const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
         const [googleLinked, setGoogleLinked] = useState<boolean>(false);
         const [hasPassword, setHasPassword] = useState<boolean>(false);
@@ -88,6 +89,7 @@ const AccountSettings: React.FC = () => {
                                 const { user } = data;
                                 setFullName(user.fullName);
                                 setEmail(user.email);
+                                setUserId(user._id);
                                 setSubscription(user.subscription || null);
                                 setGoogleLinked(Boolean(user.googleId));
                                 setHasPassword(user.hasPassword || false);
@@ -275,6 +277,7 @@ const AccountSettings: React.FC = () => {
                                                         }
                                                         disabled={googleLinked}
                                                         className={googleLinked ? "opacity-60 cursor-not-allowed" : ""}
+                                                        userId={userId}
                                                 />
                                                 {googleLinked && (
                                                         <>

@@ -7,6 +7,7 @@ interface GoogleSignInButtonProps extends React.ButtonHTMLAttributes<HTMLButtonE
         label?: string; // Optional custom label
         disabled?: boolean;
         onSuccess?: () => void; // Optional callback when Google auth succeeds
+        userId?: string; // Optional user ID for linking to existing account
 }
 
 const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
@@ -15,6 +16,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         className,
         disabled,
         onSuccess,
+        userId,
         ...rest
 }) => {
         const handleGoogleSignIn = () => {
@@ -26,7 +28,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
                         localStorage.setItem("pendingGoogleAuthCallback", "true");
                 }
 
-                const googleOAuthURL = getGoogleOAuthURL();
+                const googleOAuthURL = getGoogleOAuthURL(userId);
                 window.location.href = googleOAuthURL;
         };
 
