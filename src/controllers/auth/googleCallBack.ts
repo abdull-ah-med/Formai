@@ -76,15 +76,15 @@ export const googleCallback = async (req: Request, res: Response) => {
 			});
 		}
 
+		// If user is logged in (has JWT), link to their account
+		// If not logged in, find by email or create new user
 		let user;
-		try {
+		if (req.user?.sub) {
+			// Authenticated user wants to link Google - use their account
+			user = await User.findById(req.user.sub);
+		} else {
+			// Not logged in - find by email or create new
 			user = await User.findOne({ email: payload.email });
-		} catch (dbError: any) {
-			return res.status(500).json({
-				success: false,
-				error: "Database error",
-				message: "Failed to query user database",
-			});
 		}
 
 		// Prevent a Google account from being linked to multiple user accounts
