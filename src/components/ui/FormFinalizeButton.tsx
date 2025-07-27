@@ -105,7 +105,10 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                 // Force the OAuth consent screen to appear again by adding a timestamp
                 // This ensures we get a fresh token with appropriate permissions
                 const timestamp = new Date().getTime();
-                const googleOAuthURL = getGoogleOAuthURL(user?.id) + `&prompt_time=${timestamp}`;
+                console.log('User object:', user);
+                console.log('User ID being passed:', user?._id);
+                const googleOAuthURL = getGoogleOAuthURL(user?._id) + `&prompt_time=${timestamp}`;
+                console.log('Generated OAuth URL:', googleOAuthURL);
 
                 window.location.href = googleOAuthURL;
         };

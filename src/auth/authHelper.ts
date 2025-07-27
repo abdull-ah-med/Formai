@@ -1,8 +1,17 @@
 // src/utils/auth.ts
 import api from "../api";
-import { CurrentUser } from "@formai/types";
 
-export type { CurrentUser };
+export interface CurrentUser {
+	_id: string;
+	email: string;
+	fullName: string;
+	role: "user" | "admin";
+	googleId?: string;
+	hasPassword: boolean;
+	createdAt: string;
+	updatedAt: string;
+	isGoogleLinked: boolean;
+}
 
 export function setAuthToken(token: string | null) {
         if (token) {
