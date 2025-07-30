@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { Mail, Twitter } from "lucide-react";
+import { Mail } from "lucide-react";
 import FormaiLogo from "@/assets/Formai.svg";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const Footer = () => {
         const { isAuthenticated, logout } = useAuth();
@@ -63,7 +63,10 @@ const Footer = () => {
                                                                         <Link
                                                                                 to="/"
                                                                                 className="block text-gray-400 hover:text-white transition-colors"
-                                                                                onClick={logout}
+                                                                                onClick={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        logout();
+                                                                                }}
                                                                         >
                                                                                 Logout
                                                                         </Link>

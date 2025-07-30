@@ -7,7 +7,7 @@ const DEFAULT_TIMEOUT = 30000; // 30 seconds
 const FORM_GENERATION_TIMEOUT = 60000; // 1 minute (decreased from 3 minutes)
 
 const api = axios.create({
-	baseURL: (import.meta as unknown as { env: Record<string, string> }).env?.VITE_API_BASE_URL || "/api",
+	baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
 	timeout: DEFAULT_TIMEOUT,
 	withCredentials: true,
 	headers: {
@@ -64,12 +64,8 @@ export const finalizeForm = async (formId: string) => {
 };
 
 export const getFormHistory = async () => {
-	try {
-		const response = await api.get("/form/forms/history");
-		return response.data;
-	} catch (error) {
-		throw error;
-	}
+	const response = await api.get("/form/forms/history");
+	return response.data;
 };
 
 export const deleteAccount = async () => {

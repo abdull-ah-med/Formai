@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { logoutAndRedirect } from "@/auth/authHelper";
 import { useDocumentTitle } from "@/utils/useDocumentTitle";
 

@@ -32,7 +32,9 @@ export async function logout() {
 
         try {
                 await api.post("/auth/logout");
-        } catch (error) {}
+        } catch {
+                // Silently ignore logout errors
+        }
 }
 
 export async function logoutAndRedirect(redirectTo: string | null = "/signin") {

@@ -1,15 +1,7 @@
-import React, { ReactNode, createContext, useContext, useState, useEffect } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { FormSchema } from "../types/form";
-import { useAuth } from "./AuthContext";
-
-interface FormContextType {
-        formSchema: FormSchema | null;
-        formId: string | null;
-        setFormData: (schema: FormSchema | null, id: string | null) => void;
-        clearFormData: () => void;
-}
-
-const FormContext = createContext<FormContextType | undefined>(undefined);
+import { useAuth } from "../hooks/useAuth";
+import { FormContext } from "./FormContextDefinition";
 
 export const FormProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         const [formSchema, setFormSchema] = useState<FormSchema | null>(null);
@@ -44,25 +36,19 @@ export const FormProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                                 setFormSchema(JSON.parse(savedSchema));
                                 setFormId(savedId);
                         }
-                } catch (error) {}
+                } catch {
+                        // Ignore errors loading form data from localStorage
+                }
         }, []);
 
         // Clear form data when user changes
         useEffect(() => {
                 clearFormData();
-        }, [user?.id]);
+        }, [user?._id]);
 
         return (
                 <FormContext.Provider value={{ formSchema, formId, setFormData, clearFormData }}>
                         {children}
                 </FormContext.Provider>
         );
-};
-
-export const useForm = (): FormContextType => {
-        const context = useContext(FormContext);
-        if (context === undefined) {
-                throw new Error("useForm must be used within a FormProvider");
-        }
-        return context;
 };

@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
 
 const GoogleAuthCallback: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { login } = useAuth();
+	const { login, reloadUser } = useAuth();
 	useDocumentTitle("Google Authentication");
 	const [error, setError] = useState<string | null>(null);
 	const [isProcessing, setIsProcessing] = useState(true);
@@ -59,10 +59,7 @@ const GoogleAuthCallback: React.FC = () => {
 
 				await login(res.data.token);
 				// Explicitly reload user state after Google linking
-				if (typeof window !== 'undefined') {
-					const { reloadUser } = require('../contexts/AuthContext');
-					if (reloadUser) await reloadUser();
-				}
+				await reloadUser();
 				const redirectPath = localStorage.getItem("redirectAfterAuth");
 
 				if (redirectPath) {
@@ -77,9 +74,10 @@ const GoogleAuthCallback: React.FC = () => {
 						navigate("/dashboard", { replace: true });
 					}
 				}
-			} catch (error: any) {
+			} catch (error: unknown) {
+				const err = error as { response?: { data?: { message?: string } } };
 				setError(
-					error.response?.data?.message ||
+					err.response?.data?.message ||
 						"Failed to connect your Google account. Please try again."
 				);
 				setIsProcessing(false);
@@ -88,11 +86,11 @@ const GoogleAuthCallback: React.FC = () => {
 		};
 
 		handleCallback();
-	}, [navigate, location, login, isProcessing]);
+	}, [navigate, location, login, reloadUser, isProcessing]);
 
 	return (
 		<div className="flex items-center justify-center h-screen bg-black">
-			<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl ring-1 ring-white/10 shadow-[0_0_30px_rgba(120,120,255,0.15)] w-full max-w-md text-center">
+			<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 ring-1 ring-white/10 shadow-[0_0_30px_rgba(120,120,255,0.15)] w-full max-w-md text-center">
 				<div className="flex flex-col items-center">
 					{isProcessing ? (
 						<>

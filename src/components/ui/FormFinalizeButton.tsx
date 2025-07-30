@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./button";
-import { useNavigate } from "react-router-dom";
 import { getGoogleOAuthURL } from "../../auth/googleOAuth";
 import { finalizeForm } from "../../api";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 interface FormFinalizeButtonProps {
         formId: string;
@@ -16,10 +15,16 @@ interface FormFinalizeResponse {
         data?: {
                 formId: string;
                 googleFormUrl: string;
-                schema: any;
+                schema: FormSchema;
         };
         error?: string;
         message?: string;
+}
+
+interface FormSchema {
+        title: string;
+        description: string;
+        [key: string]: unknown;
 }
 
 const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSuccess, className }) => {
@@ -27,7 +32,6 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
         const [error, setError] = useState<string | null>(null);
         const [showPermissionDialog, setShowPermissionDialog] = useState(false);
         const [permissionError, setPermissionError] = useState<string>("");
-        const navigate = useNavigate();
         const { user } = useAuth();
 
         // Prevent scrolling when dialog is open
@@ -76,8 +80,9 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                         setError(response.message || response.error || "Failed to finalize form");
                                 }
                         }
-                } catch (err: any) {
-                        const errData = err.response?.data;
+                } catch (err: unknown) {
+                        const error = err as { response?: { data?: { error?: string; message?: string } }; message?: string };
+                        const errData = error.response?.data;
 
                         if (errData?.error === "CONNECT_GOOGLE") {
                                 setPermissionError("Please connect your Google account to create forms.");
@@ -93,7 +98,7 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                                 );
                                 setShowPermissionDialog(true);
                         } else {
-                                setError(errData?.message || err.message || "An error occurred creating your form. Please try reconnecting your Google account.");
+                                setError(errData?.message || error.message || "An error occurred creating your form. Please try reconnecting your Google account.");
                         }
                 } finally {
                         setIsLoading(false);
@@ -105,16 +110,9 @@ const FormFinalizeButton: React.FC<FormFinalizeButtonProps> = ({ formId, onSucce
                 // Force the OAuth consent screen to appear again by adding a timestamp
                 // This ensures we get a fresh token with appropriate permissions
                 const timestamp = new Date().getTime();
-                console.log('User object:', user);
-                console.log('User ID being passed:', user?._id);
                 const googleOAuthURL = getGoogleOAuthURL(user?._id) + `&prompt_time=${timestamp}`;
-                console.log('Generated OAuth URL:', googleOAuthURL);
 
                 window.location.href = googleOAuthURL;
-        };
-
-        const handleGoToSettings = () => {
-                navigate("/account-settings");
         };
 
         return (

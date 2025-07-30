@@ -1,16 +1,16 @@
 import { Send, Edit2 } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { useForm } from "../../contexts/FormContext";
+import { useAuth } from "../../hooks/useAuth";
+import { useForm } from "../../contexts/useForm";
 import { generateForm, reviseForm } from "../../api";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "./dialog";
 import {
-	FormSchema,
 	FormQuestion,
 	GenerateFormResponse,
 	ReviseFormResponse,
-	FormSection,
 	FormCondition,
+	FormField,
+	FormOption,
 } from "../../types/form";
 import FormFinalizeButton from "./FormFinalizeButton";
 import DOMPurify from "dompurify";
@@ -28,7 +28,6 @@ const UserDashboard: React.FC = () => {
 	const [loadingMessage, setLoadingMessage] = useState("");
 	const [error, setError] = useState("");
 	const [revisionPrompt, setRevisionPrompt] = useState("");
-	const [isInputFocused, setIsInputFocused] = useState(false);
 	const [showWarning, setShowWarning] = useState(false);
 	const [showLengthWarning, setShowLengthWarning] = useState(false);
 
@@ -81,7 +80,7 @@ const UserDashboard: React.FC = () => {
 
 			// Handle case when form is loaded from history without proper sections
 			if (!processedSchema.sections || processedSchema.sections.length === 0) {
-				let fields: any[] = [];
+				let fields: FormField[] = [];
 
 				if (processedSchema.fields && processedSchema.fields.length > 0) {
 					fields = processedSchema.fields;
@@ -137,13 +136,14 @@ const UserDashboard: React.FC = () => {
 				setError(response.error || "Failed to generate form");
 				setResponse(`Error: ${response.error || "Failed to generate form"}`);
 			}
-		} catch (err: any) {
-			if (err.response?.status === 429) {
+		} catch (err: unknown) {
+			const error = err as { response?: { status?: number; data?: { error?: string } }; code?: string; message?: string };
+			if (error.response?.status === 429) {
 				setError("Daily form generation limit reached. Try again tomorrow.");
 				setResponse(
 					"Whoa, you're a form-making machine! Our AI needs to recharge its creative juices (and maybe take a nap). Please come back tomorrow for a fresh batch of forms."
 				);
-			} else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+			} else if (error.code === "ECONNABORTED" || error.message?.includes("timeout")) {
 				setError(
 					"Looks like our AI is pondering the meaning of forms and took too long to respond. This can happen with very complex requests or when our servers are meditating. Please try a simpler request or try again later."
 				);
@@ -152,12 +152,12 @@ const UserDashboard: React.FC = () => {
 				);
 			} else {
 				setError(
-					err.response?.data?.error ||
+					error.response?.data?.error ||
 						"Oops! Something went haywire. We've sent a distress signal to our team of caffeinated developers. Please try again in a bit."
 				);
 				setResponse(
 					`Error: ${
-						err.response?.data?.error ||
+						error.response?.data?.error ||
 						"Oops! Something went haywire. We've sent a distress signal to our team of caffeinated developers. Please try again in a bit."
 					}`
 				);
@@ -169,7 +169,7 @@ const UserDashboard: React.FC = () => {
 		}
 	};
 
-	const handleFormSuccess = (googleFormUrl: string) => {
+	const handleFormSuccess = (_googleFormUrl: string) => {
 		// Reset form state
 		setResponse("");
 		setPrompt("");
@@ -200,27 +200,28 @@ const UserDashboard: React.FC = () => {
 		setLoadingMessage("Revising your form...");
 
 		reviseForm(formId, sanitizedPrompt)
-			.then((response: any) => {
+			.then((response: ReviseFormResponse) => {
 				// Set progress to 100% when API returns
 				setLoadingProgress(100);
 				setLoadingMessage("Revision complete!");
 
-				const typedResponse = response as ReviseFormResponse;
-				if (typedResponse.success) {
-					setFormData(typedResponse.data.schema, formId);
+				if (response.success) {
+					setFormData(response.data.schema, formId);
 					setRevisionPrompt("");
 				} else {
-					setError(typedResponse.error || "Failed to revise form");
+					setError(response.error || "Failed to revise form");
 				}
 			})
-			.catch((err: any) => {
-				if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+			.catch((err: unknown) => {
+				const error = err as { code?: string; message?: string };
+				if (error.code === "ECONNABORTED" || error.message?.includes("timeout")) {
 					setError(
 						"Our AI got a little carried away revising and the request timed out. Try a simpler change, or give it another go in a moment."
 					);
 				} else {
+					const errorWithResponse = error as { response?: { data?: { error?: string } } };
 					setError(
-						err.response?.data?.error ||
+						errorWithResponse.response?.data?.error ||
 							"A wild error appeared during revision! We're working on catching it. Please try your revision again."
 					);
 				}
@@ -236,12 +237,12 @@ const UserDashboard: React.FC = () => {
 	const renderFormContent = () => {
 		if (!formSchema) return null;
 
-		const renderFieldPreview = (field: any) => {
+		const renderFieldPreview = (field: FormField) => {
 			switch (field.type) {
 				case "radio":
 					return (
 						<div className="mt-2 space-y-2">
-							{(field.options || []).map((option: any, i: number) => {
+							{(field.options || []).map((option: FormOption, i: number) => {
 								const optionText =
 									typeof option === "string"
 										? option
@@ -280,7 +281,7 @@ const UserDashboard: React.FC = () => {
 								</svg>
 							</div>
 							<div className="pl-2 space-y-1">
-								{(field.options || []).map((option: any, i: number) => {
+								{(field.options || []).map((option: FormOption, i: number) => {
 									const optionText =
 										typeof option === "string"
 											? option
@@ -302,7 +303,7 @@ const UserDashboard: React.FC = () => {
 							{(field.options && field.options.length
 								? field.options
 								: ["Yes", "No"]
-							).map((option: any, i: number) => {
+							).map((option: FormOption, i: number) => {
 								const optionText =
 									typeof option === "string"
 										? option

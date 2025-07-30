@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getFormHistory } from "../../api";
-import { useForm } from "../../contexts/FormContext";
+import { useForm } from "../../contexts/useForm";
 import { Loader } from "./loader";
 import { useDocumentTitle } from "../../utils/useDocumentTitle";
+
+import { FormSchema } from "../../types/form";
 
 interface FormHistoryItem {
         id: string;
         formId: string;
         title: string;
         createdAt: string;
-        schema?: any;
+        schema?: FormSchema;
 }
 
 interface HistoryResponse {
@@ -37,8 +39,9 @@ const History: React.FC = () => {
                                 } else {
                                         setError(response.error || "Failed to fetch history");
                                 }
-                        } catch (err: any) {
-                                setError(err.message || "An error occurred while fetching history");
+                        } catch (err: unknown) {
+                                const error = err as { message?: string };
+                                setError(error.message || "An error occurred while fetching history");
                         } finally {
                                 setIsLoading(false);
                         }

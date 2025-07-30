@@ -6,14 +6,14 @@ import signUpSchema from "../../schemas/signUpSchema";
 import api from "../../api";
 import GoogleSignInButton from "./GoogleSignInButton";
 import ReCAPTCHA from "react-google-recaptcha";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { useDocumentTitle } from "../../utils/useDocumentTitle";
 /// <reference types="vite/client" />
 
 const Signup = () => {
         const navigate = useNavigate();
         useDocumentTitle("Sign Up");
-        const siteKey = (import.meta as any).env.VITE_RECAPTCHA_SITE_KEY as string;
+        const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
         const [apiError, setApiError] = useState<string | null>(null);
         const { isAuthenticated, loading } = useAuth();
 
@@ -33,7 +33,10 @@ const Signup = () => {
                 recaptchaToken: "",
         };
 
-        const handleSubmit = async (values: typeof initialValues, { setSubmitting }: any) => {
+        const handleSubmit = async (
+                values: typeof initialValues, 
+                { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+        ) => {
                 if (!values.recaptchaToken) {
                         setApiError("Please complete the CAPTCHA");
                         return;
@@ -49,8 +52,9 @@ const Signup = () => {
                                 recaptchaToken: values.recaptchaToken,
                         });
                         navigate("/signin?signup=success"); // Redirect to signin with a success message
-                } catch (err: any) {
-                        setApiError(err.response?.data?.message || "An unexpected error occurred. Please try again.");
+                } catch (err: unknown) {
+                        const error = err as { response?: { data?: { message?: string } } };
+                        setApiError(error.response?.data?.message || "An unexpected error occurred. Please try again.");
                 } finally {
                         setSubmitting(false);
                 }

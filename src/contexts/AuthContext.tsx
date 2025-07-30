@@ -1,17 +1,7 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { getAuthToken, setAuthToken, CurrentUser, logout as logoutUser } from "../auth/authHelper";
 import api from "../api";
-
-interface AuthContextType {
-	isAuthenticated: boolean;
-	user: CurrentUser | null;
-	loading: boolean;
-	login: (token: string) => Promise<void>;
-	logout: (callback?: () => void) => void;
-	reloadUser: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from "./AuthContextDefinition";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const [user, setUser] = useState<CurrentUser | null>(null);
@@ -33,9 +23,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 				setUser(null);
 				setAuthToken(null); // Token is invalid, remove it
 			}
-		} catch (error: any) {
+		} catch {
+			// Token is invalid or network error, clear auth state
 			setUser(null);
-			setAuthToken(null); // Token is invalid, remove it
+			setAuthToken(null);
 		} finally {
 			setLoading(false);
 		}
@@ -77,12 +68,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			{children}
 		</AuthContext.Provider>
 	);
-};
-
-export const useAuth = () => {
-	const context = useContext(AuthContext);
-	if (context === undefined) {
-		throw new Error("useAuth must be used within an AuthProvider");
-	}
-	return context;
 };

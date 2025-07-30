@@ -5,8 +5,6 @@ import {
 	LogOut,
 	Settings,
 	User,
-	ChevronDown,
-	Menu,
 	X,
 	MessageSquare,
 	History,
@@ -15,14 +13,13 @@ import {
 	UserPlus,
 } from "lucide-react";
 import FormaiLogo from "../../assets/Formai.svg";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const Navbar = () => {
 	const navigate = useNavigate();
-	const { isAuthenticated, user, logout } = useAuth();
+	const { isAuthenticated, logout } = useAuth();
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-	const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 	const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
 	const handleScroll = () => {
@@ -105,7 +102,6 @@ const Navbar = () => {
 
 	const closeAllMenus = () => {
 		setIsMobileMenuOpen(false);
-		setIsProfileMenuOpen(false);
 	};
 
 	return (
