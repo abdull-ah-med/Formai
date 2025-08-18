@@ -13,6 +13,8 @@ Why the migration:
 - Migrated to separate backend/frontend architecture.
 - Consolidated into this monorepo for simpler collaboration, versioning, and deployments.
 
+> **Note**: The backend deployment is temporarily inactive due to hosting service constraints (Railway and Anthropic). The codebase remains fully functional and can be deployed on alternative infrastructure as needed.
+
 ## Repository structure
 
 ```
