@@ -1,0 +1,154 @@
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import api from "../api";
+import { useAuth } from "../hooks/useAuth";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
+
+const GoogleAuthCallback: React.FC = () => {
+	const navigate = useNavigate();
+	const location = useLocation();
+	const { login, reloadUser } = useAuth();
+	useDocumentTitle("Google Authentication");
+	const [error, setError] = useState<string | null>(null);
+	const [isProcessing, setIsProcessing] = useState(true);
+	const codeProcessed = useRef(false);
+
+	useEffect(() => {
+		const handleCallback = async () => {
+			if (!isProcessing || codeProcessed.current) return;
+
+			const params = new URLSearchParams(location.search);
+			const code = params.get("code");
+			const error = params.get("error");
+
+			if (error) {
+				setError("Google authentication was denied or cancelled.");
+				setIsProcessing(false);
+				return;
+			}
+
+			if (!code) {
+				setError("No authorization code received from Google.");
+				setIsProcessing(false);
+				return;
+			}
+			codeProcessed.current = true;
+			try {
+				const res = await api.get<{
+					token: string;
+					success: boolean;
+					error?: string;
+					message?: string;
+					hasFormsScope?: boolean;
+					hasRefreshToken?: boolean;
+				}>("/auth/google/callback", {
+					params: { code },
+				});
+
+				if (!res.data.success) {
+					setError(res.data.message || "Authentication failed");
+					setIsProcessing(false);
+					return;
+				}
+
+				if (!res.data.token) {
+					setError("No authentication token received.");
+					setIsProcessing(false);
+					return;
+				}
+
+				await login(res.data.token);
+				// Explicitly reload user state after Google linking
+				await reloadUser();
+				const redirectPath = localStorage.getItem("redirectAfterAuth");
+
+				if (redirectPath) {
+					localStorage.removeItem("redirectAfterAuth");
+					navigate(redirectPath, { replace: true });
+				} else {
+					const pendingCallback = localStorage.getItem("pendingGoogleAuthCallback");
+					if (pendingCallback) {
+						localStorage.removeItem("pendingGoogleAuthCallback");
+						navigate("/dashboard", { replace: true });
+					} else {
+						navigate("/dashboard", { replace: true });
+					}
+				}
+			} catch (error: unknown) {
+				const err = error as { response?: { data?: { message?: string } } };
+				setError(
+					err.response?.data?.message ||
+						"Failed to connect your Google account. Please try again."
+				);
+				setIsProcessing(false);
+				codeProcessed.current = false;
+			}
+		};
+
+		handleCallback();
+	}, [navigate, location, login, reloadUser, isProcessing]);
+
+	return (
+		<div className="flex items-center justify-center h-screen bg-black">
+			<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 ring-1 ring-white/10 shadow-[0_0_30px_rgba(120,120,255,0.15)] w-full max-w-md text-center">
+				<div className="flex flex-col items-center">
+					{isProcessing ? (
+						<>
+							<div className="w-16 h-16 rounded-full bg-blue-500/20 backdrop-blur-sm flex items-center justify-center mb-6">
+								<svg
+									className="w-8 h-8 text-blue-400 animate-pulse"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg">
+									<path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-8v-6h2v6h4l-5 5-5-5h4z"></path>
+								</svg>
+							</div>
+							<h2 className="text-2xl font-semibold text-white mb-3">
+								Connecting to Google
+							</h2>
+							<p className="text-gray-300 mb-6">
+								Please wait while we securely connect your Google
+								account...
+							</p>
+
+							<div className="flex justify-center space-x-2">
+								<div
+									className="w-3 h-3 rounded-full bg-blue-500 animate-bounce"
+									style={{ animationDelay: "0ms" }}></div>
+								<div
+									className="w-3 h-3 rounded-full bg-blue-500 animate-bounce"
+									style={{ animationDelay: "150ms" }}></div>
+								<div
+									className="w-3 h-3 rounded-full bg-blue-500 animate-bounce"
+									style={{ animationDelay: "300ms" }}></div>
+							</div>
+						</>
+					) : (
+						<>
+							<div className="w-16 h-16 rounded-full bg-red-500/20 backdrop-blur-sm flex items-center justify-center mb-6">
+								<svg
+									className="w-8 h-8 text-red-400"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg">
+									<path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1.5-5l-4.5-4.5 1.5-1.5 3 3 6-6 1.5 1.5-7.5 7.5z"></path>
+								</svg>
+							</div>
+							<h2 className="text-2xl font-semibold text-white mb-3">
+								Connection Failed
+							</h2>
+							<p className="text-red-300 mb-6">{error}</p>
+							<button
+								onClick={() => navigate("/signin", { replace: true })}
+								className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+								Return to Sign In
+							</button>
+						</>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export default GoogleAuthCallback;
