@@ -31,16 +31,17 @@ export const getAccount = async (req: Request, res: Response) => {
                                 role: user.role,
                                 googleId: user.googleId,
                                 hasPassword: !!user.password,
+                                hasApiKey: !!user.get('anthropicApiKey'),
                                 createdAt: user.createdAt,
                                 updatedAt: user.updatedAt,
                                 isGoogleLinked: !!user.googleId,
                         },
                 });
         } catch (error: any) {
+                console.error("[getAccount] Error:", error.message);
                 return res.status(500).json({
                         success: false,
                         message: "Server error while fetching account",
-                        error: error.message,
                 });
         }
 };

@@ -7,6 +7,7 @@ import Privacy from "./components/ui/privacy";
 import Terms from "./components/ui/terms";
 import Cookies from "./components/ui/cookies";
 import Pricing from "./components/ui/pricing";
+import ApiKeyPolicy from "./components/ui/apiKeyPolicy";
 import UserDashboard from "./components/ui/userdashboard";
 import History from "./components/ui/history";
 import AccountSettings from "./components/ui/accountSettings";
@@ -26,6 +27,7 @@ export default function AppRoutes() {
                         <Route path="/terms" element={<Terms />} />
                         <Route path="/cookies" element={<Cookies />} />
                         <Route path="/pricing" element={<Pricing />} />
+                        <Route path="/api-key-policy" element={<ApiKeyPolicy />} />
                         <Route element={<DashboardLayout />}>
                                 <Route element={<ProtectedRoute />}>
                                         <Route path="/dashboard" element={<UserDashboard />} />

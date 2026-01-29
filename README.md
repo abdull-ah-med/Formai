@@ -1,6 +1,6 @@
 # Formai Monorepo
 
-AI-powered form generation with Google Forms export. This monorepo contains the production backend (Express/Node, TypeScript, MongoDB) and frontend (React/Vite/Tailwind) that replaced the original serverless implementation.
+AI-powered form generation with Google Forms export. This monorepo contains the production backend (Express/Node, TypeScript, MongoDB) and frontend (React 19/Vite/Tailwind) that replaced the original serverless implementation.
 
 - Current monorepo (you are here): backend + frontend
 - Previous split repos:
@@ -13,37 +13,47 @@ Why the migration:
 - Migrated to separate backend/frontend architecture.
 - Consolidated into this monorepo for simpler collaboration, versioning, and deployments.
 
-> **Note**: The backend deployment is temporarily inactive due to hosting service constraints (Railway and Anthropic). The codebase remains fully functional and can be deployed on alternative infrastructure as needed.
-
 ## Repository structure
 
 ```
 formai/
+  package.json          Monorepo root with workspace scripts
+  
   backend/              Express + TypeScript API
     src/
       config/           DB connection, Claude system prompt
-      controllers/      Auth, account, form generation/revision/finalization
-      middleware/       JWT auth, rate limiting
+      controllers/
+        auth/           Sign up, sign in, sign out, Google OAuth callback
+        account/        Get account, delete account, Google delink, API key management
+        formController.ts  Form generation, revision, finalization
+      middleware/       JWT auth, rate limiting (auth, form generation, general API)
       models/           Mongoose models (User, Form, Submission)
       routes/           API route definitions
       schemas/          Zod schema for Google Form mapping
       utils/            Claude client, Google Forms service, reCAPTCHA
-      index.ts          App bootstrap
+      types/            Custom type definitions
+      index.ts          App bootstrap with health endpoint
     package.json        build/dev scripts
     tsconfig.json
 
-  frontend/             React + Vite app
+  frontend/             React 19 + Vite app
     src/
       api/              Axios client and API helpers
       auth/             OAuth helpers and auth utilities
-      components/       UI and dashboard
-      contexts/         Auth + Form contexts
-      hooks/            useAuth etc.
-      types/            App-wide types
+      components/
+        ui/             UI components (forms, dialogs, buttons, pages)
+        GoogleAuthCallback.tsx
+        SessionManager.tsx
+      contexts/         Auth + Form contexts with providers
+      hooks/            useAuth hook
+      lib/              Utility functions (cn for classnames)
+      schemas/          Yup validation schemas (login, signup)
+      types/            App-wide type definitions
       utils/            Helpers (DOM title, form validation)
-      routes.tsx        Client routes
-    package.json        dev/build scripts
+      routes.tsx        Client routes with protected route handling
+    package.json        dev/build/lint scripts
     vite.config.js      dev proxy to backend
+    tailwind.config.js  Tailwind with animations
 ```
 
 ## What it does
@@ -53,10 +63,11 @@ formai/
   - Google OAuth 2.0 (link existing account or sign in)
   - JWT-based auth (token returned by API, saved client-side; cookie set for server use)
   - reCAPTCHA + honeypot to reduce bot signups/logins
-  - Rate limiting for auth endpoints
+  - Multiple rate limiters: auth (10 req/15min), form generation (20 req/hour), general API (100 req/15min)
 - AI form generation (Anthropic Claude)
   - Generate a complete form JSON from a natural language prompt
   - Revise iteratively with follow-up prompts
+  - Support for user's own Anthropic API key (encrypted at rest)
   - Validation hints and safe content filtering via a strict system prompt
 - Google Forms export
   - Map the generated schema into a Google Form using the Google Forms API
@@ -66,12 +77,18 @@ formai/
   - Preview generated form with validation hints
   - Finalize to Google Forms
   - View form history
-  - Manage account and Google linking
+  - Manage account, Google linking, and personal API key
+- Account management
+  - Profile viewing and editing
+  - Password management
+  - Google account linking/unlinking
+  - Anthropic API key management (save/delete)
+  - Account deletion
 
 ## Tech stack
 
-- Backend: Node.js, Express, TypeScript, Mongoose, Zod, axios, googleapis, google-auth-library, express-rate-limit, helmet, cors, cookie-parser, jsonwebtoken
-- Frontend: React 19, Vite, TypeScript, TailwindCSS, Formik + Yup, react-router, react-google-recaptcha, DOMPurify
+- Backend: Node.js, Express, TypeScript, Mongoose, Zod, axios, googleapis, google-auth-library, express-rate-limit, helmet, cors, cookie-parser, jsonwebtoken, bcrypt
+- Frontend: React 19, Vite, TypeScript, TailwindCSS (with tailwindcss-animate), Formik + Yup, react-router-dom v7, react-google-recaptcha, DOMPurify, Radix UI (dialog, slot), lucide-react, lenis (smooth scroll), js-cookie, jwt-decode, class-variance-authority, clsx, tailwind-merge
 - AI: Anthropic Claude (messages API)
 - Database: MongoDB (Mongoose ODM)
 
@@ -82,39 +99,48 @@ formai/
   - Google OAuth: frontend builds consent URL with scopes (openid, email, profile, forms, drive.file) and optional state (userId) for linking; backend exchanges code, creates/links user, sets cookie + returns token.
 - Schema generation
   - `src/utils/claudeClient.ts` calls Claude with a strict system prompt (`src/config/systemPrompt.ts`) to produce minified JSON representing the form.
+  - Supports user-provided Anthropic API keys (encrypted with AES-256-CBC) for personalized usage.
   - Zod schema (`src/schemas/formSchema.ts`) validates strict structure before Google API calls.
   - Additional branch metadata is added for the dashboard (non-functional for Forms API, but visible in UI).
 - Google Forms export
   - `src/utils/googleFormService.ts` maps internal schema to Google Forms BatchUpdate requests, then patches navigation (goTo) after section item IDs are known.
 - Data storage
-  - `User` model stores Google tokens encrypted (AES-256-CBC) via `ENCRYPTION_KEY`. Tokens are refreshed if expired during finalize.
+  - `User` model stores Google tokens and Anthropic API keys encrypted (AES-256-CBC) via `ENCRYPTION_KEY`. Tokens are refreshed if expired during finalize.
   - `Form` stores original/revised schemas and Google Form URL once finalized.
   - `Submission` placeholder model for future responses storage.
+- Rate limiting
+  - Auth endpoints: 10 requests per 15 minutes per IP
+  - Form generation/revision: 20 requests per hour per IP
+  - General API: 100 requests per 15 minutes per IP
 
 ## API overview
 
 Base URL: `/api`
 
-Auth
-- POST `/auth/register` — register user (reCAPTCHA + honeypot)
-- POST `/auth/login` — login (reCAPTCHA), returns `{ success, message, token }` and sets `token` cookie
-- GET `/auth/google/callback` — OAuth callback (code), sets cookie and returns `{ token, hasFormsScope, hasRefreshToken }`
-- POST `/auth/logout` — clears cookie
+Auth (`/api/auth`)
+- POST `/register` — register user (reCAPTCHA + honeypot)
+- POST `/login` — login (reCAPTCHA), returns `{ success, message, token }` and sets `token` cookie
+- GET `/google/callback` — OAuth callback (code), sets cookie and returns `{ token, hasFormsScope, hasRefreshToken }`
+- POST `/logout` — clears cookie (requires auth)
 
-Account
-- GET `/account` — current user profile (requires auth)
-- DELETE `/account/google-link` — unlink Google (requires password to exist)
-- DELETE `/account` — delete account and owned forms + submissions
+Account (`/api/account`)
+- GET `/` — current user profile (requires auth)
+- DELETE `/google-link` — unlink Google (requires password to exist)
+- DELETE `/` — delete account and owned forms + submissions
+- POST `/api-key` — save Anthropic API key (encrypted)
+- DELETE `/api-key` — remove Anthropic API key
 
-Forms
-- POST `/form/generate-form` — body: `{ prompt }` → creates a draft form in DB, returns `{ formId, schema }`
-- POST `/form/revise-form/:formId` — body: `{ prompt }` → appends revision, returns updated `{ schema }`
-- POST `/form/finalize-form/:formId` — creates Google Form, returns `{ googleFormUrl }`
-- GET `/form/forms/history` — list of finalized forms for the user
+Forms (`/api/form`)
+- POST `/generate-form` — body: `{ prompt }` → creates a draft form in DB, returns `{ formId, schema }`
+- POST `/revise-form/:formId` — body: `{ prompt }` → appends revision, returns updated `{ schema }`
+- POST `/finalize-form/:formId` — creates Google Form, returns `{ googleFormUrl }`
+- GET `/forms/history` — list of finalized forms for the user
 
-Protected/debug
-- GET `/protected` — simple auth check
-- GET `/auth-debug` — debug info about auth/cookies
+Health & Debug
+- GET `/` — API status message
+- GET `/health` — health check with timestamp
+- GET `/api/protected` — simple auth check
+- GET `/api/auth-debug` — debug info about auth/cookies
 
 Notes
 - Daily generation limit: up to 3 per user per day (`User.dailyFormCreations`).
@@ -125,8 +151,13 @@ Notes
 User
 - `fullName`, `email`, `password?`
 - `googleId?`, `googleTokens?` (encrypted `accessToken`, `refreshToken?`, `expiryDate`)
-- `formsHistory[]` (stored final schemas + Google links)
+- `anthropicApiKey?` (encrypted with AES-256-CBC)
+- `formsHistory[]` (stored final schemas + Google links + responderUri)
+- `formsCreated[]` (references to Form documents)
 - `dailyFormCreations { count, date }`
+- `subscription { tier, stripeCustomerId?, stripeSubscriptionId?, priceId?, status?, currentPeriodEnd?, paymentMethod? }`
+- `chatHistory[]` (prompt/response pairs with timestamps)
+- `role` (user | admin)
 
 Form
 - `userId`, `prompt`, `claudeResponse` (JSON), `revisions[]`, `googleFormUrl?`, `revisionCount`
@@ -217,23 +248,29 @@ npm run dev
 
 ## Deployment (high level)
 
-- Backend: deploy to a Node host (Render, Railway, Fly.io, VPS, etc.). Provide the same `.env` values and ensure HTTPS if using cookies cross-site.
+- Backend: currently deployed on Azure App Service with CI/CD via GitHub Actions. Can also be deployed to other Node hosts (Render, Fly.io, VPS, etc.). Provide the same `.env` values and ensure HTTPS if using cookies cross-site.
 - Frontend: deploy to Vercel/Netlify/Static host. Configure `VITE_*` envs and point to the API base URL.
 - CORS: set `FRONTEND_URL` on the backend to the deployed frontend origin.
 - OAuth: set production redirect URI in Google Cloud to `${public-frontend}/auth/google/callback`.
 
 ## Frontend notes
 
-- Major routes: `/` (home), `/signup`, `/signin`, `/auth/google/callback`, `/dashboard`, `/history`, `/account-settings`
-- Key UI: `FormBuilder` (preview + revision), `FormFinalizeButton` (permission dialog + reconnect flow), `GoogleAuthCallback` (handles code exchange), `ProtectedRoute` (guards dashboard routes)
+- Major routes: `/` (home), `/signup`, `/signin`, `/auth/google/callback`, `/dashboard`, `/history`, `/account-settings`, `/about`, `/privacy`, `/terms`, `/cookies`, `/pricing`, `/api-key-policy`
+- Protected routes: `/dashboard`, `/history`, `/account-settings` — wrapped in `DashboardLayout` and `ProtectedRoute`
+- Key UI: `FormBuilder` (preview + revision), `FormFinalizeButton` (permission dialog + reconnect flow), `GoogleAuthCallback` (handles code exchange), `ProtectedRoute` (guards dashboard routes), `DashboardLayout` (shared layout for authenticated pages)
+- Components library: Custom `Button`, `Dialog` (using Radix UI), smooth scroll with Lenis
 - Security: DOMPurify is used to sanitize rendered strings from generated schemas; Formik + Yup enforce client validation; reCAPTCHA v2/3 supported via `react-google-recaptcha`.
+- Styling: TailwindCSS with `tailwindcss-animate`, custom utilities via `class-variance-authority` and `tailwind-merge`
 
 ## Backend notes
 
 - `verifyJWT` middleware accepts tokens from cookie or `Authorization` header.
-- `rateLimiter` guards auth endpoints.
+- Rate limiters: `authLimiter` (10/15min), `formGenerationLimiter` (20/hour), `apiLimiter` (100/15min).
 - `systemPrompt` enforces safe generation and branching rules; schemas are validated with Zod prior to Google API calls.
-- Google tokens are encrypted at rest; refresh attempted on finalize if expired.
+- Google tokens and Anthropic API keys are encrypted at rest with AES-256-CBC; refresh attempted on finalize if expired.
+- Trust proxy enabled for correct IP handling behind proxies.
+- ETag disabled to prevent 304 responses that can break auth checks.
+- Health endpoint at `/health` returns status and timestamp.
 
 ## Troubleshooting
 
@@ -242,6 +279,7 @@ npm run dev
 - `ENCRYPTION_KEY` must be exactly 32 characters; otherwise token encryption/decryption will fail.
 - Google branching: every radio/select option must include `goTo`; section titles referenced in `goTo` must exist and will be resolved to item IDs during patching.
 - Claude errors/timeouts: API calls use increased timeouts for generation/revision. Ensure `ANTHROPIC_API_KEY` and model name are correct.
+- API key format: User-provided Anthropic API keys must start with `sk-ant-`.
 
 ## Roadmap / ideas
 

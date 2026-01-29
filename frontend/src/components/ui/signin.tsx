@@ -162,12 +162,16 @@ const Signin = () => {
                 }}
               />
               <div className="flex justify-center">
-                <ReCAPTCHA
-                  sitekey={siteKey}
-                  onChange={(token: string | null) =>
-                    setFieldValue("recaptchaToken", token)
-                  }
-                />
+                {siteKey ? (
+                  <ReCAPTCHA
+                    sitekey={siteKey}
+                    onChange={(token: string | null) =>
+                      setFieldValue("recaptchaToken", token)
+                    }
+                  />
+                ) : (
+                  <p className="text-red-400 text-sm">reCAPTCHA not configured. Please set VITE_RECAPTCHA_SITE_KEY.</p>
+                )}
               </div>
               <Button
                 type="submit"

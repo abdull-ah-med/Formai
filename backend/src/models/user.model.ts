@@ -52,6 +52,7 @@ export interface IUser extends Document {
 	fullName: string;
 	email: string;
 	password?: string;
+	anthropicApiKey?: string;
 	chatHistory: { prompt: string; response: string; timestamp: Date }[];
 	formsCreated: Types.ObjectId[];
 	lastLogin?: Date;
@@ -164,8 +165,16 @@ const userSchema = new Schema<IUser>(
 				enum: ["free", "premium", "enterprise"],
 				default: "free",
 			},
-			stripeCustomerId: { type: String },
-			stripeSubscriptionId: { type: String },
+			stripeCustomerId: {
+				type: String,
+				set: (val: string) => (val ? encrypt(val) : undefined),
+				get: (val: string) => (val ? decrypt(val) : undefined),
+			},
+			stripeSubscriptionId: {
+				type: String,
+				set: (val: string) => (val ? encrypt(val) : undefined),
+				get: (val: string) => (val ? decrypt(val) : undefined),
+			},
 			priceId: { type: String },
 			status: {
 				type: String,
@@ -189,6 +198,11 @@ const userSchema = new Schema<IUser>(
 			},
 		},
 		googleId: { type: String, unique: true, sparse: true },
+		anthropicApiKey: {
+			type: String,
+			set: (val: string) => (val ? encrypt(val) : undefined),
+			get: (val: string) => (val ? decrypt(val) : undefined),
+		},
 		googleTokens: {
 			accessToken: {
 				type: String,

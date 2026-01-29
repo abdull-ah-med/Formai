@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "./button";
 import api, { deleteAccount } from "../../api";
 import GoogleSignInButton from "./GoogleSignInButton";
@@ -37,6 +38,7 @@ interface UserResponse {
                 createdAt: string;
                 googleId?: string;
                 hasPassword?: boolean;
+                hasApiKey?: boolean;
         };
 }
 
@@ -67,6 +69,13 @@ const AccountSettings: React.FC = () => {
 
         const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+        // API Key state
+        const [hasApiKey, setHasApiKey] = useState<boolean>(false);
+        const [apiKeyInput, setApiKeyInput] = useState("");
+        const [apiKeyError, setApiKeyError] = useState<string | null>(null);
+        const [apiKeySuccess, setApiKeySuccess] = useState<string | null>(null);
+        const [apiKeySaving, setApiKeySaving] = useState(false);
+
         const handleDeleteAccount = async () => {
                 setSaving(true); // Use saving state for delete operation
                 setError(null);
@@ -93,6 +102,7 @@ const AccountSettings: React.FC = () => {
                                 setSubscription(user.subscription || null);
                                 setGoogleLinked(Boolean(user.googleId));
                                 setHasPassword(user.hasPassword || false);
+                                setHasApiKey(user.hasApiKey || false);
                         } catch (err: any) {
                                 setError(err.response?.data?.message || err.message || "Failed to load account data");
                         } finally {
@@ -171,6 +181,52 @@ const AccountSettings: React.FC = () => {
                 }
         };
 
+        const handleSaveApiKey = async () => {
+                setApiKeyError(null);
+                setApiKeySuccess(null);
+
+                if (!apiKeyInput.trim()) {
+                        setApiKeyError("Please enter your API key.");
+                        return;
+                }
+
+                if (!apiKeyInput.startsWith("sk-ant-")) {
+                        setApiKeyError("Invalid API key format. Anthropic API keys start with 'sk-ant-'");
+                        return;
+                }
+
+                setApiKeySaving(true);
+                try {
+                        await api.post("/account/api-key", { apiKey: apiKeyInput });
+                        setApiKeySuccess("API key saved successfully!");
+                        setHasApiKey(true);
+                        setApiKeyInput("");
+                } catch (err: any) {
+                        setApiKeyError(err.response?.data?.message || "Failed to save API key");
+                } finally {
+                        setApiKeySaving(false);
+                }
+        };
+
+        const handleDeleteApiKey = async () => {
+                if (!window.confirm("Are you sure you want to delete your API key? You won't be able to generate forms until you add a new one.")) {
+                        return;
+                }
+
+                setApiKeyError(null);
+                setApiKeySuccess(null);
+                setApiKeySaving(true);
+                try {
+                        await api.delete("/account/api-key");
+                        setApiKeySuccess("API key deleted successfully.");
+                        setHasApiKey(false);
+                } catch (err: any) {
+                        setApiKeyError(err.response?.data?.message || "Failed to delete API key");
+                } finally {
+                        setApiKeySaving(false);
+                }
+        };
+
         if (loading) {
                 return <div className="min-h-screen flex items-center justify-center">Loading account…</div>;
         }
@@ -228,6 +284,102 @@ const AccountSettings: React.FC = () => {
                                                         </span>
                                                 )}
                                         </div>
+                                </div>
+
+                                {/* API Key Section */}
+                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                                        <h2 className="text-xl font-medium text-white mb-4">Anthropic API Key</h2>
+                                        <p className="text-gray-400 text-sm mb-4">
+                                                Formai uses your own Anthropic API key to generate forms with Claude AI.
+                                                Your API key is encrypted and stored securely.{" "}
+                                                <Link to="/api-key-policy" className="text-blue-400 hover:underline">
+                                                        Learn more about our API Key Policy
+                                                </Link>
+                                        </p>
+                                        
+                                        {hasApiKey ? (
+                                                <div className="space-y-4">
+                                                        <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                                                                <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                                                                <span className="text-green-400 text-sm">API key configured</span>
+                                                        </div>
+                                                        <p className="text-gray-400 text-sm">
+                                                                You can update your API key by entering a new one below, or delete it.
+                                                        </p>
+                                                        <div>
+                                                                <label className="block text-sm text-gray-400 mb-1">
+                                                                        New API Key (optional)
+                                                                </label>
+                                                                <input
+                                                                        type="password"
+                                                                        placeholder="sk-ant-..."
+                                                                        className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                                                                        value={apiKeyInput}
+                                                                        onChange={(e) => setApiKeyInput(e.target.value)}
+                                                                />
+                                                        </div>
+                                                        <div className="flex gap-3">
+                                                                <Button
+                                                                        className="bg-white text-black hover:bg-gray-200"
+                                                                        onClick={handleSaveApiKey}
+                                                                        disabled={apiKeySaving || !apiKeyInput.trim()}
+                                                                >
+                                                                        {apiKeySaving ? "Saving…" : "Update Key"}
+                                                                </Button>
+                                                                <Button
+                                                                        variant="destructive"
+                                                                        onClick={handleDeleteApiKey}
+                                                                        disabled={apiKeySaving}
+                                                                >
+                                                                        Delete Key
+                                                                </Button>
+                                                        </div>
+                                                </div>
+                                        ) : (
+                                                <div className="space-y-4">
+                                                        <div className="flex items-center gap-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                                                                <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                                                <span className="text-yellow-400 text-sm">No API key configured - you need to add one to generate forms</span>
+                                                        </div>
+                                                        <p className="text-gray-400 text-sm">
+                                                                Get your API key from{" "}
+                                                                <a 
+                                                                        href="https://console.anthropic.com/settings/keys" 
+                                                                        target="_blank" 
+                                                                        rel="noopener noreferrer"
+                                                                        className="text-blue-400 hover:underline"
+                                                                >
+                                                                        Anthropic Console
+                                                                </a>
+                                                        </p>
+                                                        <div>
+                                                                <label className="block text-sm text-gray-400 mb-1">
+                                                                        API Key
+                                                                </label>
+                                                                <input
+                                                                        type="password"
+                                                                        placeholder="sk-ant-..."
+                                                                        className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
+                                                                        value={apiKeyInput}
+                                                                        onChange={(e) => setApiKeyInput(e.target.value)}
+                                                                />
+                                                        </div>
+                                                        <Button
+                                                                className="bg-white text-black hover:bg-gray-200"
+                                                                onClick={handleSaveApiKey}
+                                                                disabled={apiKeySaving || !apiKeyInput.trim()}
+                                                        >
+                                                                {apiKeySaving ? "Saving…" : "Save API Key"}
+                                                        </Button>
+                                                </div>
+                                        )}
+                                        
+                                        {apiKeyError && (
+                                                <p className="text-red-500 text-sm mt-3">{apiKeyError}</p>
+                                        )}
+                                        {apiKeySuccess && (
+                                                <p className="text-green-400 text-sm mt-3">{apiKeySuccess}</p>
+                                        )}
                                 </div>
 
                                 {/* Subscription Section */}

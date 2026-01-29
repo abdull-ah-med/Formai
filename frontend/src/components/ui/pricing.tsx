@@ -224,7 +224,7 @@ const Pricing: React.FC = () => {
                                         WebkitOverflowScrolling: "touch",
                                 }}
                         >
-                                {tiers.map((tier, idx) => (
+                                {tiers.map((tier) => (
                                         <div
                                                 key={tier.name}
                                                 className={`relative flex-shrink-0 w-80 md:w-auto bg-white/5 border border-white/10 rounded-2xl shadow-lg p-8 flex flex-col items-center transition-transform duration-300 mx-2 ${tier.highlight

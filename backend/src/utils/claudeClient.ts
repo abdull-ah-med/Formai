@@ -1,10 +1,6 @@
 import axios from "axios";
-import dotenv from "dotenv";
 import { CLAUDE_SYSTEM_PROMPT } from "../config/systemPrompt";
 
-dotenv.config();
-
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
 
 // This interface should match the type expected in the system prompt
@@ -13,17 +9,11 @@ export interface FormField {
 	type: string;
 	required?: boolean;
 	scale?: number;
-	// Options can optionally include goToAction to enable conditional navigation
 	options?: Array<
 		| string
 		| {
 				label?: string;
 				text?: string;
-				/**
-				 * Navigation directive – REQUIRED for every option of radio/select.
-				 * "NEXT_SECTION" | "SUBMIT_FORM" for built-in actions, or the exact
-				 * Section.title to jump to for branching.
-				 */
 				goTo: "NEXT_SECTION" | "SUBMIT_FORM" | string;
 		  }
 	>;
@@ -42,9 +32,9 @@ export interface FormSchema {
 	sections?: FormSection[];
 }
 
-export async function generateSchemaFromPrompt(prompt: string): Promise<FormSchema> {
-	if (!ANTHROPIC_API_KEY) {
-		throw new Error("ANTHROPIC_API_KEY is not set in environment variables.");
+export async function generateSchemaFromPrompt(prompt: string, apiKey: string): Promise<FormSchema> {
+	if (!apiKey) {
+		throw new Error("Anthropic API key is required. Please add your API key in Account Settings.");
 	}
 	try {
 		const response = await axios.post(
@@ -57,7 +47,7 @@ export async function generateSchemaFromPrompt(prompt: string): Promise<FormSche
 			},
 			{
 				headers: {
-					"x-api-key": ANTHROPIC_API_KEY,
+					"x-api-key": apiKey,
 					"anthropic-version": "2023-06-01",
 					"content-type": "application/json",
 				},
@@ -89,9 +79,9 @@ export async function generateSchemaFromPrompt(prompt: string): Promise<FormSche
 	}
 }
 
-export async function reviseSchemaWithPrompt(previousSchema: FormSchema, revisionPrompt: string): Promise<FormSchema> {
-	if (!ANTHROPIC_API_KEY) {
-		throw new Error("ANTHROPIC_API_KEY is not set in environment variables.");
+export async function reviseSchemaWithPrompt(previousSchema: FormSchema, revisionPrompt: string, apiKey: string): Promise<FormSchema> {
+	if (!apiKey) {
+		throw new Error("Anthropic API key is required. Please add your API key in Account Settings.");
 	}
 	const prompt = `
 Here is the current form schema:
@@ -115,7 +105,7 @@ Please apply these changes and return the new, complete JSON schema. Maintain th
 			},
 			{
 				headers: {
-					"x-api-key": ANTHROPIC_API_KEY,
+					"x-api-key": apiKey,
 					"anthropic-version": "2023-06-01",
 					"content-type": "application/json",
 				},
